@@ -1,11 +1,17 @@
 import { z } from "zod";
 import { ActionType } from "./ActionTypeRegistry";
 
-// Helper for security consistency
+/**
+ * Isomorphic utility to extract file extension.
+ * Returns the extension without the dot (e.g., "txt" for "/foo/bar.txt").
+ */
+const getExt = (p: string) => p.slice((Math.max(0, p.lastIndexOf(".")) || Infinity) + 1);
+
+// Helper for security consistency - restricted to .txt and .md
 const isSafeExt = (path: string) => path.endsWith(".txt") || path.endsWith(".md");
 
 const Base = z.object({
-  schema_version: z.string().regex(/^1\.\d+\.\d+$/), 
+  schema_version: z.string().regex(/^1\.\d+\.\d+$/),
   id: z.string().uuid().default(() => crypto.randomUUID()),
   reasoning: z.string().min(1),
 });
@@ -29,23 +35,31 @@ export const AgentProposalSchema = z.discriminatedUnion("action", [
   Base.extend({
     action: z.literal(ActionType.WRITE_FILE),
     args: z.object({
-      path: z.string().startsWith("/sandbox/").refine(isSafeExt),
+      path: z.string().startsWith("/sandbox/").refine(isSafeExt, {
+        message: "WRITE_FILE is restricted to .txt and .md extensions"
+      }),
       content: z.string().min(1)
     }).strict()
   }),
 
   Base.extend({
     action: z.literal(ActionType.DELETE_FILE),
-    args: z.object({ 
-      path: z.string().startsWith("/sandbox/").refine(isSafeExt)
+    args: z.object({
+      path: z.string().startsWith("/sandbox/").refine(isSafeExt, {
+        message: "DELETE_FILE is restricted to .txt and .md extensions"
+      })
     }).strict()
   }),
 
   Base.extend({
     action: z.literal(ActionType.RENAME_FILE),
     args: z.object({
-      source: z.string().startsWith("/sandbox/"),
-      destination: z.string().startsWith("/sandbox/").refine(isSafeExt)
+      source: z.string().startsWith("/sandbox/").refine(isSafeExt, {
+        message: "RENAME_FILE source is restricted to .txt and .md"
+      }),
+      destination: z.string().startsWith("/sandbox/").refine(isSafeExt, {
+        message: "RENAME_FILE destination is restricted to .txt and .md"
+      })
     }).strict()
   }),
 
@@ -58,7 +72,7 @@ export const AgentProposalSchema = z.discriminatedUnion("action", [
 
   Base.extend({
     action: z.literal(ActionType.LIST_FILES),
-    args: z.object({ 
+    args: z.object({
       path: z.string().startsWith("/sandbox/")
     }).strict()
   }),

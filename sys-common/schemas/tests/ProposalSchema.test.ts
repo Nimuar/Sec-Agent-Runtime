@@ -6,7 +6,7 @@ const TEST_UUID = "00000000-0000-0000-0000-000000000000";
 
 describe("Agent Action Request Security & Validation", () => {
 
-    // Good Actions
+  // Good Actions
 
   // Valid read operation
   it("should accept a valid READ_FILE proposal", () => {
@@ -42,15 +42,15 @@ describe("Agent Action Request Security & Validation", () => {
   });
 
   // renaming valid extension
-  it("should accept renaming a file to an markdown (.md)", () => {
+  it("should accept renaming a file with extension parity (.md -> .md)", () => {
     const validProposal = {
       id: TEST_UUID,
       schema_version: "1.0.0",
-      reasoning: "Renaming safe file to executable",
+      reasoning: "Renaming documentation file",
       action: ActionType.RENAME_FILE,
       args: {
-        source: "/sandbox/notes.txt",
-        destination: "/sandbox/notes.md" 
+        source: "/sandbox/notes.md",
+        destination: "/sandbox/final_notes.md"
       }
     };
 
@@ -134,7 +134,7 @@ describe("Agent Action Request Security & Validation", () => {
       action: ActionType.RENAME_FILE,
       args: {
         source: "/sandbox/notes.txt",
-        destination: "/sandbox/virus.exe" 
+        destination: "/sandbox/virus.exe"
       }
     };
 
@@ -187,7 +187,7 @@ describe("Agent Action Request Security & Validation", () => {
     const result = AgentProposalSchema.safeParse(invalidProposal);
     expect(result.success).toBe(false);
   });
-  
+
   // Mismatched args
   it("should fail if args do not match the action", () => {
     const invalidProposal = {
@@ -195,9 +195,9 @@ describe("Agent Action Request Security & Validation", () => {
       schema_version: "1.0.0",
       reasoning: "Mixed up args",
       action: ActionType.READ_FILE,
-      args: { 
+      args: {
         // READ_FILE only takes 'path', but we provided 'content'
-        content: "This shouldn't be here" 
+        content: "This shouldn't be here"
       }
     };
 
@@ -263,5 +263,74 @@ describe("Agent Action Request Security & Validation", () => {
 
     const result = AgentProposalSchema.safeParse(invalidProposal);
     expect(result.success).toBe(false);
+  });
+
+  // --- Phase 3 Verification Suite Additions ---
+
+  // Strict Versioning
+  it("should reject major version mismatch (2.0.0)", () => {
+    const invalidProposal = {
+      id: TEST_UUID,
+      schema_version: "2.0.0",
+      reasoning: "Attempting to use future schema",
+      action: ActionType.READ_FILE,
+      args: { path: "/sandbox/test.txt" }
+    };
+    const result = AgentProposalSchema.safeParse(invalidProposal);
+    expect(result.success).toBe(false);
+  });
+
+  // RENAME_FILE Cross-Extension Test (Positive Case)
+  it("should accept RENAME_FILE with mismatching but safe extensions (.txt -> .md)", () => {
+    const validProposal = {
+      id: TEST_UUID,
+      schema_version: "1.0.0",
+      reasoning: "Changing file type during rename",
+      action: ActionType.RENAME_FILE,
+      args: {
+        source: "/sandbox/notes.txt",
+        destination: "/sandbox/notes.md"
+      }
+    };
+    const result = AgentProposalSchema.safeParse(validProposal);
+    expect(result.success).toBe(true);
+  });
+
+  // THINK strictness
+  it("should reject THINK with non-empty args", () => {
+    const invalidProposal = {
+      id: TEST_UUID,
+      schema_version: "1.0.0",
+      reasoning: "Thinking...",
+      action: ActionType.THINK,
+      args: { thought: "I should not be here" }
+    };
+    const result = AgentProposalSchema.safeParse(invalidProposal);
+    expect(result.success).toBe(false);
+  });
+
+  // FINISH strictness
+  it("should reject FINISH with old 'final_response' field", () => {
+    const invalidProposal = {
+      id: TEST_UUID,
+      schema_version: "1.0.0",
+      reasoning: "Finishing...",
+      action: ActionType.FINISH,
+      args: { final_response: "Done" }
+    };
+    const result = AgentProposalSchema.safeParse(invalidProposal);
+    expect(result.success).toBe(false);
+  });
+
+  it("should accept FINISH with 'response' field", () => {
+    const validProposal = {
+      id: TEST_UUID,
+      schema_version: "1.0.0",
+      reasoning: "Task complete",
+      action: ActionType.FINISH,
+      args: { response: "The result is 42" }
+    };
+    const result = AgentProposalSchema.safeParse(validProposal);
+    expect(result.success).toBe(true);
   });
 });
