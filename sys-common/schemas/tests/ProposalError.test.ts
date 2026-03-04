@@ -62,7 +62,6 @@ describe("Gate Schema Validation", () => {
             ErrorId: filter.ID_COLLISION,
             args: {
                 incoming: TEST_UUID,
-                backlog: TEST_UUID,
                 message: "ID matches with previously logged proposal ID"
             }
         };

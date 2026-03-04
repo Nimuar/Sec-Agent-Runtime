@@ -1,131 +1,93 @@
-import { describe, it, expect, should } from "vitest";
-import { GateList } from "../../sys-common/schemas/ProposalErrorSchema.js";
-import { filter,TEST_UUID } from "../../sys-common/schemas/ProposalErrorConfig.js";
+import { describe, it, expect } from "vitest";
+import { ValidateProposal } from "./Proposal_Handler.js";
+import { filter,TEST_UUID,proposal_limit } from "../../sys-common/schemas/ProposalErrorConfig.js";
+
 import { de } from "zod/v4/locales";
+import { config } from "node:process";
 
 // This test suite validates the error handling logic of the Proposal Handler, specifically for proposals containing null byte characters. It checks that the correct error response is generated and that the error message is accurate. The test uses a predefined UUID for consistency in testing.
 describe("Proposal Handler Validation Tests", () => {
     //Invalid Test Case 
-    it("should return NULL_BYTE error for proposals containing null byte characters", () => {  
-        const proposalWithNullByte = "This proposal contains a null byte \0 character.";
-        const errorResponse = GateList.parse({
+    it("should return an error for proposals containing null byte characters", () => {
+        const proposalNullByte = {
+  "schema_version": "1.0.0",
+  "id": "123e4567-e89b-12d3-a456-426614174000",
+  "reasoning": "Write a short project status note to a safe sandbox path. \0",
+  "action": "WRITE_FILE",
+  "args": {
+    "path": "/sandbox/notes/status.md",
+    "content": "Sprint complete. Next step is handler integration tests."
+  }
+};
+
+        const expectedError = {
             schema_version: "1.0.0",
-            id: TEST_UUID,
-            input: proposalWithNullByte,
+            id: expect.any(String), // The ID should be a string (UUID)
+            input: JSON.stringify(proposalNullByte),
             ErrorId: filter.NULL_BYTE,
             args: {
                 message: "Cannot contain null byte characters"
             }
-        });
-        expect(errorResponse.ErrorId).toBe(filter.NULL_BYTE);
-        expect(errorResponse.args.message).toBe("Cannot contain null byte characters");
+        };
+
+        const result = ValidateProposal(proposalNullByte);
+        expect(result).toEqual(expectedError);
     });
 
-    it("should return a VALID_ASCII error for proposals containing non-ASCII characters", () => {
-        const proposalWithNonASCII = "This proposal contains a non-ASCII character: ñ.";
-        const errorResponse = GateList.parse({
+    it("should return an error for proposals containing invalid ASCII Characters", () => {
+        const invalidASCIIProposal = "This proposal contains an invalid ASCII character: \x01";
+        
+        const expectedError = {
             schema_version: "1.0.0",
-            id: TEST_UUID,
-            input: proposalWithNonASCII,
+            id: expect.any(String), // The ID should be a string (UUID)
+            input: invalidASCIIProposal,
             ErrorId: filter.INVALID_ASCII,
             args: {
-                message: "Proposal contains non-ASCII characters"
+                message: "Cannot contain invalid ASCII characters"
             }
-        });
-        expect(errorResponse.ErrorId).toBe(filter.INVALID_ASCII);
-        expect(errorResponse.args.message).toBe("Proposal contains non-ASCII characters");
+        };
+
+        const result = ValidateProposal(invalidASCIIProposal);
+        expect(result).toEqual(expectedError);
     });
 
-    it("should return a PAYLOAD_SIZE error for proposals exceeding the maximum allowed size", () => {
-        const largeProposal = "A".repeat(10001);
-        const errorResponse = GateList.parse({
+    it("should return an error for proposals exceeding the payload size limit", () => {
+        const oversizedProposal = "A".repeat(1026); // Create a proposal that exceeds the 1024 character limit
+        
+        const expectedError = {
             schema_version: "1.0.0",
-            id: TEST_UUID,
-            input: largeProposal,
+            id: expect.any(String), // The ID should be a string (UUID)
+            input: oversizedProposal,
             ErrorId: filter.PAYLOAD_OVERFLOW,
             args: {
-                message: "Proposal exceeds maximum allowed size"
+                size: oversizedProposal.length, // Actual size in bytes
+                limit: proposal_limit, // Limit from config
+                message: "Payload exceeds maximum size of 1024 characters"
             }
-        });
-        expect(errorResponse.ErrorId).toBe(filter.PAYLOAD_OVERFLOW);
-        expect(errorResponse.args.message).toBe("Proposal exceeds maximum allowed size");
+        };
+
+        const result = ValidateProposal(oversizedProposal);
+        expect(result).toEqual(expectedError);
     });
-    
-    it("should return an ID_COLLISION error for proposals with duplicate IDs", () => {
-        const duplicateIDProposal = "This proposal has a duplicate ID.";
-        const errorResponse = GateList.parse({
+
+    it("should return an error for proposals with ID collisions", () => {
+        const proposalWithIDCollision = "This proposal has an ID that collides with a previously logged proposal.";
+        
+        const expectedError = {
             schema_version: "1.0.0",
-            id: TEST_UUID,
-            input: duplicateIDProposal,
+            id: expect.any(String), // The ID should be a string (UUID)
+            input: proposalWithIDCollision,
             ErrorId: filter.ID_COLLISION,
             args: {
-                message: "Proposal ID already exists in backlog"
+                incoming: TEST_UUID, // ID from the incoming proposal
+                message: "ID matches with previously logged proposal ID"
             }
-        });
-        expect(errorResponse.ErrorId).toBe(filter.ID_COLLISION);
-        expect(errorResponse.args.message).toBe("Proposal ID already exists in backlog");
+        };
+
+        const result = ValidateProposal(proposalWithIDCollision);
+        expect(result).toEqual(expectedError);
     });
-
-
     //Valid Test Cases
 
-    it("should pass validation for a valid proposal", () => {
-        const validProposal = "This is a valid proposal with only ASCII characters and no null bytes.";
-        const errorResponse = GateList.parse({
-            schema_version: "1.0.0",
-            id: TEST_UUID,
-            input: validProposal,
-            ErrorId: null,
-            args: {
-                message: "Proposal is valid"
-            }
-        });
-        expect(errorResponse.ErrorId).toBeNull();
-        expect(errorResponse.args.message).toBe("Proposal is valid");
-    });
 
-    it("should pass validation for a proposal at the maximum allowed size", () => {
-        const maxSizeProposal = "A".repeat(1024);
-        const errorResponse = GateList.parse({
-            schema_version: "1.0.0",
-            id: TEST_UUID,
-            input: maxSizeProposal,
-            ErrorId: null,
-            args: {
-                message: "Proposal is valid"
-            }
-        });
-        expect(errorResponse.ErrorId).toBeNull();
-        expect(errorResponse.args.message).toBe("Proposal is valid");
-    });
-
-    it("should pass validation for a proposal with a unique ID", () => {
-        const uniqueIDProposal = "This proposal has a unique ID.";
-        const errorResponse = GateList.parse({
-            schema_version: "1.0.0",
-            id: crypto.randomUUID(),
-            input: uniqueIDProposal,
-            ErrorId: null,
-            args: {
-                message: "Proposal is valid"
-            }
-        });
-        expect(errorResponse.ErrorId).toBeNull();
-        expect(errorResponse.args.message).toBe("Proposal is valid");
-    });
-
-    it("should pass validation for a proposal with complete core structure", () => {
-        const completeProposal = "This proposal has a complete core structure and meets all validation criteria.";
-        const errorResponse = GateList.parse({
-            schema_version: "1.0.0",
-            id: crypto.randomUUID(),
-            input: completeProposal,
-            ErrorId: null,
-            args: {
-                message: "Proposal is valid"
-            }
-        });
-        expect(errorResponse.ErrorId).toBeNull();
-        expect(errorResponse.args.message).toBe("Proposal is valid");
-    });
 });

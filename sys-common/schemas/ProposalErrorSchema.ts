@@ -32,7 +32,7 @@ export const GateList = z.discriminatedUnion("ErrorId", [
         ErrorId: z.literal(filter.PAYLOAD_OVERFLOW),
         args: z.object({
             size: z.number(), // Actual size in bytes
-            limit: z.number(), // Maximum allowed size
+            limit: z.number(), // Limit from config
             message: z.literal("Payload exceeds maximum size of 1024 characters")
         }).strict()
     }),
@@ -42,7 +42,6 @@ export const GateList = z.discriminatedUnion("ErrorId", [
         ErrorId: z.literal(filter.ID_COLLISION),
         args: z.object({
             incoming: z.string().uuid(), // ID from the incoming proposal
-            backlog: z.string().uuid(), // ID from backlog database. 
             message: z.literal("ID matches with previously logged proposal ID")
         }).strict()
     }),

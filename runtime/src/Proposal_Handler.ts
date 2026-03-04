@@ -104,8 +104,9 @@ database/logfile of logged proposal IDs.*/
 
 function ValidateIDCollision (proposal: string) {
     const backlogIDs: string[] = [config.TEST_UUID]; // This should be replaced with actual backlog data source
+    const proposal_data = JSON.parse(proposal).id;
+    if (backlogIDs.includes(proposal_data)) {
 
-    if (backlogIDs.includes(proposal)) {
         return { 
             schema_version: config.schema_version,
             id: crypto.randomUUID(),
@@ -113,7 +114,6 @@ function ValidateIDCollision (proposal: string) {
             ErrorId: config.filter.ID_COLLISION,
             args: {
                 incoming: proposal,
-                backlog: backlogIDs.find(id => id === proposal) || "",
                 message: "ID matches with previously logged proposal ID"
             }
         }
