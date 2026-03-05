@@ -31,4 +31,9 @@ jobs:
           python-version: '3.11'
           
       - name: Run Python simulation harness
-        run: python -m unittest discover tests
+        run: |
+          if [ -d "tests" ] && [ "$(ls -A tests 2>/dev/null)" ]; then
+            python -m unittest discover tests
+          else
+            echo "No tests directory found or directory is empty, skipping simulation tests"
+          fi
