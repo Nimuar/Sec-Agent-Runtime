@@ -141,3 +141,27 @@ dist
 # Vite logs files
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
+
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Python virtual environment
+venv/
+.venv/
+env/
+
+# Python test reports
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Python IDE settings
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Test output
+metrics.txt

@@ -6,7 +6,6 @@
     "build": "tsc",
     "preview": "tsc --watch",
     "test": "vitest run"
-
   },
   "repository": {
     "type": "git",
@@ -20,7 +19,7 @@
   },
   "homepage": "https://github.com/Collaborative-SWE-at-Purdue/Sec-Agent-Runtime#readme",
   "devDependencies": {
-    "@types/node": "^25.0.10",
+    "@types/node": "^25.3.3",
     "typescript": "^5.9.3",
     "vitest": "^4.0.18"
   },
