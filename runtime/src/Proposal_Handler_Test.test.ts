@@ -7,7 +7,8 @@ import { AgentProposal } from "../../sys-common/schemas/ProposalSchema.js";
 import * as fs from "fs";
 
 const TEST_UUID = "00000000-0000-0000-0000-000000000000";
-
+//Testing repo change\
+const test = "This is a test string to verify that the testing framework is working correctly.";
 // Clear ID log before and after each test to prevent cross-test ID collisions
 beforeEach(() => { fs.writeFileSync(config.ID_LOG_PATH, ""); });
 afterEach(() => { fs.writeFileSync(config.ID_LOG_PATH, ""); });
