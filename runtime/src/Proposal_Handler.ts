@@ -1,98 +1,103 @@
 import * as z from "zod";
 import * as config from "../../sys-common/schemas/ProposalErrorConfig.js";
-import { GateList } from "../../sys-common/schemas/ProposalErrorSchema.js";
-import {AgentProposalSchema} from "../../sys-common/schemas/ProposalSchema.js"
+import { GateError } from "../../sys-common/schemas/ProposalErrorSchema.js";
+import {AgentProposalSchema} from "../../sys-common/schemas/ProposalSchema.js";
 import * as fs from 'fs'; // Import the Node.js File System module
-
+import { objectProcessor } from "zod/v4/core/json-schema-processors.cjs";
 //Proposal Error handling logic for incoming proposals. As of now it simply defines the proposal type and logs it. 
 //This should be done in Typescript PascalCase for better readability and maintainability.
 
-//Eventually we want to return the error to the LLM, and Log it. FOr now it just returns it. 
-export function ValidateProposal(proposal: string) {
-    // Check for null byte characters
 
+//Eventually we want to return the error to the LLM, and Log it. FOr now it just returns it. 
+export function ValidateProposal(proposal: GateError ) {
+    // Check for null byte characters
+    
     const nullByteError = ValidateNullByte(proposal);
     if (nullByteError) {
-        //This is so sloppy please fix. 
-        let stringifiedError = JSON.stringify(nullByteError);
-        LogError(stringifiedError);
+        LogError(nullByteError); 
         return nullByteError;
     }
 
     // Check for valid ASCII characters
     const asciiError = ValidateASCII(proposal);
     if (asciiError) {
-        let stringifiedError = JSON.stringify(asciiError);
-        LogError(stringifiedError);
         return asciiError;
     }
 
     // Check for payload size
     const payloadError = validatePayloadSize(proposal);
     if (payloadError) {
-        let stringifiedError = JSON.stringify(payloadError);
-        LogError(stringifiedError);
         return payloadError;
     }
     
     // Check for ID Collision
     const idCollisionError = ValidateIDCollision(proposal);
     if (idCollisionError) {
-        let stringifiedError = JSON.stringify(idCollisionError);
-        LogError(stringifiedError);
         return idCollisionError;
     }
 
-    
+    LogID(proposal.id);
 };
     
     
     
-function ValidateNullByte(proposal: string) {  
-    if (proposal.includes("\0")) {
-        return { 
-            schema_version: config.schema_version,
-            id: crypto.randomUUID(),
-            input: proposal,
-            ErrorId: config.filter.NULL_BYTE,
-            args: {
-                message: "Cannot contain null byte characters"
-            }
-        };
-    }
- };
-    // Check for valid ASCII characters
-function ValidateASCII(proposal: string) {
-    if (!config.valid_ascii.test(proposal)) {
-        return { 
-            schema_version: config.schema_version,
-            id: crypto.randomUUID(),
-            input: proposal,
-            ErrorId: config.filter.INVALID_ASCII,
-            args: {
-                message: "Cannot contain invalid ASCII characters"
-            }
+function ValidateNullByte(proposal: GateError) {  
+
+    for(const value of Object.values(proposal)){
+        if (value.type == "string" &&value.includes("\0")) {
+            let error : GateError = { 
+                schema_version: config.schema_version,
+                id: crypto.randomUUID(),
+                input: proposal,
+                ErrorId: config.ProposalErrorCode.NULL_BYTE,
+                args: {
+                    message: "Cannot contain null byte characters"
+                }
+            };
+            return error;
         }
-        
+
     }
+   
+ };
+
+    // Check for valid ASCII characters
+function ValidateASCII(proposal: GateError) {
+    for(const value of Object.values(proposal)){
+        if (!config.valid_ascii.test(value)) {
+            let error : GateError = { 
+                schema_version: config.schema_version,
+                id: crypto.randomUUID(),
+                input: proposal,
+                ErrorId: config.ProposalErrorCode.INVALID_ASCII,
+                args: {
+                    message: "Cannot contain invalid ASCII characters"
+                }
+            };
+            return error;
+        }
+    }
+
 };
 // Check for payload size
-function validatePayloadSize(proposal: string) {
+function validatePayloadSize(proposal: GateError) {
     //Convert Proposal to bytes
-    const ProposalByteSize = (str:string) => new TextEncoder().encode(str).length;
+    const proposal_bytes = new TextEncoder().encode(JSON.stringify(proposal)).byteLength;
+
     //Check if proposal exceeds limit
-    if (ProposalByteSize(proposal) > config.proposal_limit ) {
-        return { 
+    if ((proposal_bytes) > config.proposal_limit ) {
+        let error : GateError = { 
             schema_version: config.schema_version,
             id: crypto.randomUUID(),
             input: proposal,
-            ErrorId: config.filter.PAYLOAD_OVERFLOW,
+            ErrorId: config.ProposalErrorCode.PAYLOAD_OVERFLOW,
             args: {
-                size: ProposalByteSize(proposal),
+                size: proposal_bytes,
                 limit: 1024,
                 message: "Payload exceeds maximum size of 1024 characters"
                 }
-        }
+        };
+        return error;
     }
 };
 
@@ -102,21 +107,29 @@ function validatePayloadSize(proposal: string) {
 but eventually this should be checking against a 
 database/logfile of logged proposal IDs.*/
 
-function ValidateIDCollision (proposal: string) {
-    const backlogIDs: string[] = [config.TEST_UUID]; // This should be replaced with actual backlog data source
-    const proposal_data = JSON.parse(proposal).id;
-    if (backlogIDs.includes(proposal_data)) {
+function ValidateIDCollision (proposal: GateError) {
+    // Load previously seen IDs from the ID log
+    let backlogIDs: string[] = [];
+    try {
+        const raw = fs.readFileSync(config.ID_LOG_PATH, 'utf8');
+        backlogIDs = raw.split('\n').map(line => line.trim()).filter(line => line.length > 0);
+    } catch (err) {
+        // Log file missing or unreadable — treat as empty backlog
+    }
 
-        return { 
+    const proposal_id = proposal.id;
+    if (backlogIDs.includes(proposal_id)) {
+        let error : GateError = {
             schema_version: config.schema_version,
             id: crypto.randomUUID(),
             input: proposal,
-            ErrorId: config.filter.ID_COLLISION,
+            ErrorId: config.ProposalErrorCode.ID_COLLISION,
             args: {
-                incoming: proposal,
+                incoming: proposal.id,
                 message: "ID matches with previously logged proposal ID"
             }
-        }
+        };
+        return error;
     }
 };
 
@@ -145,16 +158,17 @@ function ValidateCoreStructure(proposal:string) {
     //If there are 1 or more missing fields, return error response with list of missing fields.
     if (missing_fields.length > 0) {
         const missing_string = missing_fields.join(", ");
-        return { 
+        let error : GateError = {
             schema_version: config.schema_version,
             id: crypto.randomUUID(),
             input: proposal,
-            ErrorId: config.filter.MISSING_CONTENT,
+            ErrorId: config.ProposalErrorCode.MISSING_CONTENT,
             args: {
-                fields: missing_string,
+                field: missing_string,
                 message: "Required field is missing or empty"
             }
         }
+        return error;
 
     }
 
@@ -162,18 +176,16 @@ function ValidateCoreStructure(proposal:string) {
 
 
 //Logs the Error, no need for schema now.
-function LogError(error:string) {
+function LogError(error:GateError) {
     //Creates Timstamp for Log Entry and finds ErrorID
     const TimeStamp = new Date().toISOString();
-    const ErrorType = JSON.parse(error).id || "UNKNOWN_ERROR_ID";
-
     //Constructs Log Entry Object
     const LogEntry = {
         log_schema_version: config.log_schema_version,
         severity:config.LogSeverity.LOW,
         timestamp: TimeStamp,
         args: {
-             message: `Error ID: ${ErrorType} | Log found in: ${config.ERROR_LOG_PATH}`,
+             message: `Error ID: ${error.id} | Log found in: ${config.ERROR_LOG_PATH}`,
              error: error
         }
      };
@@ -188,3 +200,12 @@ function LogError(error:string) {
 }
 
 
+function LogID(proposal_id:string) {
+    
+    // No collision — record this ID so future proposals can be checked against it
+    try {
+        fs.appendFileSync(config.ID_LOG_PATH, proposal_id + '\n');
+    } catch (err) {
+        console.error("Failed to write to ID log:", err);
+    }
+}

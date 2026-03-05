@@ -1,15 +1,17 @@
 import { describe, it, expect } from "vitest";
 import { ValidateProposal } from "./Proposal_Handler.js";
-import { filter,TEST_UUID,proposal_limit } from "../../sys-common/schemas/ProposalErrorConfig.js";
-
+import { proposal_limit,ProposalErrorCode } from "../../sys-common/schemas/ProposalErrorConfig.js";
+import * as z from "zod";
 import { de } from "zod/v4/locales";
 import { config } from "node:process";
 
+
+const TEST_UUID = "00000000-0000-0000-0000-000000000000";
 // This test suite validates the error handling logic of the Proposal Handler, specifically for proposals containing null byte characters. It checks that the correct error response is generated and that the error message is accurate. The test uses a predefined UUID for consistency in testing.
 describe("Proposal Handler Validation Tests", () => {
     //Invalid Test Case 
     it("should return an error for proposals containing null byte characters", () => {
-        const proposalNullByte = {
+        const proposalNullByte = z.object({
   "schema_version": "1.0.0",
   "id": "123e4567-e89b-12d3-a456-426614174000",
   "reasoning": "Write a short project status note to a safe sandbox path. \0",
@@ -17,14 +19,15 @@ describe("Proposal Handler Validation Tests", () => {
   "args": {
     "path": "/sandbox/notes/status.md",
     "content": "Sprint complete. Next step is handler integration tests."
-  }
-};
+    }
+});
+
 
         const expectedError = {
             schema_version: "1.0.0",
             id: expect.any(String), // The ID should be a string (UUID)
-            input: JSON.stringify(proposalNullByte),
-            ErrorId: filter.NULL_BYTE,
+            input: proposalNullByte,
+            ErrorId: ProposalErrorCode.NULL_BYTE,
             args: {
                 message: "Cannot contain null byte characters"
             }
@@ -41,7 +44,7 @@ describe("Proposal Handler Validation Tests", () => {
             schema_version: "1.0.0",
             id: expect.any(String), // The ID should be a string (UUID)
             input: invalidASCIIProposal,
-            ErrorId: filter.INVALID_ASCII,
+            ErrorId: ProposalErrorCode.INVALID_ASCII,
             args: {
                 message: "Cannot contain invalid ASCII characters"
             }
@@ -58,7 +61,7 @@ describe("Proposal Handler Validation Tests", () => {
             schema_version: "1.0.0",
             id: expect.any(String), // The ID should be a string (UUID)
             input: oversizedProposal,
-            ErrorId: filter.PAYLOAD_OVERFLOW,
+            ErrorId: ProposalErrorCode.PAYLOAD_OVERFLOW,
             args: {
                 size: oversizedProposal.length, // Actual size in bytes
                 limit: proposal_limit, // Limit from config
@@ -77,7 +80,7 @@ describe("Proposal Handler Validation Tests", () => {
             schema_version: "1.0.0",
             id: expect.any(String), // The ID should be a string (UUID)
             input: proposalWithIDCollision,
-            ErrorId: filter.ID_COLLISION,
+            ErrorId: ProposalErrorCode.ID_COLLISION,
             args: {
                 incoming: TEST_UUID, // ID from the incoming proposal
                 message: "ID matches with previously logged proposal ID"

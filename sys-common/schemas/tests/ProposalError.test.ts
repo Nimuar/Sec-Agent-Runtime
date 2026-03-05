@@ -1,9 +1,8 @@
 import { describe, it, expect } from "vitest";
 import { GateList } from "../ProposalErrorSchema.js";
-import { ProposalErrorCode } from "../ProposalErrorConfig.js";
+import { ProposalErrorCode,TEST_UUID } from "../ProposalErrorConfig.js";
 
 // Test UUID 
-const TEST_UUID = "00000000-0000-0000-0000-000000000000";
 
 
 

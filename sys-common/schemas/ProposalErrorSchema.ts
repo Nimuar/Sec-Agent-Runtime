@@ -7,7 +7,7 @@ import { ProposalErrorCode } from "./ProposalErrorConfig.js"
 const Base = z.object({
     schema_version: z.string().regex(/^1\.\d+\.\d+$/),
     id: z.string().uuid().default(() => crypto.randomUUID()),
-    input: z.string().min(1), // Original proposal that failed validation
+    input: z.any(), // Original proposal that failed validation
 });
 
 export const GateList = z.discriminatedUnion("ErrorId", [
@@ -42,7 +42,6 @@ export const GateList = z.discriminatedUnion("ErrorId", [
         ErrorId: z.literal(ProposalErrorCode.ID_COLLISION),
         args: z.object({
             incoming: z.string().uuid(), // ID from the incoming proposal
-            backlog: z.string().uuid(), // ID from backlog database. 
             message: z.literal("ID matches with previously logged proposal ID")
         }).strict()
     }),
