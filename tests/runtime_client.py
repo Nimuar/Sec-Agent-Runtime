@@ -41,7 +41,7 @@ class RuntimeClient:
                 capture_output=True,
                 text=True,
                 cwd=self.cwd,
-                shell=True
+                shell=(os.name == 'nt')
             )
             
             # The stdout should be purely the JSON response
