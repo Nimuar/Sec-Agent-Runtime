@@ -1,7 +1,7 @@
 import { ActionType } from "./ActionTypeRegistry";
 
-// 2. The 3 possible execution outcomes
-export type RequestOutcome = "SUCCESS" | "DENIED" | "EXECUTION_ERROR";
+// 2. The 4 possible execution outcomes
+export type RequestOutcome = "SUCCESS" | "DENIED" | "EXECUTION_ERROR" | "VALIDATION_ERROR";
 
 // Read Operations
 export interface ReadFileArgs {
@@ -42,6 +42,7 @@ export interface FinishArgs {
 export interface ExecutionError {
     error_code: string; // e.g., "FILE_NOT_FOUND", "ACCESS_DENIED", "POLICY_VIOLATION"
     message: string;
+    details?: any;
 }
 
 export interface RuntimeResponse {

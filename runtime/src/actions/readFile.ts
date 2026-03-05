@@ -1,4 +1,5 @@
 import * as fs from 'fs/promises';
+import * as path from 'path';
 import { ExecutionPrimitive, ReadFileArgs, RuntimeResponse } from '../../../sys-common/schemas/ExecutionContracts';
 import { ActionType } from '../../../sys-common/schemas/ActionTypeRegistry';
 
@@ -20,7 +21,8 @@ export const readFile: ExecutionPrimitive<ReadFileArgs> = async (
             };
         }
 
-        const content = await fs.readFile(args.path, 'utf-8');
+        const physicalPath = path.join(process.cwd(), 'local_sandbox', args.path.slice('/sandbox/'.length));
+        const content = await fs.readFile(physicalPath, 'utf-8');
 
         return {
             proposal_id,

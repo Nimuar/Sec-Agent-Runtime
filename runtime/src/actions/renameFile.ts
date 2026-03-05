@@ -1,4 +1,5 @@
 import * as fs from 'fs/promises';
+import * as path from 'path';
 import { ExecutionPrimitive, RenameFileArgs, RuntimeResponse } from '../../../sys-common/schemas/ExecutionContracts';
 import { ActionType } from '../../../sys-common/schemas/ActionTypeRegistry';
 
@@ -37,7 +38,9 @@ export const renameFile: ExecutionPrimitive<RenameFileArgs> = async (
             };
         }
 
-        await fs.rename(args.source, args.destination);
+        const physicalSource = path.join(process.cwd(), 'local_sandbox', args.source.slice('/sandbox/'.length));
+        const physicalDestination = path.join(process.cwd(), 'local_sandbox', args.destination.slice('/sandbox/'.length));
+        await fs.rename(physicalSource, physicalDestination);
 
         return {
             proposal_id,

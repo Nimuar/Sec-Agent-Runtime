@@ -1,4 +1,5 @@
 import * as fs from 'fs/promises';
+import * as path from 'path';
 import { Dirent } from 'fs';
 import { ExecutionPrimitive, ListFilesArgs, RuntimeResponse } from '../../../sys-common/schemas/ExecutionContracts';
 import { ActionType } from '../../../sys-common/schemas/ActionTypeRegistry';
@@ -18,7 +19,8 @@ export const listFiles: ExecutionPrimitive<ListFilesArgs> = async (
             };
         }
 
-        const dirents = await fs.readdir(args.path, { withFileTypes: true });
+        const physicalPath = path.join(process.cwd(), 'local_sandbox', args.path.slice('/sandbox/'.length));
+        const dirents = await fs.readdir(physicalPath, { withFileTypes: true });
 
         if (dirents.length === 0) {
             return {

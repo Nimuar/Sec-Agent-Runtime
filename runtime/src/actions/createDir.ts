@@ -1,4 +1,5 @@
 import * as fs from 'fs/promises';
+import * as path from 'path';
 import { ExecutionPrimitive, CreateDirectoryArgs, RuntimeResponse } from '../../../sys-common/schemas/ExecutionContracts';
 import { ActionType } from '../../../sys-common/schemas/ActionTypeRegistry';
 
@@ -17,7 +18,8 @@ export const createDir: ExecutionPrimitive<CreateDirectoryArgs> = async (
             };
         }
 
-        await fs.mkdir(args.path, { recursive: true });
+        const physicalPath = path.join(process.cwd(), 'local_sandbox', args.path.slice('/sandbox/'.length));
+        await fs.mkdir(physicalPath, { recursive: true });
 
         return {
             proposal_id,
