@@ -1,0 +1,332 @@
+
+\documentclass[conference]{IEEEtran}
+\IEEEoverridecommandlockouts
+
+%% ==========================================
+%%   ECE 50874/59500 - FINAL REPORT TEMPLATE
+%%          TRACK: ENGINEERING
+%% ==========================================
+
+%% ==========================================
+%% 1. PACKAGES
+%% ==========================================
+\usepackage{amsmath,amssymb,amsfonts}
+\usepackage{algorithmic}
+\usepackage{graphicx}
+\usepackage{textcomp}
+\usepackage{xcolor}
+\usepackage{float}
+\usepackage{url}
+\usepackage[normalem]{ulem}
+\usepackage[style=ieee]{biblatex}
+\usepackage[colorlinks=true, urlcolor=blue, linkcolor=blue]{hyperref}
+\usepackage{enumitem}
+
+\addbibresource{references.bib}
+
+%% ==========================================
+%% 2. INSTRUCTION COMMAND
+%% ==========================================
+\newcommand{\instruction}[1]{%
+    \begin{list}{}{%
+        \leftmargin=10pt
+        \rightmargin=10pt
+        \topsep=0.5em
+    }
+    \item[]
+    \begingroup
+        \color{gray}\itshape
+        \small
+        
+        \textbf{Instructions:} #1
+    \endgroup
+    \end{list}
+}
+
+\begin{document}
+
+%% ==========================================
+%% 3. TITLE & AUTHORS
+%% ==========================================
+\title{Engineering Track - Final Project Title\\
+}
+
+% Authors
+\author{
+\IEEEauthorblockN{Ting-Chia Liu}
+\IEEEauthorblockA{\textit{ECE Department} \\
+\textit{Purdue University}\\
+San Jose, CA, USA \\
+liu4642@purdue.edu}
+\and
+\IEEEauthorblockN{Evan Behrendt}
+\IEEEauthorblockA{\textit{ECE Department} \\
+\textit{Purdue University}\\
+San Carlos, CA, USA \\
+behrende@purdue.edu}
+\and
+\IEEEauthorblockN{Kevin Rivera}
+\IEEEauthorblockA{\textit{ECE Department} \\
+\textit{Purdue University}\\
+Irvine, CA, USA \\
+river297@purdue.edu}
+}
+
+\maketitle
+
+%% ==========================================
+%% 4. BODY
+%% ==========================================
+
+\begin{abstract}
+\instruction{You must use a \textbf{STRUCTURED ABSTRACT}. Do not write a single block of text.
+Follow the specific headings (Context, Objective, Method, Results, Conclusion) defined in the guidelines:
+\begin{itemize}
+    \item Guidelines: \href{https://link.springer.com/journal/10664/submission-guidelines}{Springer Submission Guidelines}
+    \item Reference Example: \href{https://link.springer.com/article/10.1007/s10664-024-10521-0}{Example Article (Springer)}
+\end{itemize}}
+
+\begin{itemize}
+    \item \textbf{Context:} Modern software architectures are transitioning from human-in-the-middle processes to fully autonomous machine-in-the-middle workflows. This shift is driven by breakthroughs in Agentic Artificial Intelligence, granting Large Language Models (LLMs) the ability to invoke APIs and manipulate file systems. However, allowing non-deterministic models direct control over execution environments introduces critical security vulnerabilities.
+    \item \textbf{Objective:} Prior work has characterized the vulnerabilities of prompt injection and hallucination, but as yet we lack standardized architectures for deterministically constraining autonomous agents at the host environment level.
+    \item \textbf{Method}: We identified key architectural vulnerabilities in agent deployment and engineered a stateless, deterministic mediation layer based on a Positive Security Model. Physically isolating an untrusted Python agent SDK from a trusted Node.js execution runtime via a local HTTP interface, we statically enforce security constraints by validating JSON-formatted agent proposals against strict Zod schemas.
+    \item \textbf{Results}: TBD
+    \item \textbf{Conclusion}: TBD
+\end{itemize}
+\end{abstract}
+
+\begin{IEEEkeywords} 
+implementation, software engineering, system design
+\end{IEEEkeywords}
+
+\section{Introduction}
+\instruction{Follow this specific structure:
+\begin{itemize}
+    \item \textbf {\sout {{ Paragraph 1 (Context):} Broad context of the field}}
+    \item \textbf {\sout {{Paragraph 2 (State of Knowledge):} What is currently known/unknown}}
+    \item \textbf{\sout {{Paragraph 3 (Approach):} How you investigated this}}
+    \item \textbf{Paragraph 4 (Results):} Summary of key findings
+\end{itemize}}
+
+Modern software architectures are transitioning from human-in-the-middle processes to fully autonomous machine-in-the-middle workflows , driven by breakthroughs in Agentic Artificial Intelligence and Large Language Models (LLMs). As noted by Jin et al. \cite{jin2025llmsllmbasedagentssoftware} and Dong et al. \cite{dong2025surveycodegenerationllmbased}, LLMs are no longer limited to passive text generation; agents are increasingly integrated into production environments where they take intrusive actions such as invoking APIs, manipulating file systems, and managing system resources. While this promises to revolutionize software engineering, it introduces critical security risks where an external, non-deterministic model is granted direct control over execution environments.
+
+Current research addresses this gap by framing the agent not as a tool, but as a potential threat vector. Wen et al. \cite{wen2024adaptivedeploymentuntrustedllms} propose a framework that explicitly treats the LLM Agent as an untrusted component, demonstrating that safety cannot be assumed but must be enforced externally. Their work shows that "wrapping" untrusted models in a rigorous protocol allows for the restriction of agentic actions based on risk, significantly reducing the success rate of distributed threats. Despite this theoretical foundation, most practical deployments still rely on probabilistic guardrails rather than deterministic constraints. The primary unknown remains how to implement these protocols in a production-grade runtime that enforces strict allowlists and argument validation before the agent can successfully invoke a tool.
+
+To address this gap, this project implements a Security-Constrained Agent Runtime designed to deterministically mediate all interactions between an untrusted agent and the execution environment. The project adopts a positive security model called Allowlisting, which rejects all actions by default unless they adhere to a predefined JSON schema and semantic policy. The investigation focuses on defining a Proposal Schema to validate agent intent, enforcing file-system sandboxing, limiting operations to specific file types, and implementing methods to track and audit the agent's execution life-cycle. 
+
+To investigate and validate this deterministic mediation strategy, this project implements a stateless, local HTTP-based execution loop that physically isolates the non-deterministic LLM logic from the host system. The approach centers on treating the LLM as a completely untrusted Python client that must negotiate with a Node.js/TypeScript server. Rather than relying on dynamic, probabilistic guardrails, the project approaches the problem through static policy enforcement. By utilizing Zod to enforce strict JSON schemas on the ingress layer, the runtime structurally guarantees that all proposals are constrained to a designated set of allowed actions and directories before the underlying Node.js file system wrappers are ever invoked. This architecture ensures that every tool invocation is evaluated strictly on its semantic merit and recorded to an immutable audit log for post-hoc analysis.
+
+\section{Background and Related Work}
+
+\subsubsection{\textbf{Adaptive Deployment of Untrusted LLMs Reduces Distributed Threats:}}
+
+
+\textbf{Prospective Goals:} This system addresses a fundamental problem with untrusted LLMs that often fly under the radar. Rather than targeting models that attempt to bypass safety features with a single catastrophic attack, this framework addresses the "distributed threat setting," where no individual action provides overwhelming evidence of misalignment. Instead, it is the amalgamation of these actions that leads to failure \cite{wen2024adaptivedeploymentuntrustedllms}.
+
+The framework operates by using an adaptive macro-protocol that chooses among several different micro-protocols to apply, rather than just two. These micro-protocols are task-specific and use a simpler, more thoroughly tested trusted model to monitor and interact with the more capable but untrusted model. Ultimately, the macro-protocol retains the discretion to select which specific micro-protocol to implement for each task based on an evolving estimate of the untrusted model’s alignment over time. This system was also validated using the open-sourced APPS Backdoor Testbed for testing an validation.
+
+
+\textbf{Technology:}
+The \textbf{macro-model} operates as a high-level control mechanism that governs how untrusted LLM outputs are handled over time. Rather than directly executing model-generated actions, the macro-model maintains global oversight by selecting among multiple micro-model protocols based on an evolving assessment of the untrusted model’s behavior. This enables adaptive responses to gradual misalignment, particularly in distributed threat settings where no single action is sufficient to trigger intervention~\cite{wen2024adaptivedeploymentuntrustedllms}.
+
+
+The \textbf{micro-model} increases granularity by acting on a single input at a time. It uses a trusted model in conjunction with an untrusted model to produce it's output. There are multiple micro-models that the macro-model uses and each generates a different output (y). 
+Breaking the agent behavior into these smaller units makes individual interactions easier to inspect and test than analyzing a fully unconstrained agent as a whole. Previous work on agentic tool orchestration has shown that structuring agent behavior into well-defined protocols can make safety evaluation more manageable~\cite{chen2025agentguardsafetytoolorchestration}. However, this approach also adds design overhead, since each micro-model must be carefully defined and maintained to provide sufficient coverage.
+
+\textbf{Domain: }
+The research in the first paper focuses on defending against untrusted LLMs within a subdomain different from our project’s scope. It addresses the "distributed threat setting," where the Threat Model targets actions that might not be individually catastrophic—such as subtle backdoors—but could lead to massive failure as actions accumulate. \cite{wen2024adaptivedeploymentuntrustedllms}. This framework specifically employs an adaptive\textbf{ }macro-protocol model that updates its micro-model to find the most efficient course of action for long-term safety.In contrast, our project focuses on a deterministic\textbf{ }method of sanitization. We utilize explicit\textbf{ }whitelists, argument schemas, and tool-invocation policies to ensure that our system approves every type of action before it is allowed to pass. 
+
+
+\section{Problem Statement}
+
+Modern systems are increasingly shifting from human-in-the-loop interaction models to machine-in-the-middle execution models. This entails integrating LLM-based agents to programatically invoke tools, APIs, or system resources. Within this setting, model outputs are no longer simply advisory text; they are action-triggers for a live system. 
+
+This transition creates an engineering problem: LLM agents are externally sourced and inherently nondeterministic, yet they are increasingly given authority to initiate privileged operations. Existing integration patterns often conflate agent intent, authorization, and execution. Thus, the introduction of an agent into the control path consequently limits guarantees about policy enforcement, auditing channels, and the level of replay the system supports.
+
+This project addresses the problem through the design and implementation of a security-constrained agent runtime that treats LLMs as untrusted processes. All agent outputs intended to trigger actions are intercepted and evaluated within a deterministic runtime boundary. The runtime strictly enforces explicit security policies. Furthermore, it mediates all tool invocation independently of the agent's internal reasoning or reported intent.
+
+This project does not aim to improve the intelligence of the agent. Rather, the core objective of the project is to provide formal safety, control, and observability guarantees around agent-initiated actions. This is achieved in two ways.
+
+\begin{enumerate}[label=(\arabic*)]
+    \item Enforcing explicit, machine-verifiable policies on all proposed actions
+    \item Structuring execution in a way that enables systematic verification, auditing, and replay of agent behavior
+\end{enumerate}
+
+ \textbf{Engineering Goals}
+ \begin{itemize}
+    \item Enforce a deterministic trust boundary between agent outputs and system execution.
+    \item Bar agents from direct tool invocation.
+    \item Enable systematic auditing and post-hoc verification of agent behavior.
+ \end{itemize}
+ 
+  \textbf{Functional Requirements}
+ \begin{itemize}
+    \item The runtime shall intercept all agent outputs intended to trigger actions.
+    \item The runtime shall validate all proposed actions against explicit policy rules.
+    \item The runtime shall reject malformed or unauthorized proposals prior to execution.
+ \end{itemize}
+ 
+  \textbf{Non-Functional Requirements}
+ \begin{itemize}
+    \item Deterministic behavior for a fixed sequence of inputs
+    \item Clear separation between agent input (untrusted) and runtime state (trusted)
+    \item Replayable execution traces
+ \end{itemize}
+
+\begin{table}[t]
+\caption{Capability Comparison Between Prior Art and Proposed Runtime}
+\label{tab:gap-analysis}
+\centering
+\small
+\begin{tabular}{|l|c|c|c|c|}
+\hline
+\textbf{Capability} &
+\rotatebox{90}{\textbf{Direct}} &
+\rotatebox{90}{\textbf{Func. Call}} &
+\rotatebox{90}{\textbf{Orchestrator}} &
+\rotatebox{90}{\textbf{Proposed}} \\
+\hline
+Agent treated as untrusted & $\times$ & $\times$ & $\triangle$ & $\checkmark$ \\
+Deterministic enforcement & $\times$ & $\times$ & $\triangle$ & $\checkmark$ \\
+Explicit policy layer & $\times$ & $\triangle$ & $\triangle$ & $\checkmark$ \\
+Replayable execution & $\times$ & $\times$ & $\triangle$ & $\checkmark$ \\
+Intent--execution separation & $\times$ & $\times$ & $\triangle$ & $\checkmark$ \\
+\hline
+\end{tabular}
+\end{table}
+
+
+\section{System Design / Implementation}
+
+    The system implements a deterministic mediation approach designed to enforce a hard trust boundary between an untrusted Large Language Model (LLM) agent and the execution of host environment actions.  Unlike traditional frameworks where models directly invoke tool functions, our design inserts a Security-Constrained Runtime as a mandatory intermediary layer. The architecture is founded on a Positive Security Model (Allowlist), where all actions are denied by default unless they strictly adhere to a predefined JSON Proposal Schema. Currently in active development, the system functions as a high-assurance, synchronous orchestrator: it intercepts agent proposals over a local network boundary, validates them, physically executes approved actions within a contained sandbox, and returns deterministic results or structured errors.
+
+    To isolate the core research problem of constraining non-deterministic behavior, the system is designed with two strict architectural constraints:
+
+    \begin{itemize}
+        \item Stateless Execution: The runtime does not maintain complex session states, database transitions, or multi-client APIs. This stateless design eliminates attack vectors related to session hijacking or state corruption, ensuring each agent proposal is evaluated strictly on its own semantic merits.
+        \item Static Policy Enforcement: Rather than using a dynamic policy engine, security policies are statically hardcoded directly into the type-validation layer. Constraints, such as restricting all file operations strictly to a \texttt{/sandbox/} directory and limiting file modifications to \texttt{.txt} and \texttt{.md} extensions, are structurally guaranteed before the execution engine is ever invoked.
+    \end{itemize}
+
+    \begin{figure}[H]
+      \centering
+      \includegraphics[width=0.8\linewidth]{ArchitectureDiagram_2.0.png} 
+      \caption{System Architecture Overview.}
+      \label{fig:arch}
+    \end{figure}
+
+    The physical implementation integrates a Python environment with a deterministic TypeScript runtime via a local HTTP interface.
+
+    \begin{itemize}
+        \item \textbf{Untrusted Agent SDK (Python)}: The agent layer is implemented in Python. It is responsible for querying the LLM, prompting it to output intents matching our system's JSON schema, and transmitting these intents via HTTP POST requests to the runtime.
+        \item \textbf{Runtime-Agent Boundary (Node.js/Express)}: A lightweight local Express server acts as the physical ingress point. It catches fatal malformed payloads (e.g., broken JSON) and issues immediate HTTP 400 responses, preventing unhandled exceptions from crashing the runtime.
+        \item \textbf{Validation \& Static Policy Layer (Zod}): The TypeScript runtime utilizes Zod for rigorous schema validation before any execution occurs. The schema enforces strict semantic versioning; any mismatch in the MAJOR version (e.g., receiving 2.0.0 when 1.x.x is supported) results in an immediate hard failure and a structured error. To ensure complete auditability, every proposal must globally include a uuid for request traceability and a reasoning string (minimum length of one character) to expose the agent's internal logic.
+        \item \textbf{Explicit Action Allow-list}: The runtime employs a strict Positive Security Model, permitting only eight explicitly defined actions: \texttt{THINK}, \texttt{FINISH}, \texttt{READ\_FILE}, \texttt{WRITE\_FILE}, \texttt{DELETE\_FILE}, \texttt{RENAME\_FILE}, \texttt{LIST\_FILES}, and \texttt{CREATE\_DIRECTORY}. Arbitrary system commands (e.g., \texttt{run\_command} or \texttt{spawn\_process}) are intentionally omitted from the core schema, making direct host control structurally impossible.
+        \item \textbf{Action Execution Layer (Node.js)}: Validated proposals are routed through a synchronous while loop orchestrator to specific Node.js file system wrappers. These wrappers perform physical I/O operations with heavily constrained arguments. For example, all file paths must explicitly begin with \texttt{/sandbox/}. Furthermore, destructive or modifying actions (\texttt{WRITE\_FILE}, \texttt{DELETE\_FILE}, and the destination of \texttt{RENAME\_FILE}) are strictly limited to \texttt{.txt} and \texttt{.md} file extensions to prevent the alteration or deletion of system binaries.
+        \item \textbf{Immutable Audit Logging}: To support post-hoc evaluation, the runtime intercepts every executed step and appends a structured record to a local \texttt{.log} file. This log captures the original proposal, the validation decision, and the exact deterministic output, forming the dataset for subsequent adversarial robustness analysis.
+    \end{itemize}
+
+    \begin{figure}[H]
+      \centering
+      \includegraphics[width=0.8\linewidth]{Sequence_Diagram.png} 
+      \caption{System Architecture Overview.}
+      \label{fig:arch}
+    \end{figure}
+
+\section{Evaluation and Results}
+\instruction{How was the system tested or validated?
+\begin{itemize}
+    \item Describe your testing strategy (Unit tests, Integration tests, User studies).
+    \item Present performance metrics or validation results.
+    \item Demonstrate that the Engineering Goals were met.
+\end{itemize}}
+
+\subsection{Testing Strategy}
+
+We evaluate our system as a binary decision system that classifies each agent proposal as either \textit{allow} or \textit{deny}. For each test case, we define an expected decision based on our policy rules and compare it with the actual output of the system. These testing categories do not represent separate test cases, but rather different aspects of system behavior that we aim to verify. A single test case may be used to evaluate multiple aspects at the same time.
+
+\textbf{Unit Testing.}  
+We use unit tests to verify that the validation and policy rules are correctly enforced. We create test cases that intentionally break specific rules, such as malformed JSON, missing fields, unsupported actions, invalid file paths, and disallowed file extensions. These tests ensure that invalid inputs are correctly denied.
+
+\textbf{Integration Testing.}  
+We also perform integration testing to check the full execution flow from receiving a proposal to returning a decision. These tests confirm that valid requests are allowed and executed correctly, while invalid or malicious requests are rejected. In particular, we verify that all file operations are restricted to the \texttt{/sandbox/} directory.
+
+\textbf{Determinism Testing.}  
+To check determinism, we run the same input multiple times and verify that the system produces the same decision each time.
+
+\textbf{Audit Logging.}  
+We verify that each step is recorded in the audit log, including the input, validation result, and final decision. This allows us to trace and review system behavior.
+
+
+\subsection{Evaluation Metrics}
+
+We treat the system as a binary classification problem, where each input is either allowed or denied.
+
+We use the following metrics:
+
+\begin{itemize}
+    \item \textbf{Accuracy}: how many decisions are correct overall
+    \item \textbf{False Positive Rate}: invalid requests that are incorrectly allowed (most critical error)
+    \item \textbf{False Negative Rate}: valid requests that are incorrectly denied
+    \item \textbf{Precision, Recall, and F1-score}: for general evaluation
+\end{itemize}
+
+We focus mainly on reducing false positives, since allowing invalid actions would directly break the security guaranties of the system.
+
+
+\subsection{Results}
+
+From our tests, the system aims to correctly enforce the defined policies. Invalid inputs, such as malformed requests, unauthorized actions, or attempts to access files outside the sandbox, are consistently denied.
+
+Valid inputs will  follow all constraints correctly to be allowed. We also observe that the system behaves deterministically, as repeated executions with the same input produce the same results.
+
+In addition, the audit logs will contain all the necessary information for each step, making it possible to trace how each decision was made.
+
+Overall, our team will push a deliverable that satisfies our main goals of policy enforcement, deterministic behavior, and audit-ability. 
+
+\section{Analysis and Discussion}
+\instruction{Interpret the findings.
+\begin{itemize}
+    \item Discuss the constraints and trade-offs encountered during implementation.
+    \item Discuss limitations of the current solution.
+\end{itemize}}
+
+\section{Limitations}
+\instruction{Discuss potential issues or boundaries of your solution.
+\begin{itemize}
+    \item \textbf{Deep Analysis:} Apply Ousterhout's principle ``Always Measure One Level Deeper'' to explain behavior. Refer: \href{https://dl.acm.org/doi/10.1145/3213770}{Ousterhout's Paper}
+    \item \textbf{Construct Validity:} Discuss whether you are measuring what you intend to measure. Refer: \href{https://dl.acm.org/doi/10.1145/3530019.3530020}{Verdecchia et al. Analysis}
+    \item \textbf{Technical Constraints:} In what real-world scenarios does the solution fail?
+\end{itemize}}
+
+\section{Conclusion}
+\instruction{Summarize the achievements and suggest future work.}
+
+\section*{Acknowledgment}
+\instruction{Acknowledge any help or resources.}
+
+%% ==========================================
+%% 5. REFERENCES
+%% ==========================================
+% \bibliographystyle{IEEEtran}
+% \bibliography{refs} 
+
+
+\printbibliography
+
+%% ==========================================
+%% 6. APPENDICES (Process Reflection)
+%% ==========================================
+\appendices
+
+\section{Project Artifacts}
+\instruction{Link to the GitHub repo, datasets, or tools produced. Provide brief descriptions.}
+
+\section{Project Postmortem}
+
+\subsection{Process \& Outcomes Reflection}
+\instruction{Compare proposed vs. actual process and outcomes. What changed and why?}
+
+\subsection{Team Retrospective}
+\instruction{What went well? What went poorly? (Process-focused).}
+
+\end{document}
