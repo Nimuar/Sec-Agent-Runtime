@@ -8,8 +8,8 @@ import * as fs from "fs";
 
 const TEST_UUID = "00000000-0000-0000-0000-000000000000";
 // Clear ID log before and after each test to prevent cross-test ID collisions
-//beforeEach(() => { fs.writeFileSync(config.ID_LOG_PATH, ""); });
-//afterEach(() => { fs.writeFileSync(config.ID_LOG_PATH, ""); });
+beforeEach(() => { fs.writeFileSync(config.ID_LOG_PATH, ""); });
+afterEach(() => { fs.writeFileSync(config.ID_LOG_PATH, ""); });
 
 describe("Proposal Handler Validation Tests", () => {
 
@@ -133,7 +133,7 @@ describe("Proposal Handler Validation Tests", () => {
     describe("ValidateIDCollision", () => {
 
         it("should return ID_COLLISION error for proposals with a previously seen ID", () => {
-           // fs.writeFileSync(config.ID_LOG_PATH, TEST_UUID + "\n");
+            fs.writeFileSync(config.ID_LOG_PATH, TEST_UUID + "\n");
 
             const ProposalWithIDCollision: AgentProposal = {
                 schema_version: "1.0.0",

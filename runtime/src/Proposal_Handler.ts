@@ -2,6 +2,7 @@ import * as config from "../../sys-common/schemas/ProposalErrorConfig.js";
 import { GateError } from "../../sys-common/schemas/ProposalErrorSchema.js";
 import { AgentProposal } from "../../sys-common/schemas/ProposalSchema.js";
 import * as fs from 'fs';
+import { dirname } from 'path';
 //Proposal Error handling logic for incoming proposals. As of now it simply defines the proposal type and logs it.
 //This should be done in Typescript PascalCase for better readability and maintainability.
 
@@ -20,25 +21,29 @@ export function ValidateProposal(proposal: proposal_type ) {
     // Check for valid ASCII characters
     const asciiError = ValidateASCII(proposal);
     if (asciiError) {
+        LogError(asciiError);
         return asciiError;
     }
 
     // Check for payload size
     const payloadError = validatePayloadSize(proposal);
     if (payloadError) {
+        LogError(payloadError);
         return payloadError;
     }
-    
+
     // Check for ID Collision
     const idCollisionError = ValidateIDCollision(proposal);
     if (idCollisionError) {
+        LogError(idCollisionError);
         return idCollisionError;
     }
     const CoreStructure = ValidateCoreStructure(proposal);
     if (CoreStructure) {
+        LogError(CoreStructure);
         return CoreStructure;
     }
-   // LogID(proposal.id);
+    LogID(proposal.id);
 };
     
     
@@ -113,7 +118,7 @@ function ValidateIDCollision (proposal: proposal_type) {
     // Load previously seen IDs from the ID log
     let backlogIDs: string[] = [];
     try {
-        //const raw = fs.readFileSync(config.ID_LOG_PATH, 'utf8');
+        const raw = fs.readFileSync(config.ID_LOG_PATH, 'utf8');
         backlogIDs = raw.split('\n').map(line => line.trim()).filter(line => line.length > 0);
     } catch (err) {
         // Log file missing or unreadable — treat as empty backlog
@@ -193,6 +198,7 @@ function LogError(error:GateError) {
 
     //Append Log Entry to Log File
     try {
+        fs.mkdirSync(dirname(config.ERROR_LOG_PATH), { recursive: true });
         fs.appendFileSync(config.ERROR_LOG_PATH, JSON.stringify(LogEntry) + "\n");
     } catch (err) {
         console.error("Failed to log error:", err);
@@ -200,16 +206,13 @@ function LogError(error:GateError) {
 }
 
 
-// function LogID(proposal_id:string) {
-    
-//     // No collision — record this ID so future proposals can be checked against it
-//     try {
-//         if(!fs.existsSync(config.ID_LOG_PATH)) {
-//             fs.writeFileSync(config.ID_LOG_PATH, proposal_id + '\n');
-//         } else {
-//             fs.appendFileSync(config.ID_LOG_PATH, proposal_id + '\n');
-//         }
-//     } catch (err) {
-//         console.error("Failed to write to ID log:", err);
-//     }
-// }
+function LogID(proposal_id:string) {
+
+    // No collision — record this ID so future proposals can be checked against it
+    try {
+        fs.mkdirSync(dirname(config.ID_LOG_PATH), { recursive: true });
+        fs.appendFileSync(config.ID_LOG_PATH, proposal_id + '\n');
+    } catch (err) {
+        console.error("Failed to write to ID log:", err);
+    }
+}
