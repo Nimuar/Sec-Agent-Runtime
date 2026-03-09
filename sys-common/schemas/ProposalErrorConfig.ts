@@ -11,7 +11,6 @@ export const TEST_UUID = "00000000-0000-0000-0000-000000000000";
 
 
 export let ERROR_LOG_PATH = resolve(__dirname, "../../logs/proposals.error.log");
-export let ID_LOG_PATH = resolve(__dirname, "../../logs/proposals.id.log");
 //For testing purposes only.
 
 
