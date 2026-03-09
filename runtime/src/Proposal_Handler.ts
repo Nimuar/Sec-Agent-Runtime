@@ -11,7 +11,6 @@ type proposal_type = AgentProposal;
 //Eventually we want to return the error to the LLM, and Log it. FOr now it just returns it. 
 export function ValidateProposal(proposal: proposal_type ) {
     // Check for null byte characters
-    
     const nullByteError = ValidateNullByte(proposal);
     if (nullByteError) {
         LogError(nullByteError); 
@@ -183,6 +182,8 @@ function ValidateCoreStructure(proposal: proposal_type) {
 //Logs the Error, no need for schema now.
 function LogError(error:GateError) {
     //Creates Timstamp for Log Entry and finds ErrorID
+
+
     const TimeStamp = new Date().toISOString();
     //Constructs Log Entry Object
     const LogEntry = {

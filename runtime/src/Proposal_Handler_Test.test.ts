@@ -5,11 +5,12 @@ import * as config from "../../sys-common/schemas/ProposalErrorConfig.js";
 import { ActionType } from "../../sys-common/schemas/ActionTypeRegistry.js";
 import { AgentProposal } from "../../sys-common/schemas/ProposalSchema.js";
 import * as fs from "fs";
+import { dirname } from "path";
 
 const TEST_UUID = "00000000-0000-0000-0000-000000000000";
 // Clear ID log before and after each test to prevent cross-test ID collisions
-beforeEach(() => { fs.writeFileSync(config.ID_LOG_PATH, ""); });
-afterEach(() => { fs.writeFileSync(config.ID_LOG_PATH, ""); });
+beforeEach(() => { fs.mkdirSync(dirname(config.ID_LOG_PATH), { recursive: true }); fs.writeFileSync(config.ID_LOG_PATH, ""); });
+afterEach(() => { fs.mkdirSync(dirname(config.ID_LOG_PATH), { recursive: true }); fs.writeFileSync(config.ID_LOG_PATH, ""); });
 
 describe("Proposal Handler Validation Tests", () => {
 
