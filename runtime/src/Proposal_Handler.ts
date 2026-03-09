@@ -113,7 +113,7 @@ function ValidateIDCollision (proposal: proposal_type) {
     // Load previously seen IDs from the ID log
     let backlogIDs: string[] = [];
     try {
-        const raw = fs.readFileSync(config.ID_LOG_PATH, 'utf8');
+        //const raw = fs.readFileSync(config.ID_LOG_PATH, 'utf8');
         backlogIDs = raw.split('\n').map(line => line.trim()).filter(line => line.length > 0);
     } catch (err) {
         // Log file missing or unreadable — treat as empty backlog
@@ -200,16 +200,16 @@ function LogError(error:GateError) {
 }
 
 
-function LogID(proposal_id:string) {
+// function LogID(proposal_id:string) {
     
-    // No collision — record this ID so future proposals can be checked against it
-    try {
-        if(!fs.existsSync(config.ID_LOG_PATH)) {
-            fs.writeFileSync(config.ID_LOG_PATH, proposal_id + '\n');
-        } else {
-            fs.appendFileSync(config.ID_LOG_PATH, proposal_id + '\n');
-        }
-    } catch (err) {
-        console.error("Failed to write to ID log:", err);
-    }
-}
+//     // No collision — record this ID so future proposals can be checked against it
+//     try {
+//         if(!fs.existsSync(config.ID_LOG_PATH)) {
+//             fs.writeFileSync(config.ID_LOG_PATH, proposal_id + '\n');
+//         } else {
+//             fs.appendFileSync(config.ID_LOG_PATH, proposal_id + '\n');
+//         }
+//     } catch (err) {
+//         console.error("Failed to write to ID log:", err);
+//     }
+// }
