@@ -1,5 +1,5 @@
 import * as z from "zod";
-import { ProposalErrorCode } from "./ProposalErrorConfig.js"
+import { ProposalErrorCode } from "./ProposalErrorRegistry.js"
 
 
 
