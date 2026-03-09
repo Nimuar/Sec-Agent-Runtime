@@ -7,11 +7,9 @@ import { AgentProposal } from "../../sys-common/schemas/ProposalSchema.js";
 import * as fs from "fs";
 
 const TEST_UUID = "00000000-0000-0000-0000-000000000000";
-//Testing repo change\
-const test = "This is a test string to verify that the testing framework is working correctly.";
 // Clear ID log before and after each test to prevent cross-test ID collisions
-beforeEach(() => { fs.writeFileSync(config.ID_LOG_PATH, ""); });
-afterEach(() => { fs.writeFileSync(config.ID_LOG_PATH, ""); });
+//beforeEach(() => { fs.writeFileSync(config.ID_LOG_PATH, ""); });
+//afterEach(() => { fs.writeFileSync(config.ID_LOG_PATH, ""); });
 
 describe("Proposal Handler Validation Tests", () => {
 
@@ -19,9 +17,9 @@ describe("Proposal Handler Validation Tests", () => {
     describe("ValidateNullByte", () => {
 
         it("should return NULL_BYTE error for proposals containing null byte characters", () => {
-            const proposalNullByte: AgentProposal = {
+            const ProposalNullByte: AgentProposal = {
                 schema_version: "1.0.0",
-                id: "123e4567-e89b-12d3-a456-426614174000",
+                id: "00000000-0000-0000-0000-000000000001",
                 reasoning: "Write a short project status note. \0",
                 action: ActionType.WRITE_FILE,
                 args: {
@@ -30,27 +28,27 @@ describe("Proposal Handler Validation Tests", () => {
                 }
             };
 
-            const expectedError = {
+            const ExpectedError = {
                 schema_version: "1.0.0",
                 id: expect.any(String),
-                input: proposalNullByte,
+                input: ProposalNullByte,
                 ErrorId: ProposalErrorCode.NULL_BYTE,
                 args: { message: "Cannot contain null byte characters" }
             };
 
-            expect(ValidateProposal(proposalNullByte)).toEqual(expectedError);
+            expect(ValidateProposal(ProposalNullByte)).toEqual(ExpectedError);
         });
 
         it("should pass for proposals with no null bytes", () => {
-            const validProposal: AgentProposal = {
+            const ValidProposal: AgentProposal = {
                 schema_version: "1.0.0",
-                id: "123e4567-e89b-12d3-a456-426614174001",
+                id: "00000000-0000-0000-0000-000000000002",
                 reasoning: "A clean proposal with no null bytes.",
                 action: ActionType.THINK,
                 args: {}
             };
 
-            expect(ValidateProposal(validProposal)).toBeUndefined();
+            expect(ValidateProposal(ValidProposal)).toBeUndefined();
         });
     });
 
@@ -58,35 +56,35 @@ describe("Proposal Handler Validation Tests", () => {
     describe("ValidateASCII", () => {
 
         it("should return INVALID_ASCII error for proposals with non-ASCII characters", () => {
-            const invalidASCIIProposal: AgentProposal = {
+            const InvalidASCIIProposal: AgentProposal = {
                 schema_version: "1.0.0",
-                id: "223e4567-e89b-12d3-a456-426614174000",
+                id: "00000000-0000-0000-0000-000000000003",
                 reasoning: "Invalid character: \x01",
                 action: ActionType.THINK,
                 args: {}
             };
 
-            const expectedError = {
+            const ExpectedError = {
                 schema_version: "1.0.0",
                 id: expect.any(String),
-                input: invalidASCIIProposal,
+                input: InvalidASCIIProposal,
                 ErrorId: ProposalErrorCode.INVALID_ASCII,
                 args: { message: "Cannot contain invalid ASCII characters" }
             };
 
-            expect(ValidateProposal(invalidASCIIProposal)).toEqual(expectedError);
+            expect(ValidateProposal(InvalidASCIIProposal)).toEqual(ExpectedError);
         });
 
         it("should pass for proposals containing only valid ASCII characters", () => {
-            const validASCIIProposal: AgentProposal = {
+            const ValidASCIIProposal: AgentProposal = {
                 schema_version: "1.0.0",
-                id: "223e4567-e89b-12d3-a456-426614174001",
+                id: "00000000-0000-0000-0000-000000000004",
                 reasoning: "All valid ASCII characters here.",
                 action: ActionType.THINK,
                 args: {}
             };
 
-            expect(ValidateProposal(validASCIIProposal)).toBeUndefined();
+            expect(ValidateProposal(ValidASCIIProposal)).toBeUndefined();
         });
     });
 
@@ -94,40 +92,40 @@ describe("Proposal Handler Validation Tests", () => {
     describe("validatePayloadSize", () => {
 
         it("should return PAYLOAD_OVERFLOW error for proposals exceeding the size limit", () => {
-            const oversizedProposal: AgentProposal = {
+            const OversizedProposal: AgentProposal = {
                 schema_version: "1.0.0",
-                id: "323e4567-e89b-12d3-a456-426614174000",
+                id: "00000000-0000-0000-0000-000000000005",
                 reasoning: "A".repeat(1026),
                 action: ActionType.THINK,
                 args: {}
             };
-            const proposal_bytes = new TextEncoder().encode(JSON.stringify(oversizedProposal)).byteLength;
+            const ProposalBytes = new TextEncoder().encode(JSON.stringify(OversizedProposal)).byteLength;
 
-            const expectedError = {
+            const ExpectedError = {
                 schema_version: "1.0.0",
                 id: expect.any(String),
-                input: oversizedProposal,
+                input: OversizedProposal,
                 ErrorId: ProposalErrorCode.PAYLOAD_OVERFLOW,
                 args: {
-                    size: proposal_bytes,
+                    size: ProposalBytes,
                     limit: proposal_limit,
                     message: "Payload exceeds maximum size of 1024 characters"
                 }
             };
 
-            expect(ValidateProposal(oversizedProposal)).toEqual(expectedError);
+            expect(ValidateProposal(OversizedProposal)).toEqual(ExpectedError);
         });
 
         it("should pass for proposals within the size limit", () => {
-            const smallProposal: AgentProposal = {
+            const SmallProposal: AgentProposal = {
                 schema_version: "1.0.0",
-                id: "323e4567-e89b-12d3-a456-426614174001",
+                id: "00000000-0000-0000-0000-000000000006",
                 reasoning: "Short proposal.",
                 action: ActionType.THINK,
                 args: {}
             };
 
-            expect(ValidateProposal(smallProposal)).toBeUndefined();
+            expect(ValidateProposal(SmallProposal)).toBeUndefined();
         });
     });
 
@@ -135,9 +133,9 @@ describe("Proposal Handler Validation Tests", () => {
     describe("ValidateIDCollision", () => {
 
         it("should return ID_COLLISION error for proposals with a previously seen ID", () => {
-            fs.writeFileSync(config.ID_LOG_PATH, TEST_UUID + "\n");
+           // fs.writeFileSync(config.ID_LOG_PATH, TEST_UUID + "\n");
 
-            const proposalWithIDCollision: AgentProposal = {
+            const ProposalWithIDCollision: AgentProposal = {
                 schema_version: "1.0.0",
                 id: TEST_UUID,
                 reasoning: "This proposal has a colliding ID.",
@@ -145,10 +143,10 @@ describe("Proposal Handler Validation Tests", () => {
                 args: {}
             };
 
-            const expectedError = {
+            const ExpectedError = {
                 schema_version: "1.0.0",
                 id: expect.any(String),
-                input: proposalWithIDCollision,
+                input: ProposalWithIDCollision,
                 ErrorId: ProposalErrorCode.ID_COLLISION,
                 args: {
                     incoming: TEST_UUID,
@@ -156,19 +154,19 @@ describe("Proposal Handler Validation Tests", () => {
                 }
             };
 
-            expect(ValidateProposal(proposalWithIDCollision)).toEqual(expectedError);
+            expect(ValidateProposal(ProposalWithIDCollision)).toEqual(ExpectedError);
         });
 
         it("should pass for proposals with a unique ID not in the log", () => {
-            const uniqueIDProposal: AgentProposal = {
+            const UniqueIDProposal: AgentProposal = {
                 schema_version: "1.0.0",
-                id: "423e4567-e89b-12d3-a456-426614174001",
+                id: "00000000-0000-0000-0000-000000000008",
                 reasoning: "This proposal has a fresh unique ID.",
                 action: ActionType.THINK,
                 args: {}
             };
 
-            expect(ValidateProposal(uniqueIDProposal)).toBeUndefined();
+            expect(ValidateProposal(UniqueIDProposal)).toBeUndefined();
         });
     });
 
@@ -176,7 +174,7 @@ describe("Proposal Handler Validation Tests", () => {
     describe("ValidateCoreStructure", () => {
 
         it("should return MISSING_CONTENT error for proposals with an incorrect schema version", () => {
-            const wrongVersionProposal: AgentProposal = {
+            const WrongVersionProposal: AgentProposal = {
                 schema_version: "2.0.0",
                 id: "",
                 reasoning: "Wrong schema version.",
@@ -184,10 +182,10 @@ describe("Proposal Handler Validation Tests", () => {
                 args: {}
             };
 
-            const expectedError = {
+            const ExpectedError = {
                 schema_version: "1.0.0",
                 id: expect.any(String),
-                input: wrongVersionProposal,
+                input: WrongVersionProposal,
                 ErrorId: ProposalErrorCode.MISSING_CONTENT,
                 args: {
                     field: ["id","schema_version"].join(", "),
@@ -195,19 +193,19 @@ describe("Proposal Handler Validation Tests", () => {
                 }
             };
 
-            expect(ValidateProposal(wrongVersionProposal)).toEqual(expectedError);
+            expect(ValidateProposal(WrongVersionProposal)).toEqual(ExpectedError);
         });
 
         it("should pass for a fully valid proposal", () => {
-            const validProposal: AgentProposal = {
+            const ValidProposal: AgentProposal = {
                 schema_version: "1.0.0",
-                id: "523e4567-e89b-12d3-a456-426614174001",
+                id: "00000000-0000-0000-0000-000000000009",
                 reasoning: "This proposal is fully valid.",
                 action: ActionType.THINK,
                 args: {}
             };
 
-            expect(ValidateProposal(validProposal)).toBeUndefined();
+            expect(ValidateProposal(ValidProposal)).toBeUndefined();
         });
     });
 

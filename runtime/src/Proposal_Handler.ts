@@ -1,15 +1,9 @@
-import * as z from "zod";
 import * as config from "../../sys-common/schemas/ProposalErrorConfig.js";
-import { GateError, GateList } from "../../sys-common/schemas/ProposalErrorSchema.js";
-import { AgentProposal, AgentProposalSchema} from "../../sys-common/schemas/ProposalSchema.js";
-import * as fs from 'fs'; // Import the Node.js File System module
-import { objectProcessor } from "zod/v4/core/json-schema-processors.cjs";
-import { Agent } from "http";
-import { resolve } from "path/win32";
-//Proposal Error handling logic for incoming proposals. As of now it simply defines the proposal type and logs it. 
+import { GateError } from "../../sys-common/schemas/ProposalErrorSchema.js";
+import { AgentProposal } from "../../sys-common/schemas/ProposalSchema.js";
+import * as fs from 'fs';
+//Proposal Error handling logic for incoming proposals. As of now it simply defines the proposal type and logs it.
 //This should be done in Typescript PascalCase for better readability and maintainability.
-
-export let ID_LOG_PATH = resolve(__dirname, "../../logs/proposals.id.log");
 
 type proposal_type = AgentProposal;
 
@@ -119,7 +113,7 @@ function ValidateIDCollision (proposal: proposal_type) {
     // Load previously seen IDs from the ID log
     let backlogIDs: string[] = [];
     try {
-        const raw = fs.readFileSync(ID_LOG_PATH, 'utf8');
+        const raw = fs.readFileSync(config.ID_LOG_PATH, 'utf8');
         backlogIDs = raw.split('\n').map(line => line.trim()).filter(line => line.length > 0);
     } catch (err) {
         // Log file missing or unreadable — treat as empty backlog
@@ -210,10 +204,10 @@ function LogID(proposal_id:string) {
     
     // No collision — record this ID so future proposals can be checked against it
     try {
-        if(!fs.existsSync(ID_LOG_PATH)) {
-            fs.writeFileSync(ID_LOG_PATH, proposal_id + '\n');
+        if(!fs.existsSync(config.ID_LOG_PATH)) {
+            fs.writeFileSync(config.ID_LOG_PATH, proposal_id + '\n');
         } else {
-            fs.appendFileSync(ID_LOG_PATH, proposal_id + '\n');
+            fs.appendFileSync(config.ID_LOG_PATH, proposal_id + '\n');
         }
     } catch (err) {
         console.error("Failed to write to ID log:", err);
