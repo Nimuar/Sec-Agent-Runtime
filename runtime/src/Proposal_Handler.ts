@@ -1,4 +1,5 @@
 import * as config from "../../sys-common/schemas/ProposalErrorConfig.js";
+import { ProposalErrorCode } from "../../sys-common/schemas/ProposalErrorRegistry.js";
 import { GateError } from "../../sys-common/schemas/ProposalErrorSchema.js";
 import { AgentProposal } from "../../sys-common/schemas/ProposalSchema.js";
 import * as fs from 'fs';
@@ -55,7 +56,7 @@ function ValidateNullByte(proposal: proposal_type) {
                 schema_version: config.schema_version,
                 id: crypto.randomUUID(),
                 input: proposal,
-                ErrorId: config.ProposalErrorCode.NULL_BYTE,
+                ErrorId: ProposalErrorCode.NULL_BYTE,
                 args: {
                     message: "Cannot contain null byte characters"
                 }
@@ -75,7 +76,7 @@ function ValidateASCII(proposal: proposal_type) {
                 schema_version: config.schema_version,
                 id: crypto.randomUUID(),
                 input: proposal,
-                ErrorId: config.ProposalErrorCode.INVALID_ASCII,
+                ErrorId: ProposalErrorCode.INVALID_ASCII,
                 args: {
                     message: "Cannot contain invalid ASCII characters"
                 }
@@ -96,7 +97,7 @@ function validatePayloadSize(proposal: proposal_type) {
             schema_version: config.schema_version,
             id: crypto.randomUUID(),
             input: proposal,
-            ErrorId: config.ProposalErrorCode.PAYLOAD_OVERFLOW,
+            ErrorId: ProposalErrorCode.PAYLOAD_OVERFLOW,
             args: {
                 size: proposal_bytes,
                 limit: 1024,
@@ -129,7 +130,7 @@ function ValidateIDCollision (proposal: proposal_type) {
             schema_version: config.schema_version,
             id: crypto.randomUUID(),
             input: proposal,
-            ErrorId: config.ProposalErrorCode.ID_COLLISION,
+            ErrorId: ProposalErrorCode.ID_COLLISION,
             args: {
                 incoming: proposal.id,
                 message: "ID matches with previously logged proposal ID"
@@ -166,7 +167,7 @@ function ValidateCoreStructure(proposal: proposal_type) {
             schema_version: config.schema_version,
             id: crypto.randomUUID(),
             input: proposal,
-            ErrorId: config.ProposalErrorCode.MISSING_CONTENT,
+            ErrorId: ProposalErrorCode.MISSING_CONTENT,
             args: {
                 field: missing_string,
                 message: "Required field is missing or incorrectly formatted"

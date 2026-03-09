@@ -1,6 +1,7 @@
 import { describe, it, expect, beforeEach, afterEach } from "vitest";
 import { ValidateProposal } from "./Proposal_Handler.js";
-import { proposal_limit, ProposalErrorCode } from "../../sys-common/schemas/ProposalErrorConfig.js";
+import { proposal_limit } from "../../sys-common/schemas/ProposalErrorConfig.js";
+import {ProposalErrorCode} from "../../sys-common/schemas/ProposalErrorRegistry.js";
 import * as config from "../../sys-common/schemas/ProposalErrorConfig.js";
 import { ActionType } from "../../sys-common/schemas/ActionTypeRegistry.js";
 import { AgentProposal } from "../../sys-common/schemas/ProposalSchema.js";

@@ -15,16 +15,7 @@ export let ID_LOG_PATH = resolve(__dirname, "../../logs/proposals.id.log");
 
 
 
-export enum ProposalErrorCode {
- NULL_BYTE  = "NULL_BYTE",
- INVALID_ASCII = "INVALID ASCII",
- PAYLOAD_OVERFLOW = "PAYLOAD_OVERFLOW",
- ID_COLLISION = "ID_COLLISION",
- MISSING_CONTENT = "MISSING_CONTENT",
-//Currently not in use
- INVALID_CONTENT = "INVALID_CONTENT",
- VALIDATION_SUCCESS = "VALIDATION_SUCCESS"
-}//error response types
+
 
 export enum LogSeverity {
     LOW = "LOW",
