@@ -5,8 +5,6 @@ import { dispatchAction } from "../../runtime/src/actions/dispatcher.js";
 const app = express();
 app.use(express.json({ limit: '1024b' }));
 
-// In-memory tracking for stateless auditing/security
-const processedIds = new Set<string>();
 let globalStepIndex = 0;
 
 // JSON Parse & Limit Error Handler (Rule L87: "Invalid JSON format")
@@ -58,22 +56,6 @@ app.post("/execute", async (req: Request, res: Response) => {
     }
 
     const proposal = parsed.data;
-
-    // ID Collision Check (Statelessness Requirement)
-    if (processedIds.has(proposal.id)) {
-      const errorResponse = {
-        proposal_id: proposal.id,
-        action: proposal.action,
-        outcome: "VALIDATION_ERROR",
-        error: {
-          error_code: "ID_COLLISION",
-          message: `Proposal ID ${proposal.id} has already been processed.`
-        }
-      };
-      console.log(`[RECORD] Step ${stepIndex} ID collision: ${proposal.id}`);
-      return res.status(400).json(errorResponse);
-    }
-    processedIds.add(proposal.id);
 
     // Phase 6: AUTHORIZE (Sandbox Boundary Enforcement)
     // Note: Zod schema already enforces /sandbox/ prefix and extensions via refiners.

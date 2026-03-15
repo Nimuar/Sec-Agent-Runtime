@@ -117,28 +117,4 @@ describe("Agent Execution API", () => {
     expect(response.body.error.error_code).toBe("INVALID_JSON");
     expect(response.body.error.message).toContain("limit");
   });
-
-  it("should return 400 for duplicate proposal ID (ID Collision)", async () => {
-    const proposal = { ...validProposal, id: "550e8400-e29b-41d4-a716-446655440050" };
-    mockDispatchAction.mockResolvedValue({
-      proposal_id: proposal.id,
-      action: "THINK",
-      outcome: "SUCCESS",
-      result: null,
-      error: null
-    });
-
-    // First request
-    await request(app).post("/execute").send(proposal);
-    
-    // Second request with same ID
-    const response = await request(app)
-      .post("/execute")
-      .send(proposal);
-
-    expect(response.status).toBe(400);
-    expect(response.body.outcome).toBe("VALIDATION_ERROR");
-    expect(response.body.error.error_code).toBe("ID_COLLISION");
-    expect(mockDispatchAction).toHaveBeenCalledTimes(1); // Only called once
-  });
 });
