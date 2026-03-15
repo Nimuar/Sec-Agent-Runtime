@@ -1,15 +1,14 @@
-import { jest, describe, it, expect, beforeEach } from "@jest/globals";
+import { describe, it, expect, beforeEach, vi } from "vitest";
 import request from "supertest";
+import { app } from "../src/server.js";
+import { dispatchAction } from "../../runtime/src/actions/dispatcher.js";
 
-// We must mock the module BEFORE importing the app that depends on it.
-jest.unstable_mockModule("../../runtime/src/actions/dispatcher.js", () => ({
-  dispatchAction: jest.fn(),
+// Mock the dispatcher module
+vi.mock("../../runtime/src/actions/dispatcher.js", () => ({
+  dispatchAction: vi.fn(),
 }));
 
-// Dynamically import dependencies after mocking
-const { app } = await import("../src/server.js");
-const dispatcher = await import("../../runtime/src/actions/dispatcher.js");
-const { dispatchAction } = dispatcher as any;
+const mockDispatchAction = dispatchAction as any;
 
 describe("Agent Execution API", () => {
   const validProposal = {
@@ -21,11 +20,11 @@ describe("Agent Execution API", () => {
   };
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it("should return 200 SUCCESS for a valid proposal", async () => {
-    dispatchAction.mockResolvedValue({
+    mockDispatchAction.mockResolvedValue({
       proposal_id: validProposal.id,
       action: "THINK",
       outcome: "SUCCESS",
@@ -39,7 +38,7 @@ describe("Agent Execution API", () => {
 
     expect(response.status).toBe(200);
     expect(response.body.outcome).toBe("SUCCESS");
-    expect(dispatchAction).toHaveBeenCalledTimes(1);
+    expect(mockDispatchAction).toHaveBeenCalledTimes(1);
   });
 
   it("should return 400 VALIDATION_ERROR for malformed JSON", async () => {
@@ -49,11 +48,11 @@ describe("Agent Execution API", () => {
 
     expect(response.status).toBe(400);
     expect(response.body.outcome).toBe("VALIDATION_ERROR");
-    expect(dispatchAction).not.toHaveBeenCalled();
+    expect(mockDispatchAction).not.toHaveBeenCalled();
   });
 
   it("should return 200 and bubble up EXECUTION_ERROR from dispatcher", async () => {
-    dispatchAction.mockResolvedValue({
+    mockDispatchAction.mockResolvedValue({
       proposal_id: validProposal.id,
       action: "THINK",
       outcome: "EXECUTION_ERROR",
@@ -70,7 +69,7 @@ describe("Agent Execution API", () => {
   });
 
   it("should return 500 for unhandled server exceptions", async () => {
-    dispatchAction.mockRejectedValue(new Error("Database down"));
+    mockDispatchAction.mockRejectedValue(new Error("Database down"));
 
     const response = await request(app)
       .post("/execute")
