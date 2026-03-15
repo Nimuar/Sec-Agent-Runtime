@@ -73,7 +73,7 @@ describe("Agent Execution API", () => {
     expect(response.body.outcome).toBe("EXECUTION_ERROR");
   });
 
-  it("should return 500 for unhandled server exceptions", async () => {
+  it("should return 200 EXECUTION_ERROR for unhandled server exceptions", async () => {
     const proposal = { ...validProposal, id: "550e8400-e29b-41d4-a716-446655440020" };
     mockDispatchAction.mockRejectedValue(new Error("Database down"));
 
