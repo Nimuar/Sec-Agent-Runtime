@@ -20,6 +20,8 @@
   "homepage": "https://github.com/Collaborative-SWE-at-Purdue/Sec-Agent-Runtime#readme",
   "devDependencies": {
     "@types/node": "^25.3.3",
+    "@types/supertest": "^7.2.0",
+    "supertest": "^7.2.2",
     "typescript": "^5.9.3",
     "vitest": "^4.0.18"
   },
