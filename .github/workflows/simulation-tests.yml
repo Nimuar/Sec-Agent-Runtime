@@ -30,6 +30,9 @@ jobs:
         with:
           python-version: '3.11'
           
+      - name: Install Python dependencies
+        run: pip install requests
+          
       - name: Run Python simulation harness
         run: |
           if [ -d "tests" ] && [ "$(ls -A tests 2>/dev/null)" ]; then
