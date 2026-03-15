@@ -1,9 +1,9 @@
-import { describe, it, expect, should } from "vitest";
+import { describe, it, expect } from "vitest";
 import { GateList } from "../ProposalErrorSchema.js";
 import { ProposalErrorCode } from "../ProposalErrorRegistry.js";
+import { TEST_UUID } from "../ProposalErrorConfig.js";
 
 // Test UUID 
-const TEST_UUID = "00000000-0000-0000-0000-000000000000";
 
 
 
@@ -62,7 +62,6 @@ describe("Gate Schema Validation", () => {
             ErrorId: ProposalErrorCode.ID_COLLISION,
             args: {
                 incoming: TEST_UUID,
-                backlog: TEST_UUID,
                 message: "ID matches with previously logged proposal ID"
             }
         };
@@ -78,7 +77,7 @@ describe("Gate Schema Validation", () => {
             ErrorId: ProposalErrorCode.MISSING_CONTENT,
             args: {
                 field: "reasoning",
-                message: "Required field is missing or empty"
+                message: "Required field is missing or incorrectly formatted"
             }
         };
         const result = GateList.safeParse(validError);
