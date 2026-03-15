@@ -34,3 +34,15 @@ npm install -D typescript vitest @types/node
 ```bash
 npm install zod --save-prod
 ```
+
+## Python Dependencies (Agent SDK & Evaluation)
+*Libraries required to run the Python Agent SDK and testing tools.*
+
+- **[google-genai](https://pypi.org/project/google-genai/)**: The official Google GenAI SDK used to interact with Gemini models in the `AgentInterface`.
+- **[requests](https://pypi.org/project/requests/)**: Used by the Python SDK to send HTTP requests to the runtime API.
+- **[python-dotenv](https://pypi.org/project/python-dotenv/)**: Loads environment variables (like your `GOOGLE_API_KEY`) from a `.env` file.
+
+Installation Command:
+```bash
+pip install google-genai requests python-dotenv
+```

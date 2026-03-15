@@ -1,0 +1,85 @@
+#from anthropic import Anthropic
+from google import genai
+import requests
+import json
+import re
+import os
+import AgentConfig
+from dotenv import load_dotenv
+
+load_dotenv()
+
+_DIR = os.path.dirname(os.path.abspath(__file__))
+
+with open(os.path.join(_DIR,"prompts", "fuzz_prompt.txt"), "r") as _f:
+    FUZZ_PROMPT = _f.read()
+
+
+class AgentInterface: 
+    def __init__(
+        self,
+        api_key: str = None,
+        model: str = "gemini-3-flash-preview",
+        max_retries: int = 3
+    ):
+        self.api_key = os.getenv("GOOGLE_API_KEY")
+        
+        if not self.api_key:
+            raise ValueError("API key is required to initialize the AgentInterface.")
+        
+        self.model = model
+        self.max_retries = max_retries
+        self.client = genai.Client(api_key=self.api_key)
+        self.proposal_history = []
+        self.active = True
+    
+
+
+    #Send a Proposal to Agent returns a response.
+    def agentprompt(self, message: str) -> str:
+        #Confirm agent active (Should be if possible.)
+        if(not self.active):
+            return "Interface not active"
+        elif(len(self.proposal_history) > self.max_retries):
+            return "Maximum Retries for this session, please try again later."
+        else:
+            try:
+                # response = self.client.messages.create(max_tokens=1024,
+                #     model=self.model,
+                #     messages=[{"role": "user", "content": message}]
+                # )
+
+                response = self.client.models.generate_content(model=self.model, contents=(message + "\n"))
+                print("response: ", response)
+                text = response.text
+                parsed = json.loads(text)
+                self.proposal_history.append((message, parsed))
+                return parsed
+            except Exception as e:
+                print(f"Something went wrong: {e}")
+
+    #Checking for agent activity turns agent on or off.
+    def close(self):
+        self.active = False
+        print("Agent has closed - Deleting History")
+        self.proposal_history = []
+
+    def open(self):
+        print("Agent has opened")
+        self.active = True
+
+
+    #send request through TS server. Reurns Response as JSON. 
+    def reqhttp(self,response)-> dict: 
+        #Try to send data to url, return output. 
+        try:
+            response = requests.post(AgentConfig.ts_url,json = response,timeout=40)
+            print(f"status: {response.status_code}")
+            print(f"Request: {response.text}")
+            return response.json()
+
+        except Exception as e:
+            print(f"Error with process: {e}")
+
+
+        

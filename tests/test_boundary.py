@@ -18,7 +18,7 @@ class TestSimulationHarness(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         """Create a physical sandbox environment for the runtime to interact with."""
-        cls.sandbox_dir = os.path.abspath("./local_sandbox")
+        cls.sandbox_dir = os.path.abspath("./sandbox")
         os.makedirs(cls.sandbox_dir, exist_ok=True)
         
         # Create necessary mock files
