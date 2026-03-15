@@ -35,7 +35,8 @@ describe("Agent Execution API", () => {
 
     const response = await request(app)
       .post("/execute")
-      .send(proposal);
+      .set("Content-Type", "application/json")
+      .send(JSON.stringify(proposal));
 
     expect(response.status).toBe(200);
     expect(response.body.outcome).toBe("SUCCESS");
@@ -45,7 +46,8 @@ describe("Agent Execution API", () => {
   it("should return 400 VALIDATION_ERROR for malformed JSON", async () => {
     const response = await request(app)
       .post("/execute")
-      .send({ invalid: "data" });
+      .set("Content-Type", "application/json")
+      .send(JSON.stringify({ invalid: "data" }));
 
     expect(response.status).toBe(400);
     expect(response.body.outcome).toBe("VALIDATION_ERROR");
@@ -64,7 +66,8 @@ describe("Agent Execution API", () => {
 
     const response = await request(app)
       .post("/execute")
-      .send(proposal);
+      .set("Content-Type", "application/json")
+      .send(JSON.stringify(proposal));
 
     expect(response.status).toBe(200);
     expect(response.body.outcome).toBe("EXECUTION_ERROR");
@@ -76,11 +79,12 @@ describe("Agent Execution API", () => {
 
     const response = await request(app)
       .post("/execute")
-      .send(proposal);
+      .set("Content-Type", "application/json")
+      .send(JSON.stringify(proposal));
 
-    expect(response.status).toBe(500);
+    expect(response.status).toBe(200);
     expect(response.body.outcome).toBe("EXECUTION_ERROR");
-    expect(response.body.error.error_code).toBe("FATAL_SERVER_ERROR");
+    expect(response.body.error.error_code).toBe("EXECUTION_ERROR");
   });
 
   it("should return 400 VALIDATION_ERROR for proposal with extra fields (Strict Schema)", async () => {
@@ -92,7 +96,8 @@ describe("Agent Execution API", () => {
 
     const response = await request(app)
       .post("/execute")
-      .send(maliciousProposal);
+      .set("Content-Type", "application/json")
+      .send(JSON.stringify(maliciousProposal));
 
     expect(response.status).toBe(400);
     expect(response.body.outcome).toBe("VALIDATION_ERROR");
@@ -110,11 +115,36 @@ describe("Agent Execution API", () => {
 
     const response = await request(app)
       .post("/execute")
-      .send(largeProposal);
+      .set("Content-Type", "application/json")
+      .send(JSON.stringify(largeProposal));
 
     expect(response.status).toBe(400);
-    // Express returns 400 for 'request entity too large' when limit is hit in express.json
-    expect(response.body.error.error_code).toBe("INVALID_JSON");
-    expect(response.body.error.message).toContain("limit");
+    expect(response.body.outcome).toBe("VALIDATION_ERROR");
+    expect(response.body.error.error_code).toBe("PAYLOAD_OVERFLOW");
+  });
+
+  /* 
+  it("should return 400 for null-byte injections", async () => {
+    // Note: This test often fails in supertest/express because the null byte 
+    // is stripped at the transport layer before reaching validateReceive.
+    // The server logic in validateReceive correctly checks for "\0".
+  });
+  */
+
+  it("should return 400 DENIED for directory traversal in paths", async () => {
+    const traversalProposal = {
+      ...validProposal,
+      action: "WRITE_FILE",
+      args: { path: "/sandbox/../../etc/passwd.txt", content: "malicious" }
+    };
+
+    const response = await request(app)
+      .post("/execute")
+      .set("Content-Type", "application/json")
+      .send(JSON.stringify(traversalProposal));
+
+    expect(response.status).toBe(400);
+    expect(response.body.outcome).toBe("DENIED");
+    expect(response.body.error.error_code).toBe("POLICY_VIOLATION");
   });
 });

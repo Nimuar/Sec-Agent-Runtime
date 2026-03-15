@@ -46,8 +46,8 @@ export interface ExecutionError {
 }
 
 export interface RuntimeResponse {
-    proposal_id: string; // Guaranteed UUID
-    action: ActionType;
+    proposal_id: string | null; // UUID or null if validation fails early
+    action: ActionType | null;
     outcome: RequestOutcome;
     result: Record<string, any> | null;
     error: ExecutionError | null;

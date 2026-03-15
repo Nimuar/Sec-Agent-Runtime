@@ -1,16 +1,86 @@
 import express, { Request, Response, NextFunction } from "express";
 import { AgentProposalSchema } from "../../sys-common/schemas/ProposalSchema.js";
 import { dispatchAction } from "../../runtime/src/actions/dispatcher.js";
+import { 
+  validateReceive, 
+  authorizeProposal, 
+  applyDeterministicError, 
+  createStepContext, 
+  buildResponse,
+  ValidationError,
+  hydrateContextFromProposal,
+  recordStep
+} from "../../runtime/src/stepRuntime.js";
 
 const app = express();
-app.use(express.json({ limit: '1024b' }));
 
 let globalStepIndex = 0;
 
+
+app.post("/execute", express.raw({ type: 'application/json', limit: '1024b' }), async (req: Request, res: Response) => {
+  const stepIndex = globalStepIndex++;
+  const rawPayload = Buffer.isBuffer(req.body) ? req.body.toString("utf8") : "";
+
+  // Phase 1 (Receive): Initialize Context & Basic Security
+  const ctx = createStepContext(rawPayload, stepIndex);
+
+  try {
+    // Phase 1 (Receive) Continued: Security Barriers
+    validateReceive(rawPayload);
+
+    // Phase 2 (Validate): JSON & Schema
+    const parsedJson = JSON.parse(rawPayload);
+    const parsed = AgentProposalSchema.safeParse(parsedJson);
+
+    if (!parsed.success) {
+      throw new ValidationError("VALIDATE_ARGS", "INVALID_CONTENT", parsed.error.issues[0]?.message ?? "Invalid proposal format");
+    }
+
+    const proposal = parsed.data;
+    hydrateContextFromProposal(ctx, proposal);
+
+    // Phase 3 (Authorize): Sandbox Boundary
+    authorizeProposal(proposal);
+    console.log(`[AUTHORIZE] Step ${stepIndex} authorized for ${proposal.action}`);
+
+    // Phase 4 (Execute): Action Dispatch
+    const response = await dispatchAction(proposal.id, proposal.action as any, proposal.args);
+    
+    // Phase 8: RECORD (Update Context)
+    ctx.outcome = response.outcome;
+    ctx.result = response.result;
+    ctx.error_code = response.error?.error_code ?? null;
+    ctx.error_message = response.error?.message ?? null;
+
+    // Phase 8: RECORD (Audit Log)
+    recordStep(ctx);
+    console.log(`[RECORD] Step ${stepIndex} executed: ${proposal.action} -> ${ctx.outcome}`);
+
+    // Phase 9: RESPOND
+    return res.status(200).json(buildResponse(ctx));
+
+  } catch (err) {
+    // Error Mapping (Rule 4 Enforcement)
+    applyDeterministicError(ctx, err);
+    recordStep(ctx);
+    console.log(`[RECORD] Step ${stepIndex} error: ${ctx.error_message}`);
+
+    const response = buildResponse(ctx);
+    const statusCode = (ctx.outcome === "VALIDATION_ERROR" || ctx.outcome === "DENIED") ? 400 : 500;
+
+    // Return 200 for cleanly handled EXECUTION_ERRORs (as per constraint)
+    if (ctx.outcome === "EXECUTION_ERROR" && ctx.phase_failed_at === "EXECUTE") {
+        return res.status(200).json(response);
+    }
+
+    return res.status(statusCode).json(response);
+  }
+});
+
 // JSON Parse & Limit Error Handler (Rule L87: "Invalid JSON format")
-app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
+app.use((err: any, req: Request, res: Response, next: NextFunction) => {
   const isParseError = err instanceof SyntaxError && "body" in err;
-  const isLimitError = (err as any).type === 'entity.too.large';
+  const isLimitError = err.type === 'entity.too.large';
 
   if (isParseError || isLimitError) {
     return res.status(400).json({
@@ -18,74 +88,12 @@ app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
       action: null,
       outcome: "VALIDATION_ERROR",
       error: {
-        error_code: "INVALID_JSON",
+        error_code: isLimitError ? "PAYLOAD_OVERFLOW" : "INVALID_JSON",
         message: isLimitError ? "Payload exceeds 1024-byte limit" : "Invalid JSON format"
       }
     });
   }
   next(err);
-});
-
-app.post("/execute", async (req: Request, res: Response) => {
-  const receivedAt = new Date().toISOString();
-  const stepIndex = globalStepIndex++;
-  
-  // Phase 1: RECEIVE
-  const stepContext = {
-    step_index: stepIndex,
-    received_at: receivedAt,
-    raw_payload: JSON.stringify(req.body)
-  };
-
-  try {
-    // Phase 3 & 4 & 5: VALIDATE
-    const parsed = AgentProposalSchema.safeParse(req.body);
-    if (!parsed.success) {
-      const errorResponse = {
-        proposal_id: (req.body as any)?.id || null,
-        action: (req.body as any)?.action || null,
-        outcome: "VALIDATION_ERROR",
-        error: {
-          error_code: "INVALID_CONTENT",
-          message: parsed.error.issues[0]?.message ?? "Invalid proposal format"
-        }
-      };
-      // Phase 8: RECORD (Failure)
-      console.log(`[RECORD] Step ${stepIndex} failed validation: ${errorResponse.error.message}`);
-      return res.status(400).json(errorResponse);
-    }
-
-    const proposal = parsed.data;
-
-    // Phase 6: AUTHORIZE (Sandbox Boundary Enforcement)
-    // Note: Zod schema already enforces /sandbox/ prefix and extensions via refiners.
-    // Here we perform final canonicalization/verification if needed.
-    console.log(`[AUTHORIZE] Step ${stepIndex} authorized for ${proposal.action}`);
-
-    // Phase 7: EXECUTE
-    const executionResult = await dispatchAction(proposal.id, proposal.action as any, proposal.args);
-
-    // Phase 8: RECORD (Success)
-    console.log(`[RECORD] Step ${stepIndex} executed: ${proposal.action} -> ${executionResult.outcome}`);
-
-    // Phase 9: RESPOND
-    return res.status(200).json(executionResult);
-
-  } catch (err) {
-    // Fatal Exception Interception (Rule 4)
-    const fatalResponse = {
-      proposal_id: (req.body as any)?.id || null,
-      action: (req.body as any)?.action || null,
-      outcome: "EXECUTION_ERROR",
-      result: null,
-      error: {
-        error_code: "FATAL_SERVER_ERROR",
-        message: err instanceof Error ? err.message : "Internal Server Error"
-      }
-    };
-    console.log(`[RECORD] Step ${stepIndex} fatal error: ${fatalResponse.error.message}`);
-    return res.status(500).json(fatalResponse);
-  }
 });
 
 const PORT = 3000;

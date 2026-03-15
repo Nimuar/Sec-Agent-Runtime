@@ -18,7 +18,7 @@ import { dispatchAction } from "./actions/dispatcher.js";
  *    -> AUTHORIZE -> EXECUTE -> RECORD -> RESPOND
  */
 
-type Phase =
+export type Phase =
   | "RECEIVE"
   | "PARSE"
   | "VALIDATE_SCHEMA"
@@ -29,7 +29,7 @@ type Phase =
   | "RECORD"
   | "RESPOND";
 
-type StepContext = {
+export type StepContext = {
   step_index: number;
   raw_payload: string;
   received_at: string;
@@ -69,7 +69,7 @@ const TopLevelProposalSchema = z
   })
   .strict();
 
-class ValidationError extends Error {
+export class ValidationError extends Error {
   readonly phase: Phase;
   readonly code: string;
 
@@ -81,7 +81,7 @@ class ValidationError extends Error {
   }
 }
 
-class PolicyError extends Error {
+export class PolicyError extends Error {
   readonly phase: Phase;
   readonly code: string;
 
@@ -93,7 +93,7 @@ class PolicyError extends Error {
   }
 }
 
-function createStepContext(rawPayload: string, stepIndex: number): StepContext {
+export function createStepContext(rawPayload: string, stepIndex: number): StepContext {
   return {
     step_index: stepIndex,
     raw_payload: rawPayload,
@@ -114,7 +114,7 @@ function createStepContext(rawPayload: string, stepIndex: number): StepContext {
   };
 }
 
-function validateReceive(rawPayload: string): void {
+export function validateReceive(rawPayload: string): void {
   if (rawPayload.trim().length === 0) {
     throw new ValidationError(
       "RECEIVE",
@@ -224,7 +224,7 @@ function normalizeSandboxPath(p: string): string {
   return normalized;
 }
 
-function authorizeProposal(proposal: AgentProposal): void {
+export function authorizeProposal(proposal: AgentProposal): void {
   switch (proposal.action) {
     case ActionType.THINK:
     case ActionType.FINISH:
@@ -250,7 +250,7 @@ function authorizeProposal(proposal: AgentProposal): void {
   }
 }
 
-function hydrateContextFromProposal(
+export function hydrateContextFromProposal(
   ctx: StepContext,
   proposal: AgentProposal
 ): void {
@@ -261,7 +261,7 @@ function hydrateContextFromProposal(
   ctx.args = proposal.args as Record<string, unknown>;
 }
 
-function applyDeterministicError(ctx: StepContext, err: unknown): void {
+export function applyDeterministicError(ctx: StepContext, err: unknown): void {
   if (err instanceof ValidationError) {
     ctx.phase_failed_at = err.phase;
     ctx.outcome = "VALIDATION_ERROR";
@@ -280,6 +280,15 @@ function applyDeterministicError(ctx: StepContext, err: unknown): void {
     return;
   }
 
+  if (err instanceof SyntaxError) {
+    ctx.phase_failed_at = "PARSE";
+    ctx.outcome = "VALIDATION_ERROR";
+    ctx.error_code = "INVALID_JSON";
+    ctx.error_message = "Invalid JSON format";
+    ctx.result = null;
+    return;
+  }
+
   ctx.phase_failed_at = "EXECUTE";
   ctx.outcome = "EXECUTION_ERROR";
   ctx.error_code = "EXECUTION_ERROR";
@@ -287,7 +296,7 @@ function applyDeterministicError(ctx: StepContext, err: unknown): void {
   ctx.result = null;
 }
 
-function recordStep(ctx: StepContext): void {
+export function recordStep(ctx: StepContext): void {
   ctx.completed_at = new Date().toISOString();
 
   const traceRecord = {
@@ -308,7 +317,7 @@ function recordStep(ctx: StepContext): void {
   console.log("[TRACE]", JSON.stringify(traceRecord, null, 2));
 }
 
-function buildResponse(ctx: StepContext): RuntimeResponse {
+export function buildResponse(ctx: StepContext): RuntimeResponse {
   return {
     proposal_id: ctx.proposal_id,
     action: ctx.action,
@@ -394,35 +403,4 @@ export async function processStep(
   return buildResponse(ctx);
 }
 
-/**
- * Runtime loop:
- * repeatedly fetch proposals, process each step,
- * and stop on FINISH or maxSteps or no more proposals.
- */
-export async function runRuntime(
-  fetchNextProposal: () => Promise<string | null>,
-  maxSteps = 25
-): Promise<RuntimeResponse[]> {
-  const responses: RuntimeResponse[] = [];
-  let stepIndex = 0;
-  let terminated = false;
-
-  while (!terminated && stepIndex < maxSteps) {
-    const rawPayload = await fetchNextProposal();
-
-    if (rawPayload === null) {
-      break;
-    }
-
-    stepIndex += 1;
-
-    const response = await processStep(rawPayload, stepIndex);
-    responses.push(response);
-
-    if (response.action === ActionType.FINISH && response.outcome === "SUCCESS") {
-      terminated = true;
-    }
-  }
-
-  return responses;
-}
+// runRuntime loop removed as per plan to integrate into Express microservice.
