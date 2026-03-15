@@ -1,4 +1,5 @@
 import * as fs from 'fs/promises';
+import * as path from 'path';
 import { ExecutionPrimitive, DeleteFileArgs, RuntimeResponse } from '../../../sys-common/schemas/ExecutionContracts';
 import { ActionType } from '../../../sys-common/schemas/ActionTypeRegistry';
 
@@ -27,7 +28,8 @@ export const deleteFile: ExecutionPrimitive<DeleteFileArgs> = async (
             };
         }
 
-        await fs.unlink(args.path);
+        const physicalPath = path.join(process.cwd(), 'local_sandbox', args.path.slice('/sandbox/'.length));
+        await fs.unlink(physicalPath);
 
         return {
             proposal_id,

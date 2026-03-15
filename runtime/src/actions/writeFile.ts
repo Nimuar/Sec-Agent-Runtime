@@ -1,4 +1,5 @@
 import * as fs from 'fs/promises';
+import * as path from 'path';
 import { ExecutionPrimitive, WriteFileArgs, RuntimeResponse } from '../../../sys-common/schemas/ExecutionContracts';
 import { ActionType } from '../../../sys-common/schemas/ActionTypeRegistry';
 
@@ -27,7 +28,8 @@ export const writeFile: ExecutionPrimitive<WriteFileArgs> = async (
             };
         }
 
-        await fs.writeFile(args.path, args.content);
+        const physicalPath = path.join(process.cwd(), 'local_sandbox', args.path.slice('/sandbox/'.length));
+        await fs.writeFile(physicalPath, args.content);
 
         return {
             proposal_id,

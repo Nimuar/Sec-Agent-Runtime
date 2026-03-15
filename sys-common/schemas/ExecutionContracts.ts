@@ -1,7 +1,7 @@
 import { ActionType } from "./ActionTypeRegistry";
 
-// 2. The 3 possible execution outcomes
-export type RequestOutcome = "SUCCESS" | "DENIED" | "EXECUTION_ERROR";
+// 2. The 4 possible execution outcomes
+export type RequestOutcome = "SUCCESS" | "DENIED" | "EXECUTION_ERROR" | "VALIDATION_ERROR";
 
 // Read Operations
 export interface ReadFileArgs {
@@ -42,11 +42,12 @@ export interface FinishArgs {
 export interface ExecutionError {
     error_code: string; // e.g., "FILE_NOT_FOUND", "ACCESS_DENIED", "POLICY_VIOLATION"
     message: string;
+    details?: any;
 }
 
 export interface RuntimeResponse {
-    proposal_id: string; // Guaranteed UUID
-    action: ActionType;
+    proposal_id: string | null; // UUID or null if validation fails early
+    action: ActionType | null;
     outcome: RequestOutcome;
     result: Record<string, any> | null;
     error: ExecutionError | null;

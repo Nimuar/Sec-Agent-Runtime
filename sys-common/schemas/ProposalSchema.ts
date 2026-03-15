@@ -14,7 +14,7 @@ const Base = z.object({
   schema_version: z.string().regex(/^1\.\d+\.\d+$/),
   id: z.string().uuid().default(() => crypto.randomUUID()),
   reasoning: z.string().min(1),
-});
+}).strict();
 
 export const AgentProposalSchema = z.discriminatedUnion("action", [
   Base.extend({

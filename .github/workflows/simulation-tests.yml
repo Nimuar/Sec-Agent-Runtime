@@ -30,9 +30,20 @@ jobs:
         with:
           python-version: '3.11'
           
+      - name: Install Python dependencies
+        run: pip install requests
+          
       - name: Run Python simulation harness
         run: |
+          # Start the Express API server in the background
+          npx tsx api/src/server.ts &
+          
+          # Wait for the server to be ready (Port 3000)
+          echo "Waiting for server to start on localhost:3000..."
+          sleep 5
+          
           if [ -d "tests" ] && [ "$(ls -A tests 2>/dev/null)" ]; then
+            export PYTHONPATH=$PYTHONPATH:.
             python -m unittest discover tests
           else
             echo "No tests directory found or directory is empty, skipping simulation tests"
