@@ -30,7 +30,7 @@ export type Phase =
   | "RESPOND";
 
 export type StepContext = {
-  step_index: number;
+  trace_id: string;
   raw_payload: string;
   received_at: string;
   completed_at: string | null;
@@ -93,9 +93,9 @@ export class PolicyError extends Error {
   }
 }
 
-export function createStepContext(rawPayload: string, stepIndex: number): StepContext {
+export function createStepContext(rawPayload: string, traceId: string): StepContext {
   return {
-    step_index: stepIndex,
+    trace_id: traceId,
     raw_payload: rawPayload,
     received_at: new Date().toISOString(),
     completed_at: null,
@@ -214,6 +214,24 @@ function normalizeSandboxPath(p: string): string {
     );
   }
 
+  // Windows Alternative Data Streams (e.g. file.txt::$DATA)
+  if (normalized.includes(":$")) {
+    throw new PolicyError(
+      "POLICY_VIOLATION",
+      "Path contains illegal stream identifiers"
+    );
+  }
+
+  // Reserved Device Names (CON, PRN, AUX, NUL, COM1-9, LPT1-9)
+  const reservedRegex = /^(CON|PRN|AUX|NUL|COM[1-9]|LPT[1-9])(\..+)?$/i;
+  const basename = path.posix.basename(normalized);
+  if (reservedRegex.test(basename)) {
+    throw new PolicyError(
+      "POLICY_VIOLATION",
+      "Path contains reserved device name"
+    );
+  }
+
   if (normalized.includes("\0")) {
     throw new PolicyError(
       "POLICY_VIOLATION",
@@ -246,7 +264,10 @@ export function authorizeProposal(proposal: AgentProposal): void {
     }
 
     default: 
-      return
+      throw new PolicyError(
+        "ACTION_NOT_RECOGNIZED",
+        "The requested action is not handled by the authorization module."
+      );
   }
 }
 
@@ -300,7 +321,7 @@ export function recordStep(ctx: StepContext): void {
   ctx.completed_at = new Date().toISOString();
 
   const traceRecord = {
-    step_index: ctx.step_index,
+    trace_id: ctx.trace_id,
     proposal_id: ctx.proposal_id,
     schema_version: ctx.schema_version,
     action: ctx.action,
@@ -338,9 +359,9 @@ export function buildResponse(ctx: StepContext): RuntimeResponse {
  */
 export async function processStep(
   rawPayload: string,
-  stepIndex: number
+  traceId: string
 ): Promise<RuntimeResponse> {
-  const ctx = createStepContext(rawPayload, stepIndex);
+  const ctx = createStepContext(rawPayload, traceId);
 
   try {
     // RECEIVE
