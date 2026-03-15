@@ -51,7 +51,7 @@ class TestAgentPrompt(unittest.TestCase):
     def test_returns_inactive_message_when_closed(self):
         self.agent.active = False
         result = self.agent.agentprompt("hello")
-        self.assertEqual(result, "Interface not active")
+        self.assertEqual(result["error"], "Interface not active")
 
     def test_successful_call_appends_history(self):
         self.agent.agentprompt("test")
@@ -63,14 +63,14 @@ class TestAgentPrompt(unittest.TestCase):
 
     def test_no_api_call_when_retries_exceeded(self):
         self.agent.proposal_history = [("m", "r")] * 3
-        self.agent.agentprompt("test")
+        result = self.agent.agentprompt("test")
+        self.assertEqual(result["error"], "Maximum Retries reached")
         self.agent.mock_client.models.generate_content.assert_not_called()
 
     def test_returns_json_error_on_exception(self):
         self.agent.mock_client.models.generate_content.side_effect = Exception("API down")
         result = self.agent.agentprompt("test")
-        error_data = json.loads(result)
-        self.assertEqual(error_data["outcome"], "EXECUTION_ERROR")
+        self.assertEqual(result["outcome"], "EXECUTION_ERROR")
 
 
 # --- close / open ---

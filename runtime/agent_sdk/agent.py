@@ -19,10 +19,10 @@ class AgentInterface:
     def __init__(
         self,
         api_key: str = None,
-        model: str = "gemini-3-flash-preview",
+        model: str = AgentConfig.model,
         max_retries: int = 3
     ):
-        self.api_key = os.getenv("GOOGLE_API_KEY")
+        self.api_key = api_key or os.getenv("GOOGLE_API_KEY")
         
         if not self.api_key:
             raise ValueError("API key is required to initialize the AgentInterface.")
@@ -35,13 +35,13 @@ class AgentInterface:
     
 
 
-    #Send a Proposal to Agent returns a response.
-    def agentprompt(self, message: str) -> str:
+    #Send a Proposal to Agent returns a response as a dictionary.
+    def agentprompt(self, message: str) -> dict:
         #Confirm agent active (Should be if possible.)
         if(not self.active):
-            return "Interface not active"
+            return {"error": "Interface not active", "outcome": "EXECUTION_ERROR"}
         elif(len(self.proposal_history) >= self.max_retries):
-            return "Maximum Retries for this session, please try again later."
+            return {"error": "Maximum Retries reached", "outcome": "EXECUTION_ERROR"}
         else:
             try:
                 # response = self.client.messages.create(max_tokens=1024,
@@ -55,9 +55,12 @@ class AgentInterface:
                 parsed = json.loads(text)
                 self.proposal_history.append((message, parsed))
                 return parsed
+            except json.JSONDecodeError as e:
+                print(f"Failed to parse LLM response: {e}")
+                return {"error": str(e), "outcome": "EXECUTION_ERROR"}
             except Exception as e:
                 print(f"Error communicating with LLM: {e}")
-                return json.dumps({"error": str(e), "outcome": "EXECUTION_ERROR"})
+                return {"error": str(e), "outcome": "EXECUTION_ERROR"}
 
     #Checking for agent activity turns agent on or off.
     def close(self):
@@ -78,6 +81,10 @@ class AgentInterface:
             print(f"status: {response.status_code}")
             print(f"Request: {response.text}")
             return response.json()
+
+        except requests.exceptions.JSONDecodeError as e:
+            print(f"Server returned non-JSON response: {e}")
+            return {"outcome": "EXECUTION_ERROR", "error": {"message": "Invalid JSON response from server"}}
 
         except requests.exceptions.RequestException as e:
             print(f"HTTP Request failed: {e}")
