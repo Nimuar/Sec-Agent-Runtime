@@ -38,13 +38,13 @@ export function ValidateProposal(proposal: proposal_type ) {
         LogError(idCollisionError);
         return idCollisionError;
     }
-    const CoreStructure = ValidateCoreStructure(proposal);
-    if (CoreStructure) {
-        LogError(CoreStructure);
-        return CoreStructure;
-    }
+   // const CoreStructure = ValidateCoreStructure(proposal);
+    // if (CoreStructure) {
+    //     LogError(CoreStructure);
+    //     return CoreStructure;
+    // }
     LogID(proposal.id);
-};
+}
     
     
     
@@ -66,7 +66,7 @@ function ValidateNullByte(proposal: proposal_type) {
 
     }
    
- };
+ }
 
     // Check for valid ASCII characters
 function ValidateASCII(proposal: proposal_type) {
@@ -85,7 +85,7 @@ function ValidateASCII(proposal: proposal_type) {
         }
     }
 
-};
+}
 // Check for payload size
 function validatePayloadSize(proposal: proposal_type) {
     //Convert Proposal to bytes
@@ -138,46 +138,46 @@ function ValidateIDCollision (proposal: proposal_type) {
         };
         return error;
     }
-};
-
-
-
-//Check for invalid strucure.
-
-function ValidateCoreStructure(proposal: proposal_type) {
-    //Missing Fields Check - Our Schema is only comprised of strings and numbers ATP.
-    //Right now it is only going to check to make sure fields are missing, initial schema checks for the other stuff
-    const missing_fields: string[] = []
-    
-
-    
-    for (const [key, value] of Object.entries(proposal)) {
-        if (value === undefined || value === null || value === "") {
-            missing_fields.push(key);
-        }
-    }
-
-    if (proposal.schema_version !== config.schema_version) {
-        missing_fields.push("schema_version");
-    }
-    //If there are 1 or more missing fields, return error response with list of missing fields.
-    if (missing_fields.length > 0) {
-        const missing_string = missing_fields.join(", ");
-        let error : GateError = {
-            schema_version: config.schema_version,
-            id: crypto.randomUUID(),
-            input: proposal,
-            ErrorId: ProposalErrorCode.MISSING_CONTENT,
-            args: {
-                field: missing_string,
-                message: "Required field is missing or incorrectly formatted"
-            }
-        }
-        return error;
-
-    }
-
 }
+
+
+//Commented out for now, replace with zod implementation.
+// //Check for invalid strucure.
+
+// function ValidateCoreStructure(proposal: proposal_type) {
+//     //Missing Fields Check - Our Schema is only comprised of strings and numbers ATP.
+//     //Right now it is only going to check to make sure fields are missing, initial schema checks for the other stuff
+//     const missing_fields: string[] = []
+    
+
+    
+//     for (const [key, value] of Object.entries(proposal)) {
+//         if (value === undefined || value === null || value === "") {
+//             missing_fields.push(key);
+//         }
+//     }
+
+//     if (proposal.schema_version !== config.schema_version) {
+//         missing_fields.push("schema_version");
+//     }
+//     //If there are 1 or more missing fields, return error response with list of missing fields.
+//     if (missing_fields.length > 0) {
+//         const missing_string = missing_fields.join(", ");
+//         let error : GateError = {
+//             schema_version: config.schema_version,
+//             id: crypto.randomUUID(),
+//             input: proposal,
+//             ErrorId: ProposalErrorCode.MISSING_CONTENT,
+//             args: {
+//                 field: missing_string,
+//                 message: "Required field is missing or incorrectly formatted"
+//             }
+//         }
+//         return error;
+
+//     }
+
+// }
 
 
 //Logs the Error, no need for schema now.

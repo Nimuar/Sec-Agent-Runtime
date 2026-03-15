@@ -173,42 +173,42 @@ describe("Proposal Handler Validation Tests", () => {
     });
 
     // ── ValidateCoreStructure ─────────────────────────────────────────────────
-    describe("ValidateCoreStructure", () => {
+    // describe("ValidateCoreStructure", () => {
 
-        it("should return MISSING_CONTENT error for proposals with an incorrect schema version", () => {
-            const WrongVersionProposal: AgentProposal = {
-                schema_version: "2.0.0",
-                id: "",
-                reasoning: "Wrong schema version.",
-                action: ActionType.THINK,
-                args: {}
-            };
+    //     it("should return MISSING_CONTENT error for proposals with an incorrect schema version", () => {
+    //         const WrongVersionProposal: AgentProposal = {
+    //             schema_version: "2.0.0",
+    //             id: "",
+    //             reasoning: "Wrong schema version.",
+    //             action: ActionType.THINK,
+    //             args: {}
+    //         };
 
-            const ExpectedError = {
-                schema_version: "1.0.0",
-                id: expect.any(String),
-                input: WrongVersionProposal,
-                ErrorId: ProposalErrorCode.MISSING_CONTENT,
-                args: {
-                    field: ["id","schema_version"].join(", "),
-                    message: "Required field is missing or incorrectly formatted"
-                }
-            };
+    //         const ExpectedError = {
+    //             schema_version: "1.0.0",
+    //             id: expect.any(String),
+    //             input: WrongVersionProposal,
+    //             ErrorId: ProposalErrorCode.MISSING_CONTENT,
+    //             args: {
+    //                 field: ["id","schema_version"].join(", "),
+    //                 message: "Required field is missing or incorrectly formatted"
+    //             }
+    //         };
 
-            expect(ValidateProposal(WrongVersionProposal)).toEqual(ExpectedError);
-        });
+    //         expect(ValidateProposal(WrongVersionProposal)).toEqual(ExpectedError);
+    //     });
 
-        it("should pass for a fully valid proposal", () => {
-            const ValidProposal: AgentProposal = {
-                schema_version: "1.0.0",
-                id: "00000000-0000-0000-0000-000000000009",
-                reasoning: "This proposal is fully valid.",
-                action: ActionType.THINK,
-                args: {}
-            };
+    //     it("should pass for a fully valid proposal", () => {
+    //         const ValidProposal: AgentProposal = {
+    //             schema_version: "1.0.0",
+    //             id: "00000000-0000-0000-0000-000000000009",
+    //             reasoning: "This proposal is fully valid.",
+    //             action: ActionType.THINK,
+    //             args: {}
+    //         };
 
-            expect(ValidateProposal(ValidProposal)).toBeUndefined();
-        });
-    });
+    //         expect(ValidateProposal(ValidProposal)).toBeUndefined();
+    //     });
+    // });
 
 });
