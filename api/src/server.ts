@@ -1,4 +1,4 @@
-import express, { Request, Response } from "express";
+import express, { Request, Response, NextFunction } from "express";
 import { AgentProposalSchema } from "../../sys-common/schemas/ProposalSchema.js";
 import { dispatchAction } from "../../runtime/src/actions/dispatcher.js";
 
@@ -8,9 +8,9 @@ app.use(express.json({ limit: '1024b' }));
 let globalStepIndex = 0;
 
 // JSON Parse & Limit Error Handler (Rule L87: "Invalid JSON format")
-app.use((err: any, req: Request, res: Response, next: any) => {
+app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
   const isParseError = err instanceof SyntaxError && "body" in err;
-  const isLimitError = err.type === 'entity.too.large';
+  const isLimitError = (err as any).type === 'entity.too.large';
 
   if (isParseError || isLimitError) {
     return res.status(400).json({
@@ -23,7 +23,7 @@ app.use((err: any, req: Request, res: Response, next: any) => {
       }
     });
   }
-  next();
+  next(err);
 });
 
 app.post("/execute", async (req: Request, res: Response) => {
