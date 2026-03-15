@@ -1,3 +1,4 @@
+import { keyof } from "zod";
 import * as config from "../../sys-common/schemas/ProposalErrorConfig.js";
 import {ProposalErrorCode} from "../../sys-common/schemas/ProposalErrorRegistry.js";
 import { GateError } from "../../sys-common/schemas/ProposalErrorSchema.js";
@@ -49,41 +50,28 @@ export function ValidateProposal(proposal: proposal_type ) {
     
     
     
-function ValidateNullByte(proposal: proposal_type):GateError | undefined {  
-    
-    let response: GateError = {} as GateError;
-
-    for(const value of Object.values(proposal)){
-        //If the value is args then check it with Null Byte. 
-        if (typeof value === "string" && value.includes("\0")) {
-             return response = { 
-                schema_version: config.schema_version,
-                id: crypto.randomUUID(),
-                input: proposal,
-                ErrorId: ProposalErrorCode.NULL_BYTE,
-                args: {
-                    message: "Cannot contain null byte characters"
-                }
-
-            };
-
+function ValidateNullByte(proposal: proposal_type): GateError | undefined {
+    if (JSON.stringify(proposal).includes("\\u0000")) {
+        return {
+            schema_version: config.schema_version,
+            id: crypto.randomUUID(),
+            input: proposal,
+            ErrorId: ProposalErrorCode.NULL_BYTE,
+            args: {
+                message: "Cannot contain null byte characters"
             }
-            if (value === "args" && typeof value === "object") {
-                return ValidateNullByte(value as proposal_type); // Recursively check nested args object
-            };
+        };
+    }
+}
 
-         }
-        }
-    
 
-    
-   
- 
+
+
 
     // Check for valid ASCII characters
 function ValidateASCII(proposal: proposal_type): GateError | undefined {
     let response: GateError = {} as GateError;
-    for(const value of Object.values(proposal)){
+    for(const [key, value] of Object.entries(proposal)){
         if (!config.valid_ascii.test(value)) {
              return response = { 
                 schema_version: config.schema_version,
@@ -94,12 +82,15 @@ function ValidateASCII(proposal: proposal_type): GateError | undefined {
                     message: "Cannot contain invalid ASCII characters"
                 }
             };
-        if(typeof value === "object" && value !== null){
+        if(typeof key === "object" && value !== null){
             return ValidateASCII(value as proposal_type); // Recursively check nested objects
         }
     }
 
 }}
+
+
+
 // Check for payload size
 function validatePayloadSize(proposal: proposal_type) {
     //Convert Proposal to bytes
