@@ -2,6 +2,7 @@ import sys
 import os
 import json
 import unittest
+import requests
 from unittest.mock import MagicMock, patch
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -10,9 +11,12 @@ from agent import AgentInterface
 
 
 def make_agent():
-    with patch("agent.Anthropic") as mock_cls:
-        mock_cls.return_value = MagicMock()
-        agent = AgentInterface(api_key="test_key")
+    with patch("agent.genai.Client") as mock_client_cls:
+        mock_client = MagicMock()
+        mock_client_cls.return_value = mock_client
+        with patch.dict(os.environ, {"GOOGLE_API_KEY": "test_key"}):
+            agent = AgentInterface(api_key="test_key")
+        agent.mock_client = mock_client
     return agent
 
 
@@ -40,10 +44,9 @@ class TestAgentPrompt(unittest.TestCase):
     def setUp(self):
         self.agent = make_agent()
         self.parsed = {"proposal": {"action": "THINK"}}
-        mock_resp = MagicMock()
-        mock_resp.text = json.dumps(self.parsed)
-        self.agent.client.messages.create.return_value = mock_resp
-        self.mock_resp = mock_resp
+        self.mock_resp = MagicMock()
+        self.mock_resp.text = json.dumps(self.parsed)
+        self.agent.mock_client.models.generate_content.return_value = self.mock_resp
 
     def test_returns_inactive_message_when_closed(self):
         self.agent.active = False
@@ -59,14 +62,15 @@ class TestAgentPrompt(unittest.TestCase):
         self.assertEqual(result, self.parsed)
 
     def test_no_api_call_when_retries_exceeded(self):
-        self.agent.proposal_history = [("m", "r")] * 4
+        self.agent.proposal_history = [("m", "r")] * 3
         self.agent.agentprompt("test")
-        self.agent.client.messages.create.assert_not_called()
+        self.agent.mock_client.models.generate_content.assert_not_called()
 
-    def test_returns_none_on_exception(self):
-        self.agent.client.messages.create.side_effect = Exception("API down")
+    def test_returns_json_error_on_exception(self):
+        self.agent.mock_client.models.generate_content.side_effect = Exception("API down")
         result = self.agent.agentprompt("test")
-        self.assertIsNone(result)
+        error_data = json.loads(result)
+        self.assertEqual(error_data["outcome"], "EXECUTION_ERROR")
 
 
 # --- close / open ---
@@ -102,14 +106,16 @@ class TestReqHttp(unittest.TestCase):
         self.mock_http.json.return_value = {"result": "ok"}
 
     def test_returns_json_on_success(self):
-        with patch("agent.requests.post", return_value=self.mock_http):
-            result = self.agent.reqhttp('{"action":"THINK"}')
+        with patch("agent.requests.post", return_value=self.mock_http) as mock_post:
+            result = self.agent.reqhttp({"action": "THINK"})
+            mock_post.assert_called_once()
+            self.assertEqual(mock_post.call_args[1]['json'], {"action": "THINK"})
         self.assertEqual(result, {"result": "ok"})
 
-    def test_returns_none_on_connection_error(self):
-        with patch("agent.requests.post", side_effect=Exception("refused")):
-            result = self.agent.reqhttp('{"action":"THINK"}')
-        self.assertIsNone(result)
+    def test_returns_error_dict_on_connection_error(self):
+        with patch("agent.requests.post", side_effect=requests.exceptions.RequestException("refused")):
+            result = self.agent.reqhttp({"action": "THINK"})
+        self.assertEqual(result["outcome"], "EXECUTION_ERROR")
 
 
 if __name__ == "__main__":

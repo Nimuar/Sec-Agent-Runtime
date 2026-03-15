@@ -4,7 +4,6 @@
   "extends": "../tsconfig.base.json",
   "compilerOptions": {
     "outDir": "dist",
-    "module": "CommonJS",
     "moduleResolution": "node"
   },
   "include": ["src/**/*"],

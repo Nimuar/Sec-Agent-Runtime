@@ -15,11 +15,17 @@ def main():
 
     # Feed it into LLM.
     response = agent.agentprompt(proposal)
+    
+    if isinstance(response, str):
+        print(f"Agent returned error string: {response}")
+        agent.close()
+        return
+
     # response = AgentConfig.sample_proposals[0] #For testing, use the first sample proposal.
     while agent.active:
 
-        if response is None:
-            print("Invalid Response. Closing Agent.")
+        if not response or not isinstance(response, dict) or "proposal" not in response:
+            print(f"Invalid Response structure: {response}. Closing Agent.")
             agent.close()
             break
 

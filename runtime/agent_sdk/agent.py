@@ -40,7 +40,7 @@ class AgentInterface:
         #Confirm agent active (Should be if possible.)
         if(not self.active):
             return "Interface not active"
-        elif(len(self.proposal_history) > self.max_retries):
+        elif(len(self.proposal_history) >= self.max_retries):
             return "Maximum Retries for this session, please try again later."
         else:
             try:
@@ -56,7 +56,8 @@ class AgentInterface:
                 self.proposal_history.append((message, parsed))
                 return parsed
             except Exception as e:
-                print(f"Something went wrong: {e}")
+                print(f"Error communicating with LLM: {e}")
+                return json.dumps({"error": str(e), "outcome": "EXECUTION_ERROR"})
 
     #Checking for agent activity turns agent on or off.
     def close(self):
@@ -70,16 +71,17 @@ class AgentInterface:
 
 
     #send request through TS server. Reurns Response as JSON. 
-    def reqhttp(self,response)-> dict: 
+    def reqhttp(self, proposal_data) -> dict: 
         #Try to send data to url, return output. 
         try:
-            response = requests.post(AgentConfig.ts_url,json = response,timeout=40)
+            response = requests.post(AgentConfig.ts_url, json=proposal_data, timeout=40)
             print(f"status: {response.status_code}")
             print(f"Request: {response.text}")
             return response.json()
 
-        except Exception as e:
-            print(f"Error with process: {e}")
+        except requests.exceptions.RequestException as e:
+            print(f"HTTP Request failed: {e}")
+            return {"outcome": "EXECUTION_ERROR", "error": {"message": str(e)}}
 
 
         

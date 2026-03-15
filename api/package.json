@@ -9,7 +9,7 @@
     "test": "vitest run",
     "build": "tsc",
     "start": "node dist/api/src/server.js",
-    "dev": "tsc && node dist/api/src/server.js",
+    "dev": "npx tsx watch src/server.ts",
     "typecheck": "tsc --noEmit",
     "watch": "tsc --watch",
     "clean": "rm -rf dist",
