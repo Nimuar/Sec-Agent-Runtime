@@ -2,7 +2,8 @@ import * as config from "../../sys-common/schemas/ProposalErrorConfig.js";
 import {ProposalErrorCode} from "../../sys-common/schemas/ProposalErrorRegistry.js";
 import { GateError } from "../../sys-common/schemas/ProposalErrorSchema.js";
 import { AgentProposal } from "../../sys-common/schemas/ProposalSchema.js";
-import * as fs from 'fs';
+import * as fs from "fs";
+import * as fsPromises from 'fs/promises';
 import { dirname } from 'path';
 //Proposal Error handling logic for incoming proposals. As of now it simply defines the proposal type and logs it.
 //This should be done in Typescript PascalCase for better readability and maintainability.
@@ -127,18 +128,25 @@ function validatePayloadSize(proposal: proposal_type) {
 but eventually this should be checking against a 
 database/logfile of logged proposal IDs.*/
 
-function ValidateIDCollision (proposal: proposal_type) {
+
+//WIP```````````````````````````````````````````````````````````````
+  function ValidateIDCollision (proposal: proposal_type) {
     // Load previously seen IDs from the ID log
-    let backlogIDs: string[] = [];
+    let lines: string[] = [];
+    
     try {
-        const raw = fs.readFileSync(config.ID_LOG_PATH, 'utf8');
-        backlogIDs = raw.split('\n').map(line => line.trim()).filter(line => line.length > 0);
+        const data =   fs.readFileSync(config.ID_LOG_PATH, 'utf-8');
+        lines = data.split("\n");
+
+
     } catch (err) {
+
+        console.log("ID Log Error: ", err);
         // Log file missing or unreadable — treat as empty backlog
     }
 
     const proposal_id = proposal.id;
-    if (backlogIDs.includes(proposal_id)) {
+    if (lines.includes(proposal_id)) {
         let error : GateError = {
             schema_version: config.schema_version,
             id: crypto.randomUUID(),
@@ -194,7 +202,7 @@ function ValidateIDCollision (proposal: proposal_type) {
 
 
 //Logs the Error, no need for schema now.
-function LogError(error:GateError) {
+async function LogError(error:GateError) {
     //Creates Timstamp for Log Entry and finds ErrorID
 
 
@@ -213,20 +221,24 @@ function LogError(error:GateError) {
 
     //Append Log Entry to Log File
     try {
-        fs.mkdirSync(dirname(config.ERROR_LOG_PATH), { recursive: true });
-        fs.appendFileSync(config.ERROR_LOG_PATH, JSON.stringify(LogEntry) + "\n");
+        if (config.ERROR_LOG_PATH === "") {
+        await fsPromises.mkdir(dirname(config.ERROR_LOG_PATH), { recursive: true });
+         }
+        await fsPromises.appendFile(config.ERROR_LOG_PATH, JSON.stringify(LogEntry) + "\n");
     } catch (err) {
         console.error("Failed to log error:", err);
     }
 }
 
 
-function LogID(proposal_id:string) {
+async function LogID(proposal_id:string) {
 
     // No collision — record this ID so future proposals can be checked against it
     try {
-        fs.mkdirSync(dirname(config.ID_LOG_PATH), { recursive: true });
-        fs.appendFileSync(config.ID_LOG_PATH, proposal_id + '\n');
+        if (config.ERROR_LOG_PATH === "") {
+            await fsPromises.mkdir(dirname(config.ERROR_LOG_PATH), { recursive: true });
+         }
+            await fsPromises.appendFile(config.ERROR_LOG_PATH, JSON.stringify({ id: proposal_id }) + "\n");
     } catch (err) {
         console.error("Failed to write to ID log:", err);
     }

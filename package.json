@@ -25,6 +25,7 @@
     "vitest": "^4.0.18"
   },
   "dependencies": {
+    "promises": "^0.2.5",
     "zod": "^4.3.6"
   }
 }
