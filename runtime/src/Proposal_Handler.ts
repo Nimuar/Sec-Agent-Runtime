@@ -48,11 +48,14 @@ export function ValidateProposal(proposal: proposal_type ) {
     
     
     
-function ValidateNullByte(proposal: proposal_type) {  
+function ValidateNullByte(proposal: proposal_type):GateError | undefined {  
+    
+    let response: GateError = {} as GateError;
 
     for(const value of Object.values(proposal)){
+        //If the value is args then check it with Null Byte. 
         if (typeof value === "string" && value.includes("\0")) {
-            let error : GateError = { 
+             return response = { 
                 schema_version: config.schema_version,
                 id: crypto.randomUUID(),
                 input: proposal,
@@ -60,19 +63,28 @@ function ValidateNullByte(proposal: proposal_type) {
                 args: {
                     message: "Cannot contain null byte characters"
                 }
-            };
-            return error;
-        }
 
-    }
+            };
+
+            }
+            if (value === "args" && typeof value === "object") {
+                return ValidateNullByte(value as proposal_type); // Recursively check nested args object
+            };
+
+         }
+        }
+    
+
+    
    
- }
+ 
 
     // Check for valid ASCII characters
-function ValidateASCII(proposal: proposal_type) {
+function ValidateASCII(proposal: proposal_type): GateError | undefined {
+    let response: GateError = {} as GateError;
     for(const value of Object.values(proposal)){
         if (!config.valid_ascii.test(value)) {
-            let error : GateError = { 
+             return response = { 
                 schema_version: config.schema_version,
                 id: crypto.randomUUID(),
                 input: proposal,
@@ -81,11 +93,12 @@ function ValidateASCII(proposal: proposal_type) {
                     message: "Cannot contain invalid ASCII characters"
                 }
             };
-            return error;
+        if(typeof value === "object" && value !== null){
+            return ValidateASCII(value as proposal_type); // Recursively check nested objects
         }
     }
 
-}
+}}
 // Check for payload size
 function validatePayloadSize(proposal: proposal_type) {
     //Convert Proposal to bytes
@@ -106,7 +119,7 @@ function validatePayloadSize(proposal: proposal_type) {
         };
         return error;
     }
-};
+}
 
 //Check for ID Collision
 //WIP to check proposal ID against backlog. 
