@@ -1,72 +1,60 @@
 import json
-import subprocess
+import requests
 import os
 
+
 class RuntimeClient:
-    """Client for executing payloads against the compiled Node.js Subprocess runtime."""
-    
-    def __init__(self, node_script_path: str = "runtime/dist/index.js", cwd: str = None):
+    """Client for executing payloads against the Express API server."""
+
+    def __init__(self, base_url: str = "http://localhost:3000"):
         """
         Initializes the RuntimeClient.
         Args:
-            node_script_path: Path to the compiled Node.js index script.
-            cwd: The working directory for the subprocess, usually the root of the project.
+            base_url: The base URL of the running Express server.
         """
-        self.node_script_path = node_script_path
-        self.cwd = cwd or os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        self.base_url = base_url.rstrip("/")
 
     def execute(self, payload: dict | str) -> dict:
         """
-        Executes a JSON payload against the Node.js runtime via STDIN.
-        
+        Executes a JSON payload against the Express API via HTTP POST.
+
         Args:
             payload: Formatted dictionary or invalid string representation of a payload.
-            
+
         Returns:
-            dict: The parsed JSON response (`RuntimeResponse` schema) from the Node script.
+            dict: The parsed JSON response (`RuntimeResponse` schema) from the API.
             If the response isn't valid JSON, it returns a dict wrapping an EXECUTION_ERROR.
         """
-        if isinstance(payload, dict):
-            payload_str = json.dumps(payload)
-        else:
-            payload_str = str(payload)
-            
+        url = f"{self.base_url}/execute"
+        
         try:
-            # We use `npx tsx runtime/src/index.ts` or `node runtime/dist/index.js`
-            # The codebase doesn't have `dist/` explicitly right now, we will use tsx if needed.
-            # Assuming compiled node:
-            process = subprocess.run(
-                ["npx", "tsx", "runtime/src/index.ts"],
-                input=payload_str,
-                capture_output=True,
-                text=True,
-                cwd=self.cwd,
-                shell=(os.name == 'nt')
-            )
-            
-            # The stdout should be purely the JSON response
-            stdout_out = process.stdout.strip()
-            
-            if not stdout_out:
+            if isinstance(payload, str):
+                try:
+                    # Try to see if it's already valid JSON
+                    payload_data = json.loads(payload)
+                    response = requests.post(url, json=payload_data)
+                except json.JSONDecodeError:
+                    # If it's totally invalid JSON (adversarial), send it as raw bytes/text
+                    # But the server uses app.use(express.json()), so it might fail with 400.
+                    # We send it as 'data' and set content-type application/json to test server resilience.
+                    response = requests.post(url, data=payload, headers={"Content-Type": "application/json"})
+            else:
+                response = requests.post(url, json=payload)
+
+            # Return the JSON body if possible
+            try:
+                return response.json()
+            except json.JSONDecodeError:
                 return {
                     "outcome": "EXECUTION_ERROR",
-                    "error_code": "EMPTY_STDOUT",
-                    "stderr": process.stderr, 
-                    "stdout": process.stdout
+                    "error_code": "INVALID_JSON_RESPONSE",
+                    "status_code": response.status_code,
+                    "raw_response": response.text,
                 }
-                
-            return json.loads(stdout_out)
-            
-        except json.JSONDecodeError as e:
-            return {
-                "outcome": "EXECUTION_ERROR",
-                "error_code": "INVALID_JSON_RESPONSE",
-                "raw_response": stdout_out,
-                "error": str(e)
-            }
+
         except Exception as e:
             return {
                 "outcome": "EXECUTION_ERROR",
-                "error_code": "SUBPROCESS_EXCEPTION",
-                "error": str(e)
+                "error_code": "HTTP_CLIENT_EXCEPTION",
+                "error": str(e),
             }

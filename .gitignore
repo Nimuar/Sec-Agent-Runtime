@@ -165,3 +165,6 @@ htmlcov/
 
 # Test output
 metrics.txt
+api/test_output_esm.txt
+api/test_output_new.txt
+api/test_output.txt
