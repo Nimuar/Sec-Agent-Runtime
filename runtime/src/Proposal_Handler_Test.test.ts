@@ -61,9 +61,10 @@ describe("Proposal Handler Validation Tests", () => {
             const InvalidASCIIProposal: AgentProposal = {
                 schema_version: "1.0.0",
                 id: "00000000-0000-0000-0000-000000000003",
-                reasoning: "Invalid character: \x01",
-                action: ActionType.THINK,
-                args: {}
+                reasoning: "Invalid character:",
+                action: ActionType.WRITE_FILE,
+                args: {path: "/sandbox/notes/status.md",
+                    content: "Sprint complete.\x01"}
             };
 
             const ExpectedError = {

@@ -49,7 +49,7 @@ export function ValidateProposal(proposal: proposal_type ) {
 }
     
     
-    
+//Can be flattened and checked for null bytes, but this is more efficient and less error prone.
 function ValidateNullByte(proposal: proposal_type): GateError | undefined {
     if (JSON.stringify(proposal).includes("\\u0000")) {
         return {
@@ -66,14 +66,12 @@ function ValidateNullByte(proposal: proposal_type): GateError | undefined {
 
 
 
+//This function needs a nested loop to check because flattening this proposal will contain broken asciis. 
 
-
-    // Check for valid ASCII characters
 function ValidateASCII(proposal: proposal_type): GateError | undefined {
-    let response: GateError = {} as GateError;
-    for(const [key, value] of Object.entries(proposal)){
-        if (!config.valid_ascii.test(value)) {
-             return response = { 
+    for (const value of Object.values(proposal)) {
+        if (typeof value === "string" && !config.valid_ascii.test(value)) {
+            return {
                 schema_version: config.schema_version,
                 id: crypto.randomUUID(),
                 input: proposal,
@@ -82,12 +80,49 @@ function ValidateASCII(proposal: proposal_type): GateError | undefined {
                     message: "Cannot contain invalid ASCII characters"
                 }
             };
-        if(typeof key === "object" && value !== null){
-            return ValidateASCII(value as proposal_type); // Recursively check nested objects
+        }
+        if (typeof value === "object" && value !== null) {
+            for (const nested of Object.values(value)) {
+                if (typeof nested === "string" && !config.valid_ascii.test(nested)) {
+                    return {
+                        schema_version: config.schema_version,
+                        id: crypto.randomUUID(),
+                        input: proposal,
+                        ErrorId: ProposalErrorCode.INVALID_ASCII,
+                        args: {
+                            message: "Cannot contain invalid ASCII characters"
+                        }
+                    };
+                }
+            }
         }
     }
+}
 
-}}
+
+
+
+
+    // Check for valid ASCII characters
+// function ValidateASCII(proposal: proposal_type): GateError | undefined {
+//     let response: GateError = {} as GateError;
+//     for(const [key, value] of Object.entries(proposal)){
+//         if (!config.valid_ascii.test(JSON.stringify(value))) {
+//              return response = { 
+//                 schema_version: config.schema_version,
+//                 id: crypto.randomUUID(),
+//                 input: proposal,
+//                 ErrorId: ProposalErrorCode.INVALID_ASCII,
+//                 args: {
+//                     message: "Cannot contain invalid ASCII characters"
+//                 }
+//             };
+//         if(typeof key === "object" && value !== null){
+//             return ValidateASCII(value as proposal_type); // Recursively check nested objects
+//         }
+//     }
+
+// }}
 
 
 
