@@ -12,13 +12,28 @@ The runtime is designed to act as a strict boundary between untrusted agent inte
 
 ---
 
-## Getting Started
+---
 
-Before contributing, please read:
-- the [documentation](/docs)
-- the [system specifications](/system-specs)
+## Testing
 
-These documents define the runtime’s trust boundaries, proposal model, and execution guarantees.
+The Agent Runtime employs a multi-layered verification suite. For full details on testing strategy and execution, see [the testing documentation](/docs/testing.md).
+
+### Quick Start: Running Tests
+
+#### Node.js Unit & Integration Tests
+```bash
+npm run test
+```
+
+#### Robustness & Boundary Tests (Python)
+**Requirement:** The server must be running in a separate terminal.
+```bash
+# Terminal 1: Start Server
+npx tsx api/src/server.ts
+
+# Terminal 2: Run Tests
+python -m unittest tests/test_boundary.py
+```
 
 <br/>
 
