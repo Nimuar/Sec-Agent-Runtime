@@ -1,8 +1,8 @@
 import { keyof } from "zod";
-import * as config from "../../sys-common/schemas/ProposalErrorConfig.js";
-import {ProposalErrorCode} from "../../sys-common/schemas/ProposalErrorRegistry.js";
-import { GateError } from "../../sys-common/schemas/ProposalErrorSchema.js";
-import { AgentProposal } from "../../sys-common/schemas/ProposalSchema.js";
+import * as config from "./schemas/ProposalErrorConfig.js";
+import { ProposalErrorCode } from "./schemas/ProposalErrorRegistry.js";
+import { GateError } from "./schemas/ProposalErrorSchema.js";
+import { AgentProposal } from "./schemas/ProposalSchema.js";
 import * as fs from "fs";
 import * as fsPromises from 'fs/promises';
 import { dirname } from 'path';

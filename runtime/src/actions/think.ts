@@ -1,5 +1,5 @@
-import { ExecutionPrimitive, ThinkArgs, RuntimeResponse } from '../../../sys-common/schemas/ExecutionContracts';
-import { ActionType } from '../../../sys-common/schemas/ActionTypeRegistry';
+import { ActionType } from '../schemas/ActionTypeRegistry.js';
+import { ExecutionPrimitive, ThinkArgs, RuntimeResponse } from '../schemas/ExecutionContracts.js';
 
 export const think: ExecutionPrimitive<ThinkArgs> = async (
     proposal_id: string,

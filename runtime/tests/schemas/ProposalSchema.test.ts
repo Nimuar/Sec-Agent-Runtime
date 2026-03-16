@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
-import { AgentProposalSchema } from "../ProposalSchema";
-import { ActionType } from "../ActionTypeRegistry";
+import { AgentProposalSchema } from "../../src/schemas/ProposalSchema.js";
+import { ActionType } from "../../src/schemas/ActionTypeRegistry.js";
 
 const TEST_UUID = "00000000-0000-0000-0000-000000000000";
 

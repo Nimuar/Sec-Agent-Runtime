@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import * as fs from 'fs/promises';
 import * as path from 'path';
-import { ActionType } from '../../../../sys-common/schemas/ActionTypeRegistry';
+import { ActionType } from '../../schemas/ActionTypeRegistry.js';
 import { readFile } from '../readFile';
 import { writeFile } from '../writeFile';
 import { deleteFile } from '../deleteFile';
@@ -165,12 +165,12 @@ describe('File Actions (Primitives)', () => {
             expect(result.outcome).toBe('EXECUTION_ERROR');
         });
 
-        it('should return EXECUTION_ERROR for an empty directory', async () => {
+        it('should return SUCCESS for an empty directory', async () => {
             vi.mocked(fs.readdir).mockResolvedValueOnce([]);
             const result = await listFiles(mockProposalId, { path: '/sandbox/emptydir' });
 
-            expect(result.outcome).toBe('EXECUTION_ERROR');
-            expect(result.error?.message).toBe('Directory is empty');
+            expect(result.outcome).toBe('SUCCESS');
+            expect(result.result).toEqual({ files: [] });
         });
     });
 

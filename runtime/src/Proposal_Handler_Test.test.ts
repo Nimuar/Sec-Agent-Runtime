@@ -1,10 +1,10 @@
 import { describe, it, expect, beforeEach, afterEach } from "vitest";
 import { ValidateProposal } from "./Proposal_Handler.js";
-import { proposal_limit } from "../../sys-common/schemas/ProposalErrorConfig.js";
-import {ProposalErrorCode} from "../../sys-common/schemas/ProposalErrorRegistry.js";
-import * as config from "../../sys-common/schemas/ProposalErrorConfig.js";
-import { ActionType } from "../../sys-common/schemas/ActionTypeRegistry.js";
-import { AgentProposal } from "../../sys-common/schemas/ProposalSchema.js";
+import { proposal_limit } from "./schemas/ProposalErrorConfig.js";
+import { ProposalErrorCode } from "./schemas/ProposalErrorRegistry.js";
+import * as config from "./schemas/ProposalErrorConfig.js";
+import { ActionType } from "./schemas/ActionTypeRegistry.js";
+import { AgentProposal } from "./schemas/ProposalSchema.js";
 import * as fs from "fs";
 import { dirname } from "path";
 

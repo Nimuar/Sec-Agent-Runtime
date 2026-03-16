@@ -16,7 +16,7 @@ The runtime is designed to act as a strict boundary between untrusted agent inte
 
 ## Testing
 
-The Agent Runtime employs a multi-layered verification suite. For full details on testing strategy and execution, see [the testing documentation](/docs/testing.md).
+The Agent Runtime employs a multi-layered verification suite. For full details on testing strategy and execution, see [the testing documentation](/docs/references/testing.md).
 
 ### Quick Start: Running Tests
 
@@ -29,7 +29,7 @@ npm run test
 **Requirement:** The server must be running in a separate terminal.
 ```bash
 # Terminal 1: Start Server
-npx tsx api/src/server.ts
+npx tsx runtime/src/server.ts
 
 # Terminal 2: Run Tests
 python -m unittest tests/test_boundary.py
@@ -39,17 +39,22 @@ python -m unittest tests/test_boundary.py
 
 ---
 
-## Repository Structure & Related Projects
+## Repository Structure
 
-This project is intentionally split across **two repositories**, each with a distinct responsibility.
+The project is consolidated into a unified runtime and e2e testing suite:
 
-### Agent Runtime (this repository)
-- Implements the core runtime logic
-- Defines the agent proposal envelope and handling pipeline
-- Performs validation, policy evaluation, and controlled action execution
-- Produces structured logs and execution outcomes
-
-This repository is the **system under test**.
+- `/docs`: Documentation and specifications.
+    - `/specs`: System contracts, allowed actions, and lifecycles.
+    - `/references`: Test documentation, dependencies, and architectural guides.
+- `/runtime`: The core Node.js application.
+    - `/src/actions`: Definitions of allowed actions.
+    - `/src/schemas`: Shared Zod schemas and TypeScript types.
+    - `/src/server.ts`: Express API interface.
+    - `stepRuntime.ts`: Core lifecycle execution logic.
+    - `agent_sdk/`: Python-based LLM client for adversarial testing.
+- `/tests`: Top-level E2E and robustness stress-testing suite (Python).
+- `/logs`: Execution traces and test result outputs.
+- `/.spec`: Spec-Driven Development (SDD) architectural history.
 
 ### SARE — Secure Agent Runtime Evaluations
 Evaluation, simulation, and analysis tooling for the Agent Runtime live in a **separate repository**.

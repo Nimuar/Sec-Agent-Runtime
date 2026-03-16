@@ -4,7 +4,10 @@ import requests
 import json
 import re
 import os
-import AgentConfig
+try:
+    from . import AgentConfig
+except ImportError:
+    import AgentConfig
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -51,7 +54,7 @@ class AgentInterface:
                     model=self.model, contents=(message + "\n"), **kwargs
                 )
                 print("response: ", response)
-                text = response.text
+                text = self._clean_json(response.text)
                 parsed = json.loads(text)
                 self.proposal_history.append((message, parsed))
                 return parsed
@@ -61,6 +64,12 @@ class AgentInterface:
             except Exception as e:
                 print(f"Error communicating with LLM: {e}")
                 return {"error": str(e), "outcome": "EXECUTION_ERROR"}
+
+    def _clean_json(self, text: str) -> str:
+        """Strips markdown code blocks from the string."""
+        text = re.sub(r'```json\s*(.*?)\s*```', r'\1', text, flags=re.DOTALL)
+        text = re.sub(r'```\s*(.*?)\s*```', r'\1', text, flags=re.DOTALL)
+        return text.strip()
 
     # Checking for agent activity turns agent on or off.
     def close(self):

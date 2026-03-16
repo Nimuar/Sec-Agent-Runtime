@@ -1,7 +1,7 @@
 import * as fs from 'fs/promises';
 import * as path from 'path';
-import { ExecutionPrimitive, ReadFileArgs, RuntimeResponse } from '../../../sys-common/schemas/ExecutionContracts';
-import { ActionType } from '../../../sys-common/schemas/ActionTypeRegistry';
+import { ActionType } from '../schemas/ActionTypeRegistry.js';
+import { ExecutionPrimitive, ReadFileArgs, RuntimeResponse } from '../schemas/ExecutionContracts.js';
 
 export const readFile: ExecutionPrimitive<ReadFileArgs> = async (
     proposal_id: string,

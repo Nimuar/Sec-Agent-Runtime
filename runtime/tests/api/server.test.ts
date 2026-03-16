@@ -4,11 +4,11 @@ const { mockDispatchAction } = vi.hoisted(() => {
   return { mockDispatchAction: vi.fn() };
 });
 
-vi.mock("../../runtime/src/actions/dispatcher.js", () => ({
+vi.mock("../../src/actions/dispatcher.js", () => ({
   dispatchAction: mockDispatchAction,
 }));
 
-import { app } from "../src/server.js";
+import { app } from "../../src/server.js";
 
 describe("Agent Execution API", () => {
   const validProposal = {

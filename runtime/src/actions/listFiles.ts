@@ -1,8 +1,8 @@
 import * as fs from 'fs/promises';
 import * as path from 'path';
 import { Dirent } from 'fs';
-import { ExecutionPrimitive, ListFilesArgs, RuntimeResponse } from '../../../sys-common/schemas/ExecutionContracts';
-import { ActionType } from '../../../sys-common/schemas/ActionTypeRegistry';
+import { ActionType } from '../schemas/ActionTypeRegistry.js';
+import { ExecutionPrimitive, ListFilesArgs, RuntimeResponse } from '../schemas/ExecutionContracts.js';
 
 export const listFiles: ExecutionPrimitive<ListFilesArgs> = async (
     proposal_id: string,
@@ -21,19 +21,6 @@ export const listFiles: ExecutionPrimitive<ListFilesArgs> = async (
 
         const physicalPath = path.join(process.cwd(), 'sandbox', args.path.slice('/sandbox/'.length));
         const dirents = await fs.readdir(physicalPath, { withFileTypes: true });
-
-        if (dirents.length === 0) {
-            return {
-                proposal_id,
-                action: ActionType.LIST_FILES,
-                outcome: "EXECUTION_ERROR",
-                result: null,
-                error: {
-                    error_code: "EXECUTION_ERROR",
-                    message: "Directory is empty"
-                }
-            };
-        }
 
         // Map Dirent arrays to serializable objects representing the directory tree structure or names
         const files = dirents.map((dirent: Dirent) => ({

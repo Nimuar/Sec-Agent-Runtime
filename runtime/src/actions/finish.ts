@@ -1,5 +1,5 @@
-import { ExecutionPrimitive, FinishArgs, RuntimeResponse } from '../../../sys-common/schemas/ExecutionContracts';
-import { ActionType } from '../../../sys-common/schemas/ActionTypeRegistry';
+import { ExecutionPrimitive, FinishArgs, RuntimeResponse } from '../schemas/ExecutionContracts.js';
+import { ActionType } from '../schemas/ActionTypeRegistry.js';
 
 export const finish: ExecutionPrimitive<FinishArgs> = async (
     proposal_id: string,

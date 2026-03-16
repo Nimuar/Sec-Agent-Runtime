@@ -2,7 +2,7 @@ import express, { Request, Response, NextFunction } from "express";
 import crypto from "crypto";
 import { 
   processStep
-} from "../../runtime/src/stepRuntime.js";
+} from "./stepRuntime.js";
 
 const app = express();
 
