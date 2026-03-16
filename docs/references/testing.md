@@ -22,8 +22,7 @@ The Express microservice must be running in a separate terminal before executing
 
 ```bash
 # In Terminal 1
-cd runtime
-npm run dev
+cd runtime && npm run dev
 ```
 
 ### Running the Python Tests
