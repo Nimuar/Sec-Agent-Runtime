@@ -1,5 +1,5 @@
-# from anthropic import Anthropic
 from google import genai
+from google.genai import types
 import requests
 import json
 import re
@@ -11,13 +11,14 @@ load_dotenv()
 
 _DIR = os.path.dirname(os.path.abspath(__file__))
 
-with open(os.path.join(_DIR, "prompts", "fuzz_prompt.txt"), "r") as _f:
-    FUZZ_PROMPT = _f.read()
-
 
 class AgentInterface:
     def __init__(
-        self, api_key: str = None, model: str = AgentConfig.model, max_retries: int = 3
+        self,
+        api_key: str = None,
+        model: str = AgentConfig.model,
+        max_retries: int = 3,
+        system_instruction: str = None
     ):
         self.api_key = api_key or os.getenv("GOOGLE_API_KEY")
 
@@ -26,6 +27,7 @@ class AgentInterface:
 
         self.model = model
         self.max_retries = max_retries
+        self.system_instruction = system_instruction
         self.client = genai.Client(api_key=self.api_key)
         self.proposal_history = []
         self.active = True
@@ -39,13 +41,14 @@ class AgentInterface:
             return {"error": "Maximum Retries reached", "outcome": "EXECUTION_ERROR"}
         else:
             try:
-                # response = self.client.messages.create(max_tokens=1024,
-                #     model=self.model,
-                #     messages=[{"role": "user", "content": message}]
-                # )
+                kwargs = {}
+                if self.system_instruction:
+                    kwargs["config"] = types.GenerateContentConfig(
+                        system_instruction=self.system_instruction
+                    )
 
                 response = self.client.models.generate_content(
-                    model=self.model, contents=(message + "\n")
+                    model=self.model, contents=(message + "\n"), **kwargs
                 )
                 print("response: ", response)
                 text = response.text

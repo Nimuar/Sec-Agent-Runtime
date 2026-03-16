@@ -5,16 +5,16 @@ import json
 
 
 def main():
-    # Define the initial agent.
-    agent = AgentInterface()
-
-    # Grab initial proposal
+    # Grab system prompt
     directory = os.path.dirname(__file__)
     with open(os.path.join(directory, "prompts", "fuzz_prompt.txt"), "r") as file:
-        proposal = file.read()
+        system_prompt = file.read()
 
-    # Feed it into LLM.
-    response = agent.agentprompt(proposal)
+    # Define the initial agent, with the prompt injected as the persona.
+    agent = AgentInterface(system_instruction=system_prompt)
+
+    # Feed an initial prompt to start the fuzzing loop.
+    response = agent.agentprompt("Begin session. Please provide the first fuzzing proposal.")
 
     if isinstance(response, dict) and response.get("outcome") == "EXECUTION_ERROR":
         print(f"Agent returned error: {response}")
