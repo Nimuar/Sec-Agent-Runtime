@@ -1,5 +1,6 @@
 {
   "name": "agent-runtime",
+  "type": "module",
   "version": "1.0.0",
   "description": "This is the repository behind a security-constrained agent runtime, which aims to build a security-constrained agent runtime that deterministically mediates between an LLM and real tools. <br/> The runtime will accomplish this in 2 ways:   1. Enforcing explicit policies   2. Enabling systematic verification.",
   "scripts": {
@@ -21,6 +22,7 @@
   "devDependencies": {
     "@types/express": "^5.0.6",
     "@types/node": "^25.3.3",
+    "mkdirp": "^3.0.1",
     "@types/supertest": "^7.2.0",
     "supertest": "^7.2.2",
     "typescript": "^5.9.3",

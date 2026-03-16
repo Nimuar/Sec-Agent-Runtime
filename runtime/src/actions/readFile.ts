@@ -21,7 +21,7 @@ export const readFile: ExecutionPrimitive<ReadFileArgs> = async (
             };
         }
 
-        const physicalPath = path.join(process.cwd(), 'local_sandbox', args.path.slice('/sandbox/'.length));
+        const physicalPath = path.join(process.cwd(), 'sandbox', args.path.slice('/sandbox/'.length));
         const content = await fs.readFile(physicalPath, 'utf-8');
 
         return {

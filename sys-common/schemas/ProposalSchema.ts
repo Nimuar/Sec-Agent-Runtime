@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { ActionType } from "./ActionTypeRegistry";
+import { ActionType } from "./ActionTypeRegistry.js";
 
 /**
  * Isomorphic utility to extract file extension.

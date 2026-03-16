@@ -28,7 +28,7 @@ export const deleteFile: ExecutionPrimitive<DeleteFileArgs> = async (
             };
         }
 
-        const physicalPath = path.join(process.cwd(), 'local_sandbox', args.path.slice('/sandbox/'.length));
+        const physicalPath = path.join(process.cwd(), 'sandbox', args.path.slice('/sandbox/'.length));
         await fs.unlink(physicalPath);
 
         return {

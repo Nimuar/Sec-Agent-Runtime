@@ -1,13 +1,13 @@
 import * as z from "zod";
 import { ProposalErrorCode } from "./ProposalErrorRegistry.js"
 
-const ValidASCII = /^[ -~]*$/;
+
 
 // Base structure for validation error responses sent back to agent
 const Base = z.object({
     schema_version: z.string().regex(/^1\.\d+\.\d+$/),
     id: z.string().uuid().default(() => crypto.randomUUID()),
-    input: z.string().min(1), // Original proposal that failed validation
+    input: z.any().refine(val => val !== "", { message: "Input cannot be empty" }), // Original proposal that failed validation
 });
 
 export const GateList = z.discriminatedUnion("ErrorId", [
@@ -42,7 +42,6 @@ export const GateList = z.discriminatedUnion("ErrorId", [
         ErrorId: z.literal(ProposalErrorCode.ID_COLLISION),
         args: z.object({
             incoming: z.string().uuid(), // ID from the incoming proposal
-            backlog: z.string().uuid(), // ID from backlog database. 
             message: z.literal("ID matches with previously logged proposal ID")
         }).strict()
     }),
@@ -53,7 +52,7 @@ export const GateList = z.discriminatedUnion("ErrorId", [
         ErrorId: z.literal(ProposalErrorCode.MISSING_CONTENT),
         args: z.object({
             field: z.string(), // Which field is missing
-            message: z.literal("Required field is missing or empty") // Description of the missing content
+            message: z.literal("Required field is missing or incorrectly formatted") // Description of the missing content
         }).strict()
     }),
 
