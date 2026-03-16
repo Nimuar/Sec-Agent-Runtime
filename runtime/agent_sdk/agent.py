@@ -4,7 +4,10 @@ import requests
 import json
 import re
 import os
-import AgentConfig
+try:
+    from . import AgentConfig
+except ImportError:
+    import AgentConfig
 from dotenv import load_dotenv
 
 load_dotenv()
