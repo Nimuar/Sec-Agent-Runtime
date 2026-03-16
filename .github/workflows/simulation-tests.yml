@@ -31,9 +31,11 @@ jobs:
           python-version: '3.11'
           
       - name: Install Python dependencies
-        run: pip install requests
+        run: pip install requests pytest
           
       - name: Run Python simulation harness
+        env:
+          GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
         run: |
           # Start the Express API server in the background
           npx tsx api/src/server.ts &
@@ -44,7 +46,7 @@ jobs:
           
           if [ -d "tests" ] && [ "$(ls -A tests 2>/dev/null)" ]; then
             export PYTHONPATH=$PYTHONPATH:.
-            python -m unittest discover tests
+            pytest tests/test_sdk_e2e.py -v
           else
             echo "No tests directory found or directory is empty, skipping simulation tests"
           fi
