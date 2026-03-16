@@ -23,7 +23,7 @@ jobs:
         env:
           GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
         run: |
-          npx tsx runtime/src/server.ts &
+          (cd runtime && npx tsx src/server.ts &)
           sleep 5
           export PYTHONPATH=$PYTHONPATH:.
           pytest tests/test_sdk_e2e.py -v
