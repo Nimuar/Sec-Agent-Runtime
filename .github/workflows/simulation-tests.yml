@@ -31,7 +31,7 @@ jobs:
           python-version: '3.11'
           
       - name: Install Python dependencies
-        run: pip install google-genai requests pytest
+        run: pip install python-dotenv google-genai requests pytest
           
       - name: Run Python simulation harness
         env:
