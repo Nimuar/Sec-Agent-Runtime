@@ -29,10 +29,11 @@ npm run test
 **Requirement:** The server must be running in a separate terminal.
 ```bash
 # Terminal 1: Start Server
-npx tsx runtime/src/server.ts
+cd runtime && npm run dev
 
 # Terminal 2: Run Tests
 python -m unittest tests/test_boundary.py
+python -m pytest tests/test_sdk_e2e.py -v
 ```
 
 <br/>
@@ -50,8 +51,8 @@ The project is consolidated into a unified runtime and e2e testing suite:
     - `/src/actions`: Definitions of allowed actions.
     - `/src/schemas`: Shared Zod schemas and TypeScript types.
     - `/src/server.ts`: Express API interface.
-    - `stepRuntime.ts`: Core lifecycle execution logic.
-    - `agent_sdk/`: Python-based LLM client for adversarial testing.
+    - `/src/stepRuntime.ts`: Core lifecycle execution logic.
+    - `/agent_sdk/`: Python-based LLM client for adversarial testing.
 - `/tests`: Top-level E2E and robustness stress-testing suite (Python).
 - `/logs`: Execution traces and test result outputs.
 

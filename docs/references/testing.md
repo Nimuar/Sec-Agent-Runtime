@@ -22,7 +22,8 @@ The Express microservice must be running in a separate terminal before executing
 
 ```bash
 # In Terminal 1
-npx tsx api/src/server.ts
+cd runtime
+npm run dev
 ```
 
 ### Running the Python Tests
@@ -33,6 +34,7 @@ Once the server is listening on `localhost:3000`, run the boundary and robustnes
 python -m unittest tests/test_boundary.py
 python -m unittest tests/test_fuzzing.py
 python -m unittest tests/test_slow_loris.py
+python -m pytest tests/test_sdk_e2e.py -v
 ```
 
 ## 3. Manual Agent SDK Testing
@@ -42,7 +44,8 @@ If you want to manually test the agent integration via the SDK (`agent_test.py`)
 ### Start the Server
 Run the API's development server in one terminal:
 ```bash
-# In Terminal 1 (from the root or api directory, where the dev script is defined)
+# In Terminal 1 (from the root directory)
+cd runtime
 npm run dev
 ```
 
@@ -51,7 +54,7 @@ In a separate terminal, navigate to the SDK folder and run the test script:
 ```bash
 # In Terminal 2
 cd runtime/agent_sdk
-python3 ./agent_test.py
+python ./agent_test.py
 ```
 
 ---
