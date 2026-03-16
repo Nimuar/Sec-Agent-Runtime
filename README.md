@@ -54,7 +54,6 @@ The project is consolidated into a unified runtime and e2e testing suite:
     - `agent_sdk/`: Python-based LLM client for adversarial testing.
 - `/tests`: Top-level E2E and robustness stress-testing suite (Python).
 - `/logs`: Execution traces and test result outputs.
-- `/.spec`: Spec-Driven Development (SDD) architectural history.
 
 ### SARE — Secure Agent Runtime Evaluations
 Evaluation, simulation, and analysis tooling for the Agent Runtime live in a **separate repository**.
