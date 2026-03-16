@@ -26,7 +26,7 @@ class RuntimeClient:
             If the response isn't valid JSON, it returns a dict wrapping an EXECUTION_ERROR.
         """
         url = f"{self.base_url}/execute"
-        
+
         try:
             if isinstance(payload, str):
                 try:
@@ -37,7 +37,9 @@ class RuntimeClient:
                     # If it's totally invalid JSON (adversarial), send it as raw bytes/text
                     # But the server uses app.use(express.json()), so it might fail with 400.
                     # We send it as 'data' and set content-type application/json to test server resilience.
-                    response = requests.post(url, data=payload, headers={"Content-Type": "application/json"})
+                    response = requests.post(
+                        url, data=payload, headers={"Content-Type": "application/json"}
+                    )
             else:
                 response = requests.post(url, json=payload)
 

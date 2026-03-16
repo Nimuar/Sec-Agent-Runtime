@@ -22,6 +22,7 @@ def make_agent():
 
 # --- Init ---
 
+
 class TestInit(unittest.TestCase):
 
     def test_agent_starts_active(self):
@@ -38,6 +39,7 @@ class TestInit(unittest.TestCase):
 
 
 # --- agentprompt ---
+
 
 class TestAgentPrompt(unittest.TestCase):
 
@@ -68,12 +70,15 @@ class TestAgentPrompt(unittest.TestCase):
         self.agent.mock_client.models.generate_content.assert_not_called()
 
     def test_returns_json_error_on_exception(self):
-        self.agent.mock_client.models.generate_content.side_effect = Exception("API down")
+        self.agent.mock_client.models.generate_content.side_effect = Exception(
+            "API down"
+        )
         result = self.agent.agentprompt("test")
         self.assertEqual(result["outcome"], "EXECUTION_ERROR")
 
 
 # --- close / open ---
+
 
 class TestCloseOpen(unittest.TestCase):
 
@@ -97,6 +102,7 @@ class TestCloseOpen(unittest.TestCase):
 
 # --- reqhttp ---
 
+
 class TestReqHttp(unittest.TestCase):
 
     def setUp(self):
@@ -109,11 +115,14 @@ class TestReqHttp(unittest.TestCase):
         with patch("agent.requests.post", return_value=self.mock_http) as mock_post:
             result = self.agent.reqhttp({"action": "THINK"})
             mock_post.assert_called_once()
-            self.assertEqual(mock_post.call_args[1]['json'], {"action": "THINK"})
+            self.assertEqual(mock_post.call_args[1]["json"], {"action": "THINK"})
         self.assertEqual(result, {"result": "ok"})
 
     def test_returns_error_dict_on_connection_error(self):
-        with patch("agent.requests.post", side_effect=requests.exceptions.RequestException("refused")):
+        with patch(
+            "agent.requests.post",
+            side_effect=requests.exceptions.RequestException("refused"),
+        ):
             result = self.agent.reqhttp({"action": "THINK"})
         self.assertEqual(result["outcome"], "EXECUTION_ERROR")
 

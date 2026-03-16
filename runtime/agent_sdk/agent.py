@@ -1,4 +1,4 @@
-#from anthropic import Anthropic
+# from anthropic import Anthropic
 from google import genai
 import requests
 import json
@@ -11,36 +11,31 @@ load_dotenv()
 
 _DIR = os.path.dirname(os.path.abspath(__file__))
 
-with open(os.path.join(_DIR,"prompts", "fuzz_prompt.txt"), "r") as _f:
+with open(os.path.join(_DIR, "prompts", "fuzz_prompt.txt"), "r") as _f:
     FUZZ_PROMPT = _f.read()
 
 
-class AgentInterface: 
+class AgentInterface:
     def __init__(
-        self,
-        api_key: str = None,
-        model: str = AgentConfig.model,
-        max_retries: int = 3
+        self, api_key: str = None, model: str = AgentConfig.model, max_retries: int = 3
     ):
         self.api_key = api_key or os.getenv("GOOGLE_API_KEY")
-        
+
         if not self.api_key:
             raise ValueError("API key is required to initialize the AgentInterface.")
-        
+
         self.model = model
         self.max_retries = max_retries
         self.client = genai.Client(api_key=self.api_key)
         self.proposal_history = []
         self.active = True
-    
 
-
-    #Send a Proposal to Agent returns a response as a dictionary.
+    # Send a Proposal to Agent returns a response as a dictionary.
     def agentprompt(self, message: str) -> dict:
-        #Confirm agent active (Should be if possible.)
-        if(not self.active):
+        # Confirm agent active (Should be if possible.)
+        if not self.active:
             return {"error": "Interface not active", "outcome": "EXECUTION_ERROR"}
-        elif(len(self.proposal_history) >= self.max_retries):
+        elif len(self.proposal_history) >= self.max_retries:
             return {"error": "Maximum Retries reached", "outcome": "EXECUTION_ERROR"}
         else:
             try:
@@ -49,7 +44,9 @@ class AgentInterface:
                 #     messages=[{"role": "user", "content": message}]
                 # )
 
-                response = self.client.models.generate_content(model=self.model, contents=(message + "\n"))
+                response = self.client.models.generate_content(
+                    model=self.model, contents=(message + "\n")
+                )
                 print("response: ", response)
                 text = response.text
                 parsed = json.loads(text)
@@ -62,7 +59,7 @@ class AgentInterface:
                 print(f"Error communicating with LLM: {e}")
                 return {"error": str(e), "outcome": "EXECUTION_ERROR"}
 
-    #Checking for agent activity turns agent on or off.
+    # Checking for agent activity turns agent on or off.
     def close(self):
         self.active = False
         print("Agent has closed - Deleting History")
@@ -72,10 +69,9 @@ class AgentInterface:
         print("Agent has opened")
         self.active = True
 
-
-    #send request through TS server. Reurns Response as JSON. 
-    def reqhttp(self, proposal_data) -> dict: 
-        #Try to send data to url, return output. 
+    # send request through TS server. Reurns Response as JSON.
+    def reqhttp(self, proposal_data) -> dict:
+        # Try to send data to url, return output.
         try:
             response = requests.post(AgentConfig.ts_url, json=proposal_data, timeout=40)
             print(f"status: {response.status_code}")
@@ -84,11 +80,11 @@ class AgentInterface:
 
         except requests.exceptions.JSONDecodeError as e:
             print(f"Server returned non-JSON response: {e}")
-            return {"outcome": "EXECUTION_ERROR", "error": {"message": "Invalid JSON response from server"}}
+            return {
+                "outcome": "EXECUTION_ERROR",
+                "error": {"message": "Invalid JSON response from server"},
+            }
 
         except requests.exceptions.RequestException as e:
             print(f"HTTP Request failed: {e}")
             return {"outcome": "EXECUTION_ERROR", "error": {"message": str(e)}}
-
-
-        

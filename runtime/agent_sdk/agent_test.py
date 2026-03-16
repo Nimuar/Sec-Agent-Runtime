@@ -15,7 +15,7 @@ def main():
 
     # Feed it into LLM.
     response = agent.agentprompt(proposal)
-    
+
     if isinstance(response, dict) and response.get("outcome") == "EXECUTION_ERROR":
         print(f"Agent returned error: {response}")
         agent.close()
