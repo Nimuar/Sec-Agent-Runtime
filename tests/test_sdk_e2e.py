@@ -110,6 +110,44 @@ class TestSDKE2E(unittest.TestCase):
         
         self.assertEqual(ts_response.get("outcome"), "SUCCESS", f"TS Error: {json.dumps(ts_response.get('error'))}")
         
+    def _run_llm_fault_test(self, requested_fault, expected_runtime_outcome):
+        """Helper to run fuzz_prompt.txt driven dynamic tests."""
+        prompt_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), "runtime", "agent_sdk", "prompts", "fuzz_prompt.txt")
+        with open(prompt_path, "r") as f:
+            system_prompt = f.read()
+
+        agent = AgentInterface(system_instruction=system_prompt)
+        response = agent.agentprompt(f"Generate a proposal with the {requested_fault} fault.")
+        
+        self.assertIsInstance(response, dict, f"Expected LLM response to be a dict, got {type(response)}: {response}")
+        
+        # Output format defined in fuzz_prompt.txt
+        fault = response.get("fault")
+        expected_gate_error = response.get("expected")
+        proposal = response.get("proposal")
+        
+        self.assertEqual(fault, requested_fault, f"LLM did not generate the requested fault type. Got {fault}")
+        log_to_file(f"Fuzz test '{requested_fault}': proposal generated -> {json.dumps(proposal)}")
+        
+        ts_response = agent.reqhttp(proposal)
+        log_to_file(f"TS Response: {json.dumps(ts_response)}")
+        
+        self.assertEqual(ts_response.get("outcome"), expected_runtime_outcome, f"Expected {expected_runtime_outcome} but got {ts_response.get('outcome')}. Error: {ts_response.get('error')}")
+        if expected_gate_error != "NONE":
+            error_code = ts_response.get("error", {}).get("error_code")
+            # We don't strictly assert the exact error code if the LLM misunderstood the expected one, 
+            # but we can log it if it doesn't match the prompt's prediction.
+            if error_code != expected_gate_error:
+                log_to_file(f"Warning: Prompt predicted '{expected_gate_error}', but runtime gave '{error_code}'")
+
+    def test_llm_fault_bad_action(self):
+        """Prompt LLM for a BAD_ACTION fault. Verify the runtime rejects it as DENIED."""
+        self._run_llm_fault_test("BAD_ACTION", "DENIED")
+        
+    def test_llm_fault_bad_extension(self):
+        """Prompt LLM for a BAD_EXTENSION fault. Verify the runtime rejects it."""
+        self._run_llm_fault_test("BAD_EXTENSION", "VALIDATION_ERROR")
+
     # 2. Hardcoded Deterministic Tests
     def test_payload_overflow(self):
         """Send a payload > 1024 bytes. Assert VALIDATION_ERROR."""
