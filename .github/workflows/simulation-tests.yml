@@ -31,7 +31,7 @@ jobs:
           python-version: '3.11'
           
       - name: Install Python dependencies
-        run: pip install python-dotenv google-genai requests pytest
+        run: pip install google-genai requests pytest python-dotenv
           
       - name: Run Python simulation harness
         env:
@@ -46,7 +46,7 @@ jobs:
           
           if [ -d "tests" ] && [ "$(ls -A tests 2>/dev/null)" ]; then
             export PYTHONPATH=$PYTHONPATH:.
-            pip install google-genai requests pytest
+            pip install google-genai requests pytest python-dotenv
             pytest tests/test_sdk_e2e.py -v
           else
             echo "No tests directory found or directory is empty, skipping simulation tests"
