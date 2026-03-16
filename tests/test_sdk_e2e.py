@@ -57,12 +57,6 @@ class TestSDKE2E(unittest.TestCase):
         
         self.assertIsInstance(response, dict)
         proposal = response.get("proposal", response)
-        
-        # Ensure a valid UUID
-        try:
-            uuid.UUID(str(proposal.get("id")))
-        except:
-            proposal["id"] = str(uuid.uuid4())
             
         log_to_file(f"Proposal sent: {json.dumps(proposal)}")
         ts_response = agent.reqhttp(proposal)
@@ -93,16 +87,6 @@ class TestSDKE2E(unittest.TestCase):
         
         self.assertIsInstance(response, dict)
         proposal = response.get("proposal", response)
-        
-        # Ensure a valid UUID
-        try:
-            uuid.UUID(str(proposal.get("id")))
-        except:
-            proposal["id"] = str(uuid.uuid4())
-            
-        # Fix common LLM arg name hallucinations
-        if "args" in proposal and "directory" in proposal["args"] and "path" not in proposal["args"]:
-            proposal["args"]["path"] = proposal["args"].pop("directory")
             
         log_to_file(f"Proposal sent: {json.dumps(proposal)}")
         ts_response = agent.reqhttp(proposal)
