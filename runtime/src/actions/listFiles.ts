@@ -19,7 +19,7 @@ export const listFiles: ExecutionPrimitive<ListFilesArgs> = async (
             };
         }
 
-        const physicalPath = path.join(process.cwd(), 'local_sandbox', args.path.slice('/sandbox/'.length));
+        const physicalPath = path.join(process.cwd(), 'sandbox', args.path.slice('/sandbox/'.length));
         const dirents = await fs.readdir(physicalPath, { withFileTypes: true });
 
         if (dirents.length === 0) {

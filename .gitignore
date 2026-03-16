@@ -151,6 +151,7 @@ __pycache__/
 venv/
 .venv/
 env/
+.env
 
 # Python test reports
 .pytest_cache/
@@ -164,6 +165,7 @@ htmlcov/
 *.swo
 
 # Test output
+*.pyc
 metrics.txt
 api/test_output_esm.txt
 api/test_output_new.txt
@@ -172,3 +174,4 @@ api/test_results.txt
 full_test_results.txt
 full_regression_results.txt
 test_results.txt
+runtime/agent_sdk/history.txt
