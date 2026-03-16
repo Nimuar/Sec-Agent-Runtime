@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { ActionType } from '../../../../sys-common/schemas/ActionTypeRegistry';
+import { ActionType } from '../../schemas/ActionTypeRegistry.js';
 import { dispatchAction } from '../dispatcher';
 import * as fileActions from '../readFile';
 

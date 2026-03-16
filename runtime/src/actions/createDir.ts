@@ -1,7 +1,7 @@
 import * as fs from 'fs/promises';
 import * as path from 'path';
-import { ExecutionPrimitive, CreateDirectoryArgs, RuntimeResponse } from '../../../sys-common/schemas/ExecutionContracts';
-import { ActionType } from '../../../sys-common/schemas/ActionTypeRegistry';
+import { ActionType } from '../schemas/ActionTypeRegistry.js';
+import { CreateDirectoryArgs, ExecutionPrimitive, RuntimeResponse } from '../schemas/ExecutionContracts.js';
 
 export const createDir: ExecutionPrimitive<CreateDirectoryArgs> = async (
     proposal_id: string,

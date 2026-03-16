@@ -1,7 +1,7 @@
 import * as fs from 'fs/promises';
 import * as path from 'path';
-import { ExecutionPrimitive, RenameFileArgs, RuntimeResponse } from '../../../sys-common/schemas/ExecutionContracts';
-import { ActionType } from '../../../sys-common/schemas/ActionTypeRegistry';
+import { ActionType } from '../schemas/ActionTypeRegistry.js';
+import { ExecutionPrimitive, RuntimeResponse, RenameFileArgs } from '../schemas/ExecutionContracts.js';
 
 export const renameFile: ExecutionPrimitive<RenameFileArgs> = async (
     proposal_id: string,

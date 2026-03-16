@@ -1,7 +1,7 @@
 import { describe, it, expect } from "vitest";
-import { GateList } from "../ProposalErrorSchema.js";
-import { ProposalErrorCode } from "../ProposalErrorRegistry.js";
-import { TEST_UUID } from "../ProposalErrorConfig.js";
+import { GateList } from "../../src/schemas/ProposalErrorSchema.js";
+import { ProposalErrorCode } from "../../src/schemas/ProposalErrorRegistry.js";
+import { TEST_UUID } from "../../src/schemas/ProposalErrorConfig.js";
 
 // Test UUID 
 

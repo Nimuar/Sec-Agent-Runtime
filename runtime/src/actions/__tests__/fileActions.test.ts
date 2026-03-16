@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import * as fs from 'fs/promises';
 import * as path from 'path';
-import { ActionType } from '../../../../sys-common/schemas/ActionTypeRegistry';
+import { ActionType } from '../../schemas/ActionTypeRegistry.js';
 import { readFile } from '../readFile';
 import { writeFile } from '../writeFile';
 import { deleteFile } from '../deleteFile';

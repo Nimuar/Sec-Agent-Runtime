@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
-import { AgentProposalSchema } from "../ProposalSchema.js";
-import { ActionType } from "../ActionTypeRegistry.js";
+import { AgentProposalSchema } from "../../src/schemas/ProposalSchema.js";
+import { ActionType } from "../../src/schemas/ActionTypeRegistry.js";
 
 describe("ProposalSchema Robustness", () => {
   const validBase = {

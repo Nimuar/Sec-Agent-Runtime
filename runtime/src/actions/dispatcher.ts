@@ -1,5 +1,5 @@
-import { ActionType } from '../../../sys-common/schemas/ActionTypeRegistry';
-import { RuntimeResponse } from '../../../sys-common/schemas/ExecutionContracts';
+import { ActionType } from '../schemas/ActionTypeRegistry.js';
+import { RuntimeResponse } from '../schemas/ExecutionContracts.js';
 
 import { readFile } from './readFile';
 import { writeFile } from './writeFile';

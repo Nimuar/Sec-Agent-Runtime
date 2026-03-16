@@ -1,7 +1,7 @@
 import * as fs from 'fs/promises';
 import * as path from 'path';
-import { ExecutionPrimitive, DeleteFileArgs, RuntimeResponse } from '../../../sys-common/schemas/ExecutionContracts';
-import { ActionType } from '../../../sys-common/schemas/ActionTypeRegistry';
+import { ActionType } from '../schemas/ActionTypeRegistry.js';
+import { ExecutionPrimitive, RuntimeResponse, DeleteFileArgs } from '../schemas/ExecutionContracts.js';
 
 export const deleteFile: ExecutionPrimitive<DeleteFileArgs> = async (
     proposal_id: string,

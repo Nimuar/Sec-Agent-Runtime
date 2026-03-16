@@ -1,9 +1,9 @@
 import { z } from "zod";
 import path from "path";
 
-import { AgentProposalSchema, AgentProposal } from "../../sys-common/schemas/ProposalSchema.js";
-import { ActionType } from "../../sys-common/schemas/ActionTypeRegistry.js";
-import { RuntimeResponse } from "../../sys-common/schemas/ExecutionContracts.js";
+import { AgentProposalSchema, AgentProposal } from "./schemas/ProposalSchema.js";
+import { ActionType } from "./schemas/ActionTypeRegistry.js";
+import { RuntimeResponse } from "./schemas/ExecutionContracts.js";
 import { dispatchAction } from "./actions/dispatcher.js";
 
 /**

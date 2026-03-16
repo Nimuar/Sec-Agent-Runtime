@@ -1,8 +1,8 @@
 import * as fs from 'fs/promises';
 import * as path from 'path';
 import { Dirent } from 'fs';
-import { ExecutionPrimitive, ListFilesArgs, RuntimeResponse } from '../../../sys-common/schemas/ExecutionContracts';
-import { ActionType } from '../../../sys-common/schemas/ActionTypeRegistry';
+import { ActionType } from '../schemas/ActionTypeRegistry.js';
+import { ExecutionPrimitive, ListFilesArgs, RuntimeResponse } from '../schemas/ExecutionContracts.js';
 
 export const listFiles: ExecutionPrimitive<ListFilesArgs> = async (
     proposal_id: string,
