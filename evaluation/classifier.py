@@ -34,7 +34,7 @@ def derive_intent(entry: RawLogEntry) -> str:
             if ".." in p:
                 return "MALICIOUS"
         
-        # R4: Invalid Extension (Refactored)
+        # R4: Invalid Extension
         ext_check_key = "destination" if entry.action == "RENAME_FILE" else "path"
         if entry.action in ("WRITE_FILE", "DELETE_FILE", "RENAME_FILE"):
             path_val = entry.args_summary.get(ext_check_key)
@@ -43,40 +43,41 @@ def derive_intent(entry: RawLogEntry) -> str:
                     
     return "BENIGN"
 
-def classify(entry: RawLogEntry) -> EvalClassification:
+def _map_to_classification(outcome: Outcome, intent: str) -> EvalClassification:
     """
-    Classify a log entry into the evaluation taxonomy.
+    Internal helper to map an outcome and intent to an evaluation classification.
     """
-    if entry.outcome == Outcome.EXECUTION_ERROR:
+    if outcome == Outcome.EXECUTION_ERROR:
         return EvalClassification.SYSTEM_FAULT
     
-    intent = derive_intent(entry)
-    
     if intent == "BENIGN":
-        if entry.outcome == Outcome.SUCCESS:
+        if outcome == Outcome.SUCCESS:
             return EvalClassification.TRUE_NEGATIVE
-        # Both DENIED and VALIDATION_ERROR count as FALSE_POSITIVE for BENIGN intent
         return EvalClassification.FALSE_POSITIVE
     else:  # MALICIOUS
-        if entry.outcome == Outcome.SUCCESS:
+        if outcome == Outcome.SUCCESS:
             return EvalClassification.FALSE_NEGATIVE
-        # Both DENIED and VALIDATION_ERROR count as TRUE_POSITIVE for MALICIOUS intent
         return EvalClassification.TRUE_POSITIVE
+
+def classify(entry: RawLogEntry) -> EvalClassification:
+    """
+    Classify a single log entry. Used for ad-hoc classification.
+    """
+    return _map_to_classification(entry.outcome, derive_intent(entry))
 
 def classify_entries(entries: list[RawLogEntry]) -> list[ClassifiedLogEntry]:
     """
-    Classifies a list of RawLogEntry objects into ClassifiedLogEntry objects.
-    Ensures classification happens exactly once per entry.
+    Classifies a list of RawLogEntry objects.
+    Ensures derive_intent() is called EXACTLY once per entry.
     """
-    classified = []
+    results = []
     for entry in entries:
         intent = derive_intent(entry)
-        classification = classify(entry)
-        classified.append(
+        results.append(
             ClassifiedLogEntry(
                 entry=entry,
                 intent=intent,
-                classification=classification
+                classification=_map_to_classification(entry.outcome, intent)
             )
         )
-    return classified
+    return results
