@@ -40,5 +40,5 @@ jobs:
         uses: thollander/actions-comment-pull-request@v3
         if: github.event_name == 'pull_request' && always()
         with:
-          file_path: tests/results/metrics_report.md
-          comment_tag: evaluation_report
+          file-path: tests/results/metrics_report.md
+          comment-tag: evaluation_report
