@@ -2,7 +2,7 @@ import pytest
 import os
 from evaluation.models import RawLogEntry, Outcome, EvalClassification
 from evaluation.loader import load_log_entries
-from evaluation.classifier import classify
+from evaluation.classifier import classify, classify_entries
 from evaluation.engine import compute_metrics
 from evaluation.reporter import generate_report
 
@@ -51,8 +51,9 @@ class TestEvaluationPipeline:
         
     def test_compute_metrics_math(self):
         """Verify the final aggregated math against the mock data."""
-        entries = load_log_entries(MOCK_FILE)
-        result = compute_metrics(entries)
+        raw_entries = load_log_entries(MOCK_FILE)
+        classified_entries = classify_entries(raw_entries)
+        result = compute_metrics(classified_entries)
         
         # Breakdown from mock data:
         # TN: 5 (1, 2, 3, 4, 5)
@@ -81,11 +82,12 @@ class TestEvaluationPipeline:
         assert result.system_fault_rate == 0.1
 
     def test_report_generation(self):
-        """Verify Markdown report generation and contents."""
-        entries = load_log_entries(MOCK_FILE)
-        result = compute_metrics(entries)
+        """Verify Markdown report generation and contents using pre-classified entries."""
+        raw_entries = load_log_entries(MOCK_FILE)
+        classified_entries = classify_entries(raw_entries)
+        result = compute_metrics(classified_entries)
         
-        report = generate_report(entries, result, REPORT_OUTPUT)
+        report = generate_report(classified_entries, result, REPORT_OUTPUT)
         
         assert os.path.exists(REPORT_OUTPUT)
         assert "# Evaluation Report" in report

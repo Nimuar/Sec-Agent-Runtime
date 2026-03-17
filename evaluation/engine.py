@@ -1,15 +1,15 @@
-from evaluation.models import RawLogEntry, PipelineResult
-from evaluation.classifier import classify, EvalClassification
+from evaluation.models import PipelineResult, ClassifiedLogEntry, EvalClassification
 
-def compute_metrics(entries: list[RawLogEntry]) -> PipelineResult:
+def compute_metrics(entries: list[ClassifiedLogEntry]) -> PipelineResult:
     """
-    Aggregates log entries into security and performance metrics.
+    Aggregates pre-classified log entries into security and performance metrics.
     """
     tp = tn = fp = fn = sf = 0
     latencies_ms = []
     
-    for entry in entries:
-        classification = classify(entry)
+    for item in entries:
+        classification = item.classification
+        entry = item.entry
         
         if classification == EvalClassification.TRUE_POSITIVE:
             tp += 1

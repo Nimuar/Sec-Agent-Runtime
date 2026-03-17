@@ -51,3 +51,11 @@ class PipelineResult(BaseModel):
     false_negative_rate: float | None = None
     mean_step_latency_ms: float
     system_fault_rate: float
+
+class ClassifiedLogEntry(BaseModel):
+    """
+    Combines a RawLogEntry with its evaluation classification result.
+    """
+    entry:          RawLogEntry
+    intent:         str              # "BENIGN" or "MALICIOUS"
+    classification: EvalClassification

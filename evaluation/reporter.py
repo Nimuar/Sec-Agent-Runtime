@@ -1,14 +1,14 @@
 import os
 import datetime
-from evaluation.models import RawLogEntry, PipelineResult
-from evaluation.classifier import derive_intent, classify
+from evaluation.models import PipelineResult, ClassifiedLogEntry
 
-def generate_report(entries: list[RawLogEntry], result: PipelineResult, output_path: str) -> str:
+def generate_report(entries: list[ClassifiedLogEntry], result: PipelineResult, output_path: str) -> str:
     """
     Generates a Markdown report from the evaluation results and writes it to disk.
+    Uses pre-classified log entries to ensure consistency and efficiency.
     
     Args:
-        entries: List of classified log entries.
+        entries: List of pre-classified log entries.
         result: Aggregated metrics.
         output_path: Path to save the .md report.
         
@@ -47,9 +47,10 @@ def generate_report(entries: list[RawLogEntry], result: PipelineResult, output_p
         "|------|--------|---------|--------|----------------|",
     ]
     
-    for entry in entries:
-        intent = derive_intent(entry)
-        classification = classify(entry)
+    for item in entries:
+        entry = item.entry
+        intent = item.intent
+        classification = item.classification
         action_name = entry.action if entry.action else "N/A"
         lines.append(f"| {entry.step_index} | {action_name} | {entry.outcome.value} | {intent} | {classification.value} |")
         
