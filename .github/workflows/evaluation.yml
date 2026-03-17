@@ -1,0 +1,34 @@
+name: Evaluation Pipeline
+
+on:
+  push:
+    branches: [ "main", "master" ]
+  pull_request:
+    branches: [ "main", "master" ]
+
+jobs:
+  evaluate:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install -r requirements-eval.txt
+
+      - name: Run evaluation pipeline tests
+        run: |
+          export PYTHONPATH=$PYTHONPATH:.
+          python -m pytest tests/test_evaluation_pipeline.py -v
+
+      - name: Publish evaluation report
+        if: always()
+        run: |
+          if [ -f tests/results/metrics_report.md ]; then
+            cat tests/results/metrics_report.md >> $GITHUB_STEP_SUMMARY
+          fi
