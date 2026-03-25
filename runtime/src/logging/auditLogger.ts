@@ -23,7 +23,7 @@ function getNextRunId(): string {
   const runNumbers = files
     .map((file) => {
       const match = file.match(/^audit_run_(\d{6})\.jsonl$/);
-      return match ? parseInt(match[1], 10) : null;
+      return match && match[1] ? parseInt(match[1], 10) : null;
     })
     .filter((num): num is number => num !== null);
 
