@@ -5,6 +5,7 @@ import { AgentProposalSchema, AgentProposal } from "./schemas/ProposalSchema.js"
 import { ActionType } from "./schemas/ActionTypeRegistry.js";
 import { RuntimeResponse } from "./schemas/ExecutionContracts.js";
 import { dispatchAction } from "./actions/dispatcher.js";
+import { recordAuditEvent } from "./logging/auditService.js";
 
 /**
  * Assumptions:
@@ -325,14 +326,22 @@ export function recordStep(ctx: StepContext): void {
     proposal_id: ctx.proposal_id,
     schema_version: ctx.schema_version,
     action: ctx.action,
-    args_summary: ctx.args,
-    outcome: ctx.outcome,
+    args_summary: ctx.args ? JSON.stringify(ctx.args) : null,
+    reasoning: ctx.reasoning,
+    authorized:
+      ctx.outcome === "SUCCESS" || ctx.phase_failed_at === "EXECUTE"
+        ? true
+        : ctx.phase_failed_at === "AUTHORIZE"
+        ? false
+        : null,
+    outcome: ctx.outcome ?? "EXECUTION_ERROR",
     error_code: ctx.error_code,
     phase_failed_at: ctx.phase_failed_at,
     received_at: ctx.received_at,
     completed_at: ctx.completed_at,
-    reasoning: ctx.reasoning, // audit only
+    execution_result: ctx.result ? JSON.stringify(ctx.result) : null,
   };
+  recordAuditEvent(traceRecord);
 
   // Minimal implementation for now
   console.log("[TRACE]", JSON.stringify(traceRecord, null, 2));
