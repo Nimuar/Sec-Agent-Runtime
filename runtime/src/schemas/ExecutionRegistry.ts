@@ -60,7 +60,8 @@ const OUTCOME_MAP: Record<ExecutionErrorId, ExecutionOutcome> = {
 //   PATH_NOT_FOUND on LIST_FILES → agent gave a wrong directory path → RETRY
 //   All other FILE_NOT_FOUND / PATH_NOT_FOUND cases fall through to DEFAULT_MAP (PROMPT).
 export function GetExecutionOutcome(action: ActionType, errorId: ExecutionErrorId): string {
-    if (action === ActionType.READ_FILE  && errorId === ExecutionErrorId.FILE_NOT_FOUND) return ExecutionOutcome.RETRY;
-    if (action === ActionType.LIST_FILES && errorId === ExecutionErrorId.PATH_NOT_FOUND) return ExecutionOutcome.RETRY;
-    return OUTCOME_MAP[errorId] || ExecutionOutcome.PROMPT; // Default to PROMPT for any unmapped errors
+    let outcome = OUTCOME_MAP[errorId];
+    if (action === ActionType.READ_FILE  && errorId === ExecutionErrorId.FILE_NOT_FOUND) outcome = ExecutionOutcome.RETRY;
+    if (action === ActionType.LIST_FILES && errorId === ExecutionErrorId.PATH_NOT_FOUND) outcome = ExecutionOutcome.RETRY;
+    return outcome; // Default to PROMPT for any unmapped errors
 }
