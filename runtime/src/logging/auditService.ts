@@ -18,6 +18,10 @@ process.on("SIGTERM", closeAuditLogger);
 export function recordAuditEvent(
   event: Omit<AuditEvent, "step_index">
 ): void {
+  if (isClosed) {
+    return;
+  }
+
   auditLogger.writeEvent({
     ...event,
     step_index: globalStepIndex++,
