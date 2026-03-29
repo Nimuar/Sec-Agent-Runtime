@@ -7,7 +7,7 @@ import {
   RunHeader,
 } from "./auditTypes";
 
-const LOG_DIR = path.join(process.cwd(), "logs");
+const LOG_DIR = process.env.AUDIT_LOG_DIR || path.join(process.cwd(), "logs");
 
 function ensureLogDirExists(): void {
   if (!fs.existsSync(LOG_DIR)) {
