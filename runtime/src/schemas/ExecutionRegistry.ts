@@ -27,7 +27,7 @@ export enum ExecutionErrorId {
     UNKNOWN_ERROR = "UNKNOWN_ERROR"
 }
 
-export const enum ExecutionOutcome {
+export enum ExecutionOutcome {
     RETRY  = "RETRY",   // Agent gave a correctable argument — prompt to fix, no quota cost
     ABORT  = "ABORT",   // System-level failure — session cannot continue
     PROMPT = "PROMPT",  // Stale world-model — deduct one error credit, prompt agent to reassess
@@ -61,7 +61,7 @@ const OUTCOME_MAP: Record<ExecutionErrorId, ExecutionOutcome> = {
 //   All other FILE_NOT_FOUND / PATH_NOT_FOUND cases fall through to DEFAULT_MAP (PROMPT).
 export function GetExecutionOutcome(action: ActionType, errorId: ExecutionErrorId): string {
     let outcome = OUTCOME_MAP[errorId];
-    if (action === ActionType.READ_FILE  && errorId === ExecutionErrorId.FILE_NOT_FOUND) outcome = ExecutionOutcome.RETRY;
-    if (action === ActionType.LIST_FILES && errorId === ExecutionErrorId.PATH_NOT_FOUND) outcome = ExecutionOutcome.RETRY;
-    return outcome; // Default to PROMPT for any unmapped errors
+    if (action === ActionType.READ_FILE  && errorId === ExecutionErrorId.FILE_NOT_FOUND) return ExecutionOutcome.RETRY;
+    if (action === ActionType.LIST_FILES && errorId === ExecutionErrorId.PATH_NOT_FOUND) return ExecutionOutcome.RETRY;
+    return OUTCOME_MAP[errorId] || ExecutionOutcome.PROMPT; // Default to PROMPT for any unmapped errors
 }

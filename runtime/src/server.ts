@@ -26,21 +26,17 @@ app.post("/execute", express.raw({ type: 'application/json', limit: '1024b' }), 
     let containment = response.result?.containment;
 
 
-    //Updates prompt and abort outcomes based on containment. 
+    //Updates prompt and abort outcomes based on containment.
     if (containment === "PROMPT") {
       quotaCost += 1; // Deduct one credit for bad prompts
-      statusCode = 409;
       if (quotaCost >= QUOTA_LIMIT) {
         containment = "ABORT"; // If quota is exceeded force abort
         response.result!.containment = "ABORT";
       }
     }
-    if (containment === "RETRY") { 
-      statusCode = 200;
-     }
-    if (containment === "ABORT") { 
-      statusCode = 500;
-    }
+    if (containment === "RETRY")  statusCode = 200;
+    if (containment === "PROMPT") statusCode = 409;
+    if (containment === "ABORT")  statusCode = 500;
   } else if (response.outcome === "VALIDATION_ERROR" || response.outcome === "DENIED") {
     statusCode = 400;
   }

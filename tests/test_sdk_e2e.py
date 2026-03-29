@@ -221,5 +221,5 @@ class TestSDKE2E(unittest.TestCase):
         }
         log_to_file("Executing test_execution_enoent")
         response = requests.post(SERVER_URL, json=payload)
-        self.assertEqual(response.status_code, 409)
+        self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json().get("outcome"), "EXECUTION_ERROR")
