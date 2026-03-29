@@ -20,7 +20,6 @@ class AgentInterface:
         self,
         api_key: str = None,
         model: str = AgentConfig.model,
-        max_retries: int = 5,
         system_instruction: str = None
     ):
         self.api_key = api_key or os.getenv("GOOGLE_API_KEY")
