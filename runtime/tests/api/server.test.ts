@@ -54,7 +54,7 @@ describe("Agent Execution API", () => {
     expect(mockDispatchAction).not.toHaveBeenCalled();
   });
 
-  it("should return 200 and bubble up EXECUTION_ERROR from dispatcher", async () => {
+  it("should return 409 for EXECUTIONS that are correct but need to be retried.", async () => {
     const proposal = { ...validProposal, id: "550e8400-e29b-41d4-a716-446655440010" };
     mockDispatchAction.mockResolvedValue({
       proposal_id: proposal.id,
@@ -69,11 +69,11 @@ describe("Agent Execution API", () => {
       .set("Content-Type", "application/json")
       .send(JSON.stringify(proposal));
 
-    expect(response.status).toBe(200);
+    expect(response.status).toBe(409);
     expect(response.body.outcome).toBe("EXECUTION_ERROR");
   });
 
-  it("should return 200 EXECUTION_ERROR for unhandled server exceptions", async () => {
+  it("should return 500 EXECUTION_ERROR for unhandled server exceptions", async () => {
     const proposal = { ...validProposal, id: "550e8400-e29b-41d4-a716-446655440020" };
     mockDispatchAction.mockRejectedValue(new Error("Database down"));
 
@@ -82,7 +82,7 @@ describe("Agent Execution API", () => {
       .set("Content-Type", "application/json")
       .send(JSON.stringify(proposal));
 
-    expect(response.status).toBe(200);
+    expect(response.status).toBe(500);
     expect(response.body.outcome).toBe("EXECUTION_ERROR");
     expect(response.body.error.error_code).toBe("EXECUTION_ERROR");
   });

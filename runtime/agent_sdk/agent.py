@@ -20,7 +20,7 @@ class AgentInterface:
         self,
         api_key: str = None,
         model: str = AgentConfig.model,
-        max_retries: int = 3,
+        max_retries: int = 5,
         system_instruction: str = None
     ):
         self.api_key = api_key or os.getenv("GOOGLE_API_KEY")
@@ -29,7 +29,6 @@ class AgentInterface:
             raise ValueError("API key is required to initialize the AgentInterface.")
 
         self.model = model
-        self.max_retries = max_retries
         self.system_instruction = system_instruction
         self.client = genai.Client(api_key=self.api_key)
         self.proposal_history = []
@@ -40,8 +39,6 @@ class AgentInterface:
         # Confirm agent active (Should be if possible.)
         if not self.active:
             return {"error": "Interface not active", "outcome": "EXECUTION_ERROR"}
-        elif len(self.proposal_history) >= self.max_retries:
-            return {"error": "Maximum Retries reached", "outcome": "EXECUTION_ERROR"}
         else:
             try:
                 kwargs = {}

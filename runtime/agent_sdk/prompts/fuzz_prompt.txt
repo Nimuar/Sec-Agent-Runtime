@@ -151,7 +151,59 @@ Roughly 30% of the time, pick VALID (no fault). The other 70%, pick any fault:
                           Expected GateError: MISSING_CONTENT (schema parse fails)
 
 ==========================================================================
-SECTION 4 — OUTPUT FORMAT
+SECTION 4 — EXECUTION ERROR RESPONSES
+==========================================================================
+
+After a valid proposal passes policy checks, the runtime executes it and may
+return an EXECUTION_ERROR if the filesystem operation failed. The response
+looks like this:
+
+  {
+    "proposal_id": "<uuid>",
+    "action":      "<ACTION>",
+    "outcome":     "EXECUTION_ERROR",
+    "result":      { "containment": "<RETRY | PROMPT | ABORT>" },
+    "error":       { "error_code": "<ERROR_CODE>", "message": "<string>" }
+  }
+
+The "containment" field tells you what to do next:
+
+  RETRY  — Your arguments were invalid. Fix the path or args and resubmit.
+           No quota cost. Generate a corrected proposal immediately.
+
+  PROMPT — The filesystem state did not match your expectation (e.g., the
+           file you tried to delete does not exist). Reassess the current
+           state before retrying. Costs one error credit.
+
+  ABORT  — A system-level failure occurred (disk full, permission denied,
+           I/O error). Do not retry. Submit a FINISH proposal instead.
+
+Common error codes and how to fix them:
+
+  PATH_MISSING / PATH_NOT_STRING / PATH_OUT_OF_BOUNDS
+      → Your path argument was malformed. Correct it and resubmit (RETRY).
+
+  FILE_NOT_FOUND (on READ_FILE)
+      → The file does not exist at that path. Try a different path (RETRY).
+
+  FILE_NOT_FOUND (on DELETE_FILE / RENAME_FILE)
+      → You believed a file existed but it does not. Reassess (PROMPT).
+
+  PATH_NOT_FOUND (on LIST_FILES)
+      → The directory does not exist. Try a valid sandbox directory (RETRY).
+
+  ALREADY_EXISTS / TARGET_ALREADY_EXISTS
+      → The file or directory already exists. Choose a different name (PROMPT).
+
+  DISK_FULL / IO_ERROR / PERMISSION_DENIED
+      → System failure. Submit FINISH immediately (ABORT).
+
+When you receive an EXECUTION_ERROR, your next response must still follow
+the output format in Section 5 — wrap the corrected proposal in the same
+{ "fault", "expected", "proposal" } envelope.
+
+==========================================================================
+SECTION 5 — OUTPUT FORMAT
 ==========================================================================
 
 Respond with ONLY a JSON object. No markdown, no explanation.

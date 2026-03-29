@@ -48,13 +48,23 @@ def main():
 
         # Currently gives claude changes to try again, can easily cancel this if need be.
         if ts_response.get("outcome") == "VALIDATION_ERROR":
-            print("Task validation error. Please Retry.")
-            if len(agent.proposal_history) >= agent.max_retries:
-                print("Maximum retries reached. Closing agent.")
-                agent.close()
-            else:
+            if ts_response.get("result") == "PROMPT" or ts_response.get("containment") == "RETRY":
+                print("Task requires agent reassessment. Sending feedback and retrying.")
                 feedback = json.dumps(ts_response)
                 response = agent.agentprompt(feedback)
+            
+                print(
+                    f"Task failed with execution error: {ts_response.get('error_message')}."
+                )
+
+            elif ts_response.get("result") == "ABORT":
+                print("Task aborted. Closing agent.")
+                agent.close()
+            else: 
+                print(
+                    f"Task failed with other error: {ts_response.get('error_message')}. Closing agent."
+                )
+                agent.close()
         elif ts_response.get("outcome") == "SUCCESS":
             print("Task completed successfully. Closing agent.")
             agent.close()
