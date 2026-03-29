@@ -54,15 +54,16 @@ export class AuditLogger {
 }
 
   async close(): Promise<void> {
-  const footer: RunFooter = {
-    record_type: "run_footer",
-    run_id: this.runId,
-    run_completed_at: new Date().toISOString(),
-  };
+    const footer: RunFooter = {
+      record_type: "run_footer",
+      run_id: this.runId,
+      run_completed_at: new Date().toISOString(),
+    };
 
-  await fs.promises.appendFile(
-    this.filePath,
-    JSON.stringify(footer) + "\n",
-    "utf8"
-  );
+    await fs.promises.appendFile(
+      this.filePath,
+      JSON.stringify(footer) + "\n",
+      "utf8"
+    );
+  }
 }
