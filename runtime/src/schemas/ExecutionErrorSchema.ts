@@ -1,6 +1,6 @@
 import * as z from "zod";
 import { ActionType } from "./ActionTypeRegistry.js";
-import { ExecutionErrorId as ErrorId } from "./ProposalErrorRegistry.js";
+import { ExecutionErrorId as ErrorId } from "./ExecutionRegistry.js";
 
 // Reusable sandbox path validator for file-operation error members
 const sandboxPath = z.string()

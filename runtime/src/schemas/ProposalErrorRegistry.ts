@@ -23,28 +23,3 @@ export enum ProposalErrorCode {
     INVALID_CONTENT = "INVALID_CONTENT",
     MISSING_CONTENT = "MISSING_CONTENT",
 }
-
-export enum RuntimeErrorId {
-    // Schema Validation
-    PATH_MISSING = "PATH_MISSING",
-    PATH_NOT_STRING = "PATH_NOT_STRING",
-    PATH_OUT_OF_BOUNDS = "PATH_OUT_OF_BOUNDS",
-
-    // Read & Inspection
-    PATH_NOT_FOUND = "PATH_NOT_FOUND",
-    IS_DIRECTORY = "IS_DIRECTORY",
-    NOT_A_DIRECTORY = "NOT_A_DIRECTORY",
-
-    // State Modification
-    ALREADY_EXISTS = "ALREADY_EXISTS",
-    DISK_FULL = "DISK_FULL",
-    IO_ERROR = "IO_ERROR",
-
-    // High-Risk Operations
-    FILE_NOT_FOUND = "FILE_NOT_FOUND",
-    PERMISSION_DENIED = "PERMISSION_DENIED",
-    TARGET_ALREADY_EXISTS = "TARGET_ALREADY_EXISTS",
-
-    // Fallback
-    UNKNOWN_ERROR = "UNKNOWN_ERROR"
-}
