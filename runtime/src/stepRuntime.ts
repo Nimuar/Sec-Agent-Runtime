@@ -329,10 +329,10 @@ export function recordStep(ctx: StepContext): void {
     args_summary: ctx.args ? JSON.stringify(ctx.args) : null,
     reasoning: ctx.reasoning,
     authorized:
-      ctx.phase_failed_at === "AUTHORIZE"
-        ? false
-        : ctx.outcome === "SUCCESS"
+      ctx.outcome === "SUCCESS" || ctx.phase_failed_at === "EXECUTE"
         ? true
+        : ctx.phase_failed_at === "AUTHORIZE"
+        ? false
         : null,
     outcome: ctx.outcome ?? "EXECUTION_ERROR",
     error_code: ctx.error_code,
