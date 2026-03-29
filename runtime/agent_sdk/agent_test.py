@@ -16,7 +16,7 @@ def main():
     # Feed an initial prompt to start the fuzzing loop.
     response = agent.agentprompt("Begin session. Please provide the first fuzzing proposal.")
 
-    if isinstance(response, dict) and response.get("outcome") == "EXECUTION_ERROR":
+    if isinstance(response, dict) and response.get("outcome") == "VALIDATION_ERROR":
         print(f"Agent returned error: {response}")
         agent.close()
         return
@@ -47,7 +47,7 @@ def main():
             break
 
         # Currently gives claude changes to try again, can easily cancel this if need be.
-        if ts_response.get("outcome") == "VALIDATION_ERROR":
+        if ts_response.get("outcome") == "EXECUTION_ERROR":
             if ts_response.get("result") == "PROMPT" or ts_response.get("containment") == "RETRY":
                 print("Task requires agent reassessment. Sending feedback and retrying.")
                 feedback = json.dumps(ts_response)
