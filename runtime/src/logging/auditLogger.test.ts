@@ -30,7 +30,7 @@ describe("AuditLogger", () => {
 
     expect(lines.length).toBe(1);
 
-    const header = JSON.parse(lines[0]);
+    const header = JSON.parse(lines[0]!);
     expect(header.record_type).toBe("run_header");
     expect(header.run_id).toBe(logger.runId);
     expect(header.run_started_at).toBeTruthy();
@@ -63,7 +63,7 @@ describe("AuditLogger", () => {
 
     expect(lines.length).toBe(2);
 
-    const eventRecord = JSON.parse(lines[1]);
+    const eventRecord = JSON.parse(lines[1]!);
     expect(eventRecord.record_type).toBe("audit_event");
     expect(eventRecord.trace_id).toBe("trace-1");
     expect(eventRecord.action).toBe("THINK");
@@ -115,8 +115,8 @@ describe("AuditLogger", () => {
 
     expect(lines.length).toBe(3);
 
-    const firstEvent = JSON.parse(lines[1]);
-    const secondEvent = JSON.parse(lines[2]);
+    const firstEvent = JSON.parse(lines[1]!);
+    const secondEvent = JSON.parse(lines[2]!);
 
     expect(firstEvent.trace_id).toBe("trace-1");
     expect(firstEvent.step_index).toBe(0);
@@ -136,7 +136,7 @@ describe("AuditLogger", () => {
 
     expect(lines.length).toBe(2);
 
-    const footer = JSON.parse(lines[1]);
+    const footer = JSON.parse(lines[1]!);
     expect(footer.record_type).toBe("run_footer");
     expect(footer.run_id).toBe(logger.runId);
     expect(footer.run_completed_at).toBeTruthy();
@@ -174,9 +174,9 @@ describe("AuditLogger", () => {
       expect(() => JSON.parse(line)).not.toThrow();
     }
 
-    const header = JSON.parse(lines[0]);
-    const event = JSON.parse(lines[1]);
-    const footer = JSON.parse(lines[2]);
+    const header = JSON.parse(lines[0]!);
+    const event = JSON.parse(lines[1]!);
+    const footer = JSON.parse(lines[2]!);
 
     expect(header.record_type).toBe("run_header");
     expect(event.record_type).toBe("audit_event");
