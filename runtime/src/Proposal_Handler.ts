@@ -9,10 +9,10 @@ import { dirname } from 'path';
 //Proposal Error handling logic for incoming proposals. As of now it simply defines the proposal type and logs it.
 //This should be done in Typescript PascalCase for better readability and maintainability.
 
-type proposal_type = AgentProposal;
+export type proposal_type = AgentProposal;
 
 //Eventually we want to return the error to the LLM, and Log it. FOr now it just returns it. 
-export function ValidateProposal(proposal: proposal_type ) {
+export function ValidateProposal(proposal: proposal_type ): string | GateError | undefined {
     // Check for null byte characters
     const nullByteError = ValidateNullByte(proposal);
     if (nullByteError) {
