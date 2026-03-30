@@ -58,3 +58,10 @@ jobs:
           if [ -f tests/results/metrics_report.md ]; then
             cat tests/results/metrics_report.md >> $GITHUB_STEP_SUMMARY
           fi
+          
+      - name: Comment on PR
+        uses: thollander/actions-comment-pull-request@v3
+        if: github.event_name == 'pull_request' && always()
+        with:
+          file-path: tests/results/metrics_report.md
+          comment-tag: evaluation_report

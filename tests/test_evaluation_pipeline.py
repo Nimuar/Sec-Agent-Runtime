@@ -7,7 +7,7 @@ from evaluation.engine import compute_metrics
 from evaluation.reporter import generate_report
 
 MOCK_FILE = os.path.join(os.path.dirname(__file__), "mock_data", "mock_audit.jsonl")
-REPORT_OUTPUT = os.path.join(os.path.dirname(__file__), "results", "metrics_report.md")
+REPORT_OUTPUT = os.path.join(os.path.dirname(__file__), "results", "mock_metrics_report_test.md")
 
 class TestEvaluationPipeline:
     
