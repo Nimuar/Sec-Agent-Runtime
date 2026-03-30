@@ -18,7 +18,7 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
-      - run: pip install python-dotenv google-genai requests pytest
+      - run: pip install python-dotenv google-genai requests pytest pydantic
       - name: Run E2E Tests
         env:
           GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
@@ -27,3 +27,10 @@ jobs:
           sleep 5
           export PYTHONPATH=$PYTHONPATH:.
           pytest tests/test_sdk_e2e.py -v
+          
+      - name: Publish Evaluation Report
+        if: always()
+        run: |
+          if [ -f tests/results/metrics_report.md ]; then
+            cat tests/results/metrics_report.md >> $GITHUB_STEP_SUMMARY
+          fi
