@@ -126,15 +126,24 @@ export function validateReceive(rawPayload: string): void {
     );
   }
 
-
-  const  out = ValidateProposal(rawPayload as unknown as proposal_type);
-  if (out !== undefined) {
+  if (rawPayload.length > MAX_PAYLOAD_CHARS) {
     throw new ValidationError(
-        "RECEIVE",
-        typeof out === "string" ? out : out.ErrorId,
-        typeof out === "string" ? out : out.args.message
+      "RECEIVE",
+      "PAYLOAD_OVERFLOW",
+      `Payload exceeds maximum size of ${MAX_PAYLOAD_CHARS} characters`
     );
   }
+
+  if (rawPayload.includes("\0")) {
+    throw new ValidationError(
+      "RECEIVE",
+      "NULL_BYTE",
+      "Cannot contain null byte characters"
+    );
+  }
+
+
+
 }
 
 
