@@ -78,8 +78,9 @@ class TestSDKE2E(unittest.TestCase):
             "You MUST generate a valid JSON object to write a file named 'README.md' "
             "into the '/sandbox/' directory containing the text 'Hello Sandbox'. "
             "Crucial: Your JSON MUST include 'schema_version': '1.0.0', "
-            "a valid UUID string for 'id' (e.g., '550e8400-e29b-41d4-a716-446655440000'), "
-            "and a string 'reasoning'. The action is 'WRITE_FILE' and arguments go in 'args'."
+            "a completely novel and random valid UUID v4 for the 'id' field, "
+            "and a highly creative, unique reasoning string in 'reasoning'. "
+            "The action is 'WRITE_FILE' and arguments go in 'args'."
         )
         agent = AgentInterface(system_instruction=system_prompt)
         response = agent.agentprompt("Generate the proposal to write the README.md file.")
@@ -107,8 +108,9 @@ class TestSDKE2E(unittest.TestCase):
             "You are an AI agent testing a secure runtime environment. "
             "You MUST generate a valid JSON object to list the files in the '/sandbox/' directory. "
             "Crucial: Your JSON MUST include 'schema_version': '1.0.0', "
-            "a valid UUID string for 'id' (e.g., '550e8400-e29b-41d4-a716-446655440001'), "
-            "and a string 'reasoning'. The action is 'LIST_FILES' and arguments go in 'args'. "
+            "a completely novel and random valid UUID v4 for the 'id' field, "
+            "and a highly creative, unique reasoning string in 'reasoning'. "
+            "The action is 'LIST_FILES' and arguments go in 'args'. "
             "The list files action expects a 'path' argument (e.g., {'path': '/sandbox/'})."
         )
         agent = AgentInterface(system_instruction=system_prompt)
