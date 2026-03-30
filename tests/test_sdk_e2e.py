@@ -31,6 +31,35 @@ class TestSDKE2E(unittest.TestCase):
     @classmethod
     def tearDownClass(cls):
         shutil.rmtree(SANDBOX_DIR, ignore_errors=True)
+        
+        try:
+            audit_files = [f for f in os.listdir(LOGS_DIR) if f.startswith("audit_run_") and f.endswith(".jsonl")]
+            if audit_files:
+                latest_audit = max([os.path.join(LOGS_DIR, f) for f in audit_files], key=os.path.getmtime)
+                log_to_file(f"Running evaluation pipeline on {latest_audit}")
+                
+                import sys
+                project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+                if project_root not in sys.path:
+                    sys.path.insert(0, project_root)
+                    
+                from evaluation.loader import load_log_entries
+                from evaluation.classifier import classify_entries
+                from evaluation.engine import compute_metrics
+                from evaluation.reporter import generate_report
+
+                raw_entries = load_log_entries(latest_audit)
+                classified_entries = classify_entries(raw_entries)
+                result = compute_metrics(classified_entries)
+                report_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "results", "metrics_report.md")
+                
+                generate_report(classified_entries, result, report_path)
+                log_to_file(f"Evaluation report generated successfully at {report_path}")
+            else:
+                log_to_file("No audit logs found for evaluation pipeline.")
+        except Exception as e:
+            log_to_file(f"Failed to run evaluation pipeline: {e}")
+            
         log_to_file("=== Finished E2E Test Session ===")
         
     def setUp(self):

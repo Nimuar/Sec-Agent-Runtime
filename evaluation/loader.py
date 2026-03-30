@@ -27,6 +27,17 @@ def load_log_entries(file_path: str) -> list[RawLogEntry]:
                 data = json.loads(line)
             except json.JSONDecodeError as e:
                 raise ValueError(f"Invalid JSON on line {i}: {e}")
+                
+            record_type = data.get("record_type")
+            if record_type in ("run_header", "run_footer"):
+                continue
+                
+            args_summary = data.get("args_summary")
+            if isinstance(args_summary, str):
+                try:
+                    data["args_summary"] = json.loads(args_summary)
+                except json.JSONDecodeError:
+                    data["args_summary"] = None
             
             try:
                 entries.append(RawLogEntry(**data))
