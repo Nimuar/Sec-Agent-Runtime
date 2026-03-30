@@ -11,7 +11,7 @@ from runtime.agent_sdk.agent import AgentInterface
 
 SERVER_URL = "http://localhost:3000/execute"
 SANDBOX_DIR = os.path.abspath("runtime/sandbox")
-LOGS_DIR = os.path.abspath("logs")
+LOGS_DIR = os.path.abspath("runtime/logs")
 
 def log_to_file(message):
     os.makedirs(LOGS_DIR, exist_ok=True)
