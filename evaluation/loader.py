@@ -36,8 +36,8 @@ def load_log_entries(file_path: str) -> list[RawLogEntry]:
             if isinstance(args_summary, str):
                 try:
                     data["args_summary"] = json.loads(args_summary)
-                except json.JSONDecodeError:
-                    data["args_summary"] = None
+                except json.JSONDecodeError as e:
+                    raise ValueError(f"Invalid args_summary JSON on line {i}: {e}")
             
             try:
                 entries.append(RawLogEntry(**data))
