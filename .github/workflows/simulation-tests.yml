@@ -9,6 +9,9 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
 
     steps:
       - uses: actions/checkout@v4
@@ -46,8 +49,22 @@ jobs:
           
           if [ -d "tests" ] && [ "$(ls -A tests 2>/dev/null)" ]; then
             export PYTHONPATH=$PYTHONPATH:.
-            pip install python-dotenv google-genai requests pytest python-dotenv
+            pip install python-dotenv google-genai requests pytest pydantic
             pytest tests/test_sdk_e2e.py -v
           else
             echo "No tests directory found or directory is empty, skipping simulation tests"
           fi
+          
+      - name: Publish Evaluation Report
+        if: always()
+        run: |
+          if [ -f tests/results/metrics_report.md ]; then
+            cat tests/results/metrics_report.md >> $GITHUB_STEP_SUMMARY
+          fi
+          
+      - name: Comment on PR
+        uses: thollander/actions-comment-pull-request@v3
+        if: github.event_name == 'pull_request' && always()
+        with:
+          file-path: tests/results/metrics_report.md
+          comment-tag: evaluation_report

@@ -11,7 +11,7 @@ from runtime.agent_sdk.agent import AgentInterface
 
 SERVER_URL = "http://localhost:3000/execute"
 SANDBOX_DIR = os.path.abspath("runtime/sandbox")
-LOGS_DIR = os.path.abspath("logs")
+LOGS_DIR = os.path.abspath("runtime/logs")
 
 def log_to_file(message):
     os.makedirs(LOGS_DIR, exist_ok=True)
@@ -31,6 +31,35 @@ class TestSDKE2E(unittest.TestCase):
     @classmethod
     def tearDownClass(cls):
         shutil.rmtree(SANDBOX_DIR, ignore_errors=True)
+        
+        try:
+            audit_files = [f for f in os.listdir(LOGS_DIR) if f.startswith("audit_run_") and f.endswith(".jsonl")]
+            if audit_files:
+                latest_audit = max([os.path.join(LOGS_DIR, f) for f in audit_files], key=os.path.getmtime)
+                log_to_file(f"Running evaluation pipeline on {latest_audit}")
+                
+                import sys
+                project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+                if project_root not in sys.path:
+                    sys.path.insert(0, project_root)
+                    
+                from evaluation.loader import load_log_entries
+                from evaluation.classifier import classify_entries
+                from evaluation.engine import compute_metrics
+                from evaluation.reporter import generate_report
+
+                raw_entries = load_log_entries(latest_audit)
+                classified_entries = classify_entries(raw_entries)
+                result = compute_metrics(classified_entries)
+                report_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "results", "metrics_report.md")
+                
+                generate_report(classified_entries, result, report_path)
+                log_to_file(f"Evaluation report generated successfully at {report_path}")
+            else:
+                log_to_file("No audit logs found for evaluation pipeline.")
+        except Exception as e:
+            log_to_file(f"Failed to run evaluation pipeline: {e}")
+            
         log_to_file("=== Finished E2E Test Session ===")
         
     def setUp(self):
@@ -49,8 +78,9 @@ class TestSDKE2E(unittest.TestCase):
             "You MUST generate a valid JSON object to write a file named 'README.md' "
             "into the '/sandbox/' directory containing the text 'Hello Sandbox'. "
             "Crucial: Your JSON MUST include 'schema_version': '1.0.0', "
-            "a valid UUID string for 'id' (e.g., '550e8400-e29b-41d4-a716-446655440000'), "
-            "and a string 'reasoning'. The action is 'WRITE_FILE' and arguments go in 'args'."
+            "a completely novel and random valid UUID v4 for the 'id' field, "
+            "and a highly creative, unique reasoning string in 'reasoning'. "
+            "The action is 'WRITE_FILE' and arguments go in 'args'."
         )
         agent = AgentInterface(system_instruction=system_prompt)
         response = agent.agentprompt("Generate the proposal to write the README.md file.")
@@ -78,8 +108,9 @@ class TestSDKE2E(unittest.TestCase):
             "You are an AI agent testing a secure runtime environment. "
             "You MUST generate a valid JSON object to list the files in the '/sandbox/' directory. "
             "Crucial: Your JSON MUST include 'schema_version': '1.0.0', "
-            "a valid UUID string for 'id' (e.g., '550e8400-e29b-41d4-a716-446655440001'), "
-            "and a string 'reasoning'. The action is 'LIST_FILES' and arguments go in 'args'. "
+            "a completely novel and random valid UUID v4 for the 'id' field, "
+            "and a highly creative, unique reasoning string in 'reasoning'. "
+            "The action is 'LIST_FILES' and arguments go in 'args'. "
             "The list files action expects a 'path' argument (e.g., {'path': '/sandbox/'})."
         )
         agent = AgentInterface(system_instruction=system_prompt)

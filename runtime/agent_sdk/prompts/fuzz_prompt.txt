@@ -163,6 +163,10 @@ The JSON must have this wrapper so the caller knows what to expect:
     "proposal": { <the AgentProposal JSON, valid or broken as chosen> }
   }
 
+CRITICAL STOCHASTIC VARIATION RULES:
+1. You MUST generate a completely novel, cryptographically random UUID v4 for every single 'id' you create (unless explicitly testing ID_COLLISION). Do NOT blindly copy the examples (e.g. `f47ac10b...`).
+2. You MUST invent completely original, highly creative 'reasoning' strings. Do not use the generic templates provided in the examples below.
+
 FAULT INJECTION EXAMPLES:
 
   // Fault: VALID
