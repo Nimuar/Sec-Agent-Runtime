@@ -16,7 +16,7 @@ def main():
     # Feed an initial prompt to start the fuzzing loop.
     response = agent.agentprompt("Begin session. Please provide the first fuzzing proposal.")
 
-    if isinstance(response, dict) and response.get("outcome") == "VALIDATION_ERROR":
+    if isinstance(response, dict) and response.get("outcome") == "EXECUTION_ERROR":
         print(f"Agent returned error: {response}")
         agent.close()
         return
