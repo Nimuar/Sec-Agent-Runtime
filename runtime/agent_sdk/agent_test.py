@@ -47,14 +47,23 @@ def main():
             break
 
         # Currently gives claude changes to try again, can easily cancel this if need be.
-        if ts_response.get("outcome") == "VALIDATION_ERROR":
-            print("Task validation error. Please Retry.")
-            if len(agent.proposal_history) >= agent.max_retries:
-                print("Maximum retries reached. Closing agent.")
-                agent.close()
-            else:
+        if ts_response.get("outcome") == "EXECUTION_ERROR":
+            #Gemini Suggestion to check for containment field properly. 
+            containment = ts_response.get("result", {}).get("containment")
+            error_message = ts_response.get("error", {}).get("message")
+
+            if containment in ["PROMPT", "RETRY"]:
+                print(f"Task requires agent reassessment. Sending feedback and retrying. Error: {error_message}")
                 feedback = json.dumps(ts_response)
                 response = agent.agentprompt(feedback)
+            elif containment == "ABORT":
+                print(f"Task aborted due to: {error_message}. Closing agent.")
+                agent.close()
+            else:
+                print(
+                    f"Task failed with unhandled execution error: {error_message}. Closing agent."
+                )
+                agent.close()
         elif ts_response.get("outcome") == "SUCCESS":
             print("Task completed successfully. Closing agent.")
             agent.close()

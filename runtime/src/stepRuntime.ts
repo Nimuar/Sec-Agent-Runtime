@@ -7,6 +7,8 @@ import { RuntimeResponse } from "./schemas/ExecutionContracts.js";
 import { dispatchAction } from "./actions/dispatcher.js";
 import { recordAuditEvent } from "./logging/auditService.js";
 
+import { ExecutionErrorId, GetExecutionOutcome } from "./schemas/ExecutionRegistry.js";
+import { ValidateProposal, proposal_type } from "./Proposal_Handler.js";
 /**
  * Assumptions:
  * 1. already updated ExecutionContracts.ts so that:
@@ -139,7 +141,12 @@ export function validateReceive(rawPayload: string): void {
       "Cannot contain null byte characters"
     );
   }
+
+
+
 }
+
+
 
 function parseProposal(rawPayload: string): unknown {
   try {
@@ -412,16 +419,21 @@ export async function processStep(
       
       if (response.outcome === "EXECUTION_ERROR") {
         ctx.phase_failed_at = "EXECUTE";
+        ctx.outcome = "EXECUTION_ERROR";
+        ctx.error_code = response.error?.error_code ?? null;
+        ctx.error_message = response.error?.message ?? null;
+        ctx.result = response.error?.error_code
+          ? { containment: GetExecutionOutcome(validatedProposal.action, response.error.error_code as ExecutionErrorId) }
+          : null;
+      } else {
+        if (response.outcome === "DENIED") {
+          ctx.phase_failed_at = "AUTHORIZE";
+        }
+        ctx.outcome = response.outcome;
+        ctx.result = response.result;
+        ctx.error_code = response.error?.error_code ?? null;
+        ctx.error_message = response.error?.message ?? null;
       }
-      
-      if (response.outcome === "DENIED") {
-        ctx.phase_failed_at = "AUTHORIZE";
-      }
-
-    ctx.outcome = response.outcome;
-    ctx.result = response.result;
-    ctx.error_code = response.error?.error_code ?? null;
-    ctx.error_message = response.error?.message ?? null;
   } catch (err) {
     applyDeterministicError(ctx, err);
   }

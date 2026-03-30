@@ -1,5 +1,4 @@
 import { ActionType } from "./ActionTypeRegistry";
-
 // 2. The 4 possible execution outcomes
 export type RequestOutcome = "SUCCESS" | "DENIED" | "EXECUTION_ERROR" | "VALIDATION_ERROR";
 
