@@ -38,11 +38,12 @@ describe('File Actions (Primitives)', () => {
         });
 
         it('should return EXECUTION_ERROR for fs read failure', async () => {
-            vi.mocked(fs.readFile).mockRejectedValueOnce(new Error('ENOENT: no such file or directory'));
+            const enoent = Object.assign(new Error('ENOENT: no such file or directory'), { code: 'ENOENT' });
+            vi.mocked(fs.readFile).mockRejectedValueOnce(enoent);
             const result = await readFile(mockProposalId, { path: '/sandbox/missing.txt' });
 
             expect(result.outcome).toBe('EXECUTION_ERROR');
-            expect(result.error?.error_code).toBe('EXECUTION_ERROR');
+            expect(result.error?.error_code).toBe('FILE_NOT_FOUND');
             expect(result.error?.message).toContain('ENOENT');
         });
     });

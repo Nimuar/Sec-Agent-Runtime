@@ -6,7 +6,7 @@ import {
 
 const app = express();
 
-let quotaCost = 0;
+const sessionQuota = new Map<string, number>();
 
 app.post("/execute", express.raw({ type: 'application/json', limit: '1024b' }), async (req: Request, res: Response) => {
   const traceId = crypto.randomUUID();
@@ -17,6 +17,8 @@ app.post("/execute", express.raw({ type: 'application/json', limit: '1024b' }), 
   const response = await processStep(rawPayload, traceId);
 
   const QUOTA_LIMIT = 5;
+  const sessionId = (req.headers["x-agent-session-id"] as string) ?? "default";
+  let quotaCost = sessionQuota.get(sessionId) ?? 0;
 
   // Map outcome to status code
   let statusCode = 500;
@@ -25,15 +27,16 @@ app.post("/execute", express.raw({ type: 'application/json', limit: '1024b' }), 
   } else if (response.outcome === "EXECUTION_ERROR") {
     let containment = response.result?.containment;
 
-
     //Updates prompt and abort outcomes based on containment.
     if (containment === "PROMPT") {
       quotaCost += 1; // Deduct one credit for bad prompts
+      sessionQuota.set(sessionId, quotaCost);
       if (quotaCost >= QUOTA_LIMIT) {
         containment = "ABORT"; // If quota is exceeded force abort
         response.result!.containment = "ABORT";
       }
     }
+    if (containment === "ABORT")  sessionQuota.delete(sessionId);
     if (containment === "RETRY")  statusCode = 200;
     if (containment === "PROMPT") statusCode = 409;
     if (containment === "ABORT")  statusCode = 500;

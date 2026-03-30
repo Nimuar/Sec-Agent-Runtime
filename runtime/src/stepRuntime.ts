@@ -8,6 +8,7 @@ import { dispatchAction } from "./actions/dispatcher.js";
 import { recordAuditEvent } from "./logging/auditService.js";
 
 import { ExecutionErrorId, GetExecutionOutcome } from "./schemas/ExecutionRegistry.js";
+import { ValidateProposal, proposal_type } from "./Proposal_Handler.js";
 /**
  * Assumptions:
  * 1. already updated ExecutionContracts.ts so that:
@@ -125,22 +126,18 @@ export function validateReceive(rawPayload: string): void {
     );
   }
 
-  if (rawPayload.length > MAX_PAYLOAD_CHARS) {
-    throw new ValidationError(
-      "RECEIVE",
-      "PAYLOAD_OVERFLOW",
-      `Payload exceeds maximum size of ${MAX_PAYLOAD_CHARS} characters`
-    );
-  }
 
-  if (rawPayload.includes("\0")) {
+  const  out = ValidateProposal(rawPayload as unknown as proposal_type);
+  if (out !== undefined) {
     throw new ValidationError(
-      "RECEIVE",
-      "NULL_BYTE",
-      "Cannot contain null byte characters"
+        "RECEIVE",
+        typeof out === "string" ? out : out.ErrorId,
+        typeof out === "string" ? out : out.args.message
     );
   }
 }
+
+
 
 function parseProposal(rawPayload: string): unknown {
   try {

@@ -48,21 +48,20 @@ def main():
 
         # Currently gives claude changes to try again, can easily cancel this if need be.
         if ts_response.get("outcome") == "EXECUTION_ERROR":
-            if ts_response.get("result") == "PROMPT" or ts_response.get("containment") == "RETRY":
-                print("Task requires agent reassessment. Sending feedback and retrying.")
+            #Gemini Suggestion to check for containment field properly. 
+            containment = ts_response.get("result", {}).get("containment")
+            error_message = ts_response.get("error", {}).get("message")
+
+            if containment in ["PROMPT", "RETRY"]:
+                print(f"Task requires agent reassessment. Sending feedback and retrying. Error: {error_message}")
                 feedback = json.dumps(ts_response)
                 response = agent.agentprompt(feedback)
-            
-                print(
-                    f"Task failed with execution error: {ts_response.get('error_message')}."
-                )
-
-            elif ts_response.get("result") == "ABORT":
-                print("Task aborted. Closing agent.")
+            elif containment == "ABORT":
+                print(f"Task aborted due to: {error_message}. Closing agent.")
                 agent.close()
-            else: 
+            else:
                 print(
-                    f"Task failed with other error: {ts_response.get('error_message')}. Closing agent."
+                    f"Task failed with unhandled execution error: {error_message}. Closing agent."
                 )
                 agent.close()
         elif ts_response.get("outcome") == "SUCCESS":

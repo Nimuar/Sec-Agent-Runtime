@@ -36,7 +36,7 @@ export const readFile: ExecutionPrimitive<ReadFileArgs> = async (
             err.code === "ENOENT"    ? "FILE_NOT_FOUND" :
             err.code === "EISDIR"    ? "IS_DIRECTORY"   :
             err.code === "EACCES"    ? "PERMISSION_DENIED" :
-            "EXECUTION_ERROR";
+            "UNKNOWN_ERROR";
 
         return {
             proposal_id,
