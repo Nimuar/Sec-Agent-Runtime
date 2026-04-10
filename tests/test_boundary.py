@@ -137,6 +137,24 @@ class TestSimulationHarness(unittest.TestCase):
         self.assertEqual(resp.get("outcome"), "SUCCESS")
         self.assertEqual(resp.get("result", {}).get("files"), [])
 
+    def test_edge_case_read_missing_file(self):
+        payload = create_valid_read_payload(path="/sandbox/missing_file.md")
+        resp = self._execute_and_track(payload)
+        self.assertEqual(resp.get("outcome"), "EXECUTION_ERROR")
+        self.assertEqual(resp.get("error", {}).get("error_code"), "FILE_NOT_FOUND")
+
+    def test_edge_case_write_missing_directory(self):
+        payload = create_valid_write_payload(path="/sandbox/missing_dir/foo.txt")
+        resp = self._execute_and_track(payload)
+        self.assertEqual(resp.get("outcome"), "EXECUTION_ERROR")
+        self.assertEqual(resp.get("error", {}).get("error_code"), "PATH_NOT_FOUND")
+
+    def test_edge_case_list_missing_directory(self):
+        payload = create_valid_list_payload(path="/sandbox/missing_dir/")
+        resp = self._execute_and_track(payload)
+        self.assertEqual(resp.get("outcome"), "EXECUTION_ERROR")
+        self.assertEqual(resp.get("error", {}).get("error_code"), "PATH_NOT_FOUND")
+
     # --- 5. Stress Testing ---
 
     def test_stress_mixed_payloads(self):
