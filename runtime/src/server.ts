@@ -1,10 +1,23 @@
 import express, { Request, Response, NextFunction } from "express";
 import crypto from "crypto";
+import fs from "fs/promises";
+import path from "path";
 import { 
   processStep
 } from "./stepRuntime.js";
 
 const app = express();
+
+const SANDBOX_DIR = path.join(import.meta.dirname, '../../sandbox');
+
+async function bootstrap() {
+  try {
+    await fs.mkdir(SANDBOX_DIR, { recursive: true });
+  } catch (err) {
+    console.error("Failed to bootstrap sandbox directory:", err);
+  }
+}
+bootstrap();
 
 const sessionQuota = new Map<string, number>();
 

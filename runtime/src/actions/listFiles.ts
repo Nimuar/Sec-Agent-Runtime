@@ -19,7 +19,8 @@ export const listFiles: ExecutionPrimitive<ListFilesArgs> = async (
             };
         }
 
-        const physicalPath = path.join(process.cwd(), 'sandbox', args.path.slice('/sandbox/'.length));
+        const SANDBOX_DIR = path.join(import.meta.dirname, '../../sandbox');
+        const physicalPath = path.join(SANDBOX_DIR, args.path.slice('/sandbox/'.length));
         const dirents = await fs.readdir(physicalPath, { withFileTypes: true });
 
         // Map Dirent arrays to serializable objects representing the directory tree structure or names
@@ -37,13 +38,19 @@ export const listFiles: ExecutionPrimitive<ListFilesArgs> = async (
             error: null
         };
     } catch (err: any) {
+        const error_code =
+            err.code === "ENOENT"    ? "PATH_NOT_FOUND" :
+            err.code === "ENOTDIR"   ? "NOT_A_DIRECTORY" :
+            err.code === "EACCES"    ? "PERMISSION_DENIED" :
+            "UNKNOWN_ERROR";
+
         return {
             proposal_id,
             action: ActionType.LIST_FILES,
             outcome: "EXECUTION_ERROR",
             result: null,
             error: {
-                error_code: "EXECUTION_ERROR",
+                error_code,
                 message: err.message || String(err)
             }
         };

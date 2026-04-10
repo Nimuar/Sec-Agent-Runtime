@@ -28,7 +28,8 @@ export const writeFile: ExecutionPrimitive<WriteFileArgs> = async (
             };
         }
 
-        const physicalPath = path.join(process.cwd(), 'sandbox', args.path.slice('/sandbox/'.length));
+        const SANDBOX_DIR = path.join(import.meta.dirname, '../../sandbox');
+        const physicalPath = path.join(SANDBOX_DIR, args.path.slice('/sandbox/'.length));
         await fs.writeFile(physicalPath, args.content);
 
         return {
@@ -39,13 +40,19 @@ export const writeFile: ExecutionPrimitive<WriteFileArgs> = async (
             error: null
         };
     } catch (err: any) {
+        const error_code =
+            err.code === "ENOENT"    ? "PATH_NOT_FOUND" :
+            err.code === "EISDIR"    ? "IS_DIRECTORY" :
+            err.code === "EACCES"    ? "PERMISSION_DENIED" :
+            "UNKNOWN_ERROR";
+
         return {
             proposal_id,
             action: ActionType.WRITE_FILE,
             outcome: "EXECUTION_ERROR",
             result: null,
             error: {
-                error_code: "EXECUTION_ERROR",
+                error_code,
                 message: err.message || String(err)
             }
         };
