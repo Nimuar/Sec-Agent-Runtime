@@ -10,14 +10,12 @@ const app = express();
 
 const SANDBOX_DIR = path.join(import.meta.dirname, '../../sandbox');
 
-async function bootstrap() {
-  try {
-    await fs.mkdir(SANDBOX_DIR, { recursive: true });
-  } catch (err) {
-    console.error("Failed to bootstrap sandbox directory:", err);
-  }
+try {
+  await fs.mkdir(SANDBOX_DIR, { recursive: true });
+} catch (err) {
+  console.error("Failed to bootstrap sandbox directory:", err);
+  process.exit(1);
 }
-bootstrap();
 
 const sessionQuota = new Map<string, number>();
 
