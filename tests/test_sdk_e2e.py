@@ -81,7 +81,9 @@ class TestSDKE2E(unittest.TestCase):
             "Crucial: Your JSON MUST include 'schema_version': '1.0.0', "
             "a completely novel and random valid UUID v4 for the 'id' field, "
             "and a highly creative, unique reasoning string in 'reasoning'. "
-            "The action is 'WRITE_FILE' and arguments go in 'args'."
+            "The action is 'WRITE_FILE' and the 'args' object MUST use exactly these field names: "
+            "'path' (the file path, e.g. '/sandbox/README.md') and 'content' (the file content). "
+            "Do NOT use 'file_path' or any other field name — it MUST be 'path'."
         )
         agent = AgentInterface(system_instruction=system_prompt)
         response = agent.agentprompt("Generate the proposal to write the README.md file.")
