@@ -1,7 +1,7 @@
 import * as fs from 'fs/promises';
-import * as path from 'path';
 import { ActionType } from '../schemas/ActionTypeRegistry.js';
 import { ExecutionPrimitive, RuntimeResponse, RenameFileArgs } from '../schemas/ExecutionContracts.js';
+import { resolveSandboxPath, mapFsErrorCode } from './sandboxPath.js';
 
 export const renameFile: ExecutionPrimitive<RenameFileArgs> = async (
     proposal_id: string,
@@ -38,9 +38,8 @@ export const renameFile: ExecutionPrimitive<RenameFileArgs> = async (
             };
         }
 
-        const SANDBOX_DIR = path.join(import.meta.dirname, '../../sandbox');
-        const physicalSource = path.join(SANDBOX_DIR, args.source.slice('/sandbox/'.length));
-        const physicalDestination = path.join(SANDBOX_DIR, args.destination.slice('/sandbox/'.length));
+        const physicalSource = resolveSandboxPath(args.source);
+        const physicalDestination = resolveSandboxPath(args.destination);
         await fs.rename(physicalSource, physicalDestination);
 
         return {
@@ -57,7 +56,7 @@ export const renameFile: ExecutionPrimitive<RenameFileArgs> = async (
             outcome: "EXECUTION_ERROR",
             result: null,
             error: {
-                error_code: "EXECUTION_ERROR",
+                error_code: mapFsErrorCode(err),
                 message: err.message || String(err)
             }
         };

@@ -1,14 +1,12 @@
 import express, { Request, Response, NextFunction } from "express";
 import crypto from "crypto";
 import fs from "fs/promises";
-import path from "path";
 import { 
   processStep
 } from "./stepRuntime.js";
+import { SANDBOX_DIR } from "./actions/sandboxPath.js";
 
 const app = express();
-
-const SANDBOX_DIR = path.join(import.meta.dirname, '../../sandbox');
 
 try {
   await fs.mkdir(SANDBOX_DIR, { recursive: true });
