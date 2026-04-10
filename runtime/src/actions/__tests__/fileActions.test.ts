@@ -130,6 +130,22 @@ describe('File Actions (Primitives)', () => {
         it('should return DENIED if destination extension is dissallowed', async () => {
             const result = await renameFile(mockProposalId, { source: '/sandbox/old.txt', destination: '/sandbox/new.bin' });
             expect(result.outcome).toBe('DENIED');
+            expect(result.error?.error_code).toBe('POLICY_VIOLATION');
+        });
+
+        it('should return DENIED if source extension is disallowed', async () => {
+            const result = await renameFile(mockProposalId, { source: '/sandbox/script.sh', destination: '/sandbox/script.txt' });
+            expect(result.outcome).toBe('DENIED');
+            expect(result.error?.error_code).toBe('POLICY_VIOLATION');
+            expect(result.error?.message).toContain('Source file must be .txt or .md');
+            expect(fs.rename).not.toHaveBeenCalled();
+        });
+
+        it('should return DENIED when renaming a restricted source like .env to .txt', async () => {
+            const result = await renameFile(mockProposalId, { source: '/sandbox/.env', destination: '/sandbox/config.txt' });
+            expect(result.outcome).toBe('DENIED');
+            expect(result.error?.error_code).toBe('POLICY_VIOLATION');
+            expect(fs.rename).not.toHaveBeenCalled();
         });
 
         it('should return EXECUTION_ERROR for fs rename failure', async () => {

@@ -28,6 +28,16 @@ export const renameFile: ExecutionPrimitive<RenameFileArgs> = async (
             };
         }
 
+        if (!args.source.endsWith('.txt') && !args.source.endsWith('.md')) {
+            return {
+                proposal_id,
+                action: ActionType.RENAME_FILE,
+                outcome: "DENIED",
+                result: null,
+                error: { error_code: "POLICY_VIOLATION", message: "Source file must be .txt or .md" }
+            };
+        }
+
         if (!args.destination.endsWith('.txt') && !args.destination.endsWith('.md')) {
             return {
                 proposal_id,
