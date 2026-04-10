@@ -18,7 +18,8 @@ export const createDir: ExecutionPrimitive<CreateDirectoryArgs> = async (
             };
         }
 
-        const physicalPath = path.join(process.cwd(), 'sandbox', args.path.slice('/sandbox/'.length));
+        const SANDBOX_DIR = path.join(import.meta.dirname, '../../sandbox');
+        const physicalPath = path.join(SANDBOX_DIR, args.path.slice('/sandbox/'.length));
         await fs.mkdir(physicalPath, { recursive: true });
 
         return {

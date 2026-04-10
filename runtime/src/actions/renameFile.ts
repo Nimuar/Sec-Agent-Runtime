@@ -38,8 +38,9 @@ export const renameFile: ExecutionPrimitive<RenameFileArgs> = async (
             };
         }
 
-        const physicalSource = path.join(process.cwd(), 'sandbox', args.source.slice('/sandbox/'.length));
-        const physicalDestination = path.join(process.cwd(), 'sandbox', args.destination.slice('/sandbox/'.length));
+        const SANDBOX_DIR = path.join(import.meta.dirname, '../../sandbox');
+        const physicalSource = path.join(SANDBOX_DIR, args.source.slice('/sandbox/'.length));
+        const physicalDestination = path.join(SANDBOX_DIR, args.destination.slice('/sandbox/'.length));
         await fs.rename(physicalSource, physicalDestination);
 
         return {

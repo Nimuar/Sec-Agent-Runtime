@@ -26,7 +26,7 @@ describe('File Actions (Primitives)', () => {
             expect(result.outcome).toBe('SUCCESS');
             expect(result.error).toBeNull();
             expect(result.result).toEqual({ content: 'test content' });
-            expect(fs.readFile).toHaveBeenCalledWith(path.join(process.cwd(), 'sandbox', 'test.txt'), 'utf-8');
+            expect(fs.readFile).toHaveBeenCalledWith(path.join(import.meta.dirname, '../../../sandbox', 'test.txt'), 'utf-8');
         });
 
         it('should return DENIED for path outside sandbox', async () => {
@@ -55,7 +55,7 @@ describe('File Actions (Primitives)', () => {
 
             expect(result.outcome).toBe('SUCCESS');
             expect(result.error).toBeNull();
-            expect(fs.writeFile).toHaveBeenCalledWith(path.join(process.cwd(), 'sandbox', 'test.txt'), 'hello');
+            expect(fs.writeFile).toHaveBeenCalledWith(path.join(import.meta.dirname, '../../../sandbox', 'test.txt'), 'hello');
         });
 
         it('should return DENIED for disallowed extension', async () => {
@@ -89,7 +89,7 @@ describe('File Actions (Primitives)', () => {
 
             expect(result.outcome).toBe('SUCCESS');
             expect(result.error).toBeNull();
-            expect(fs.unlink).toHaveBeenCalledWith(path.join(process.cwd(), 'sandbox', 'test.md'));
+            expect(fs.unlink).toHaveBeenCalledWith(path.join(import.meta.dirname, '../../../sandbox', 'test.md'));
         });
 
         it('should return DENIED for disallowed extension', async () => {
@@ -114,7 +114,7 @@ describe('File Actions (Primitives)', () => {
             const result = await renameFile(mockProposalId, { source: '/sandbox/old.txt', destination: '/sandbox/new.md' });
 
             expect(result.outcome).toBe('SUCCESS');
-            expect(fs.rename).toHaveBeenCalledWith(path.join(process.cwd(), 'sandbox', 'old.txt'), path.join(process.cwd(), 'sandbox', 'new.md'));
+            expect(fs.rename).toHaveBeenCalledWith(path.join(import.meta.dirname, '../../../sandbox', 'old.txt'), path.join(import.meta.dirname, '../../../sandbox', 'new.md'));
         });
 
         it('should return DENIED if source is outside sandbox', async () => {
@@ -151,7 +151,7 @@ describe('File Actions (Primitives)', () => {
 
             expect(result.outcome).toBe('SUCCESS');
             expect(result.result).toBeDefined();
-            expect(fs.readdir).toHaveBeenCalledWith(path.join(process.cwd(), 'sandbox', 'dir'), { withFileTypes: true });
+            expect(fs.readdir).toHaveBeenCalledWith(path.join(import.meta.dirname, '../../../sandbox', 'dir'), { withFileTypes: true });
         });
 
         it('should return DENIED for path outside sandbox', async () => {
@@ -181,7 +181,7 @@ describe('File Actions (Primitives)', () => {
             const result = await createDir(mockProposalId, { path: '/sandbox/newdir' });
 
             expect(result.outcome).toBe('SUCCESS');
-            expect(fs.mkdir).toHaveBeenCalledWith(path.join(process.cwd(), 'sandbox', 'newdir'), { recursive: true });
+            expect(fs.mkdir).toHaveBeenCalledWith(path.join(import.meta.dirname, '../../../sandbox', 'newdir'), { recursive: true });
         });
 
         it('should return DENIED for path outside sandbox', async () => {
