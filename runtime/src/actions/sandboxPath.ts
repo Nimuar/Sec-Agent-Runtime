@@ -1,14 +1,22 @@
 import * as path from 'path';
 
-/** Canonical sandbox directory — resolved once from this file's location. */
-export const SANDBOX_DIR = path.join(import.meta.dirname, '../../sandbox');
+/** Canonical sandbox directory — resolved and normalized once from this file's location. */
+export const SANDBOX_DIR = path.resolve(import.meta.dirname, '../../sandbox');
 
 /**
  * Map a virtual /sandbox/... path to a physical filesystem path.
- * Callers are responsible for validating that virtualPath starts with '/sandbox/'.
+ * Resolves the path and verifies it remains within the SANDBOX_DIR boundary.
+ * Throws if the resolved path escapes the sandbox (e.g. via ../).
  */
 export function resolveSandboxPath(virtualPath: string): string {
-    return path.join(SANDBOX_DIR, virtualPath.slice('/sandbox/'.length));
+    const resolved = path.resolve(SANDBOX_DIR, virtualPath.slice('/sandbox/'.length));
+    if (!resolved.startsWith(SANDBOX_DIR + path.sep) && resolved !== SANDBOX_DIR) {
+        throw Object.assign(
+            new Error(`Path traversal blocked: ${virtualPath} resolves outside sandbox`),
+            { code: 'PATH_TRAVERSAL' }
+        );
+    }
+    return resolved;
 }
 
 /**
