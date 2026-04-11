@@ -6,19 +6,20 @@ import * as config from "./schemas/ProposalErrorConfig.js";
 import { ActionType } from "./schemas/ActionTypeRegistry.js";
 import { AgentProposal } from "./schemas/ProposalSchema.js";
 import * as fs from "fs";
-import { dirname } from "path";
+import { join } from "path";
 
 const TEST_UUID = "00000000-0000-0000-0000-000000000000";
-// Clear ID log before and after each test to prevent cross-test ID collisions
-beforeEach(() => { fs.mkdirSync(dirname(config.ID_LOG_PATH), { recursive: true }); fs.writeFileSync(config.ID_LOG_PATH, ""); });
-afterEach(() => { fs.mkdirSync(dirname(config.ID_LOG_PATH), { recursive: true }); fs.writeFileSync(config.ID_LOG_PATH, ""); });
+// Clear audit log directory before and after each test to prevent cross-test ID collisions
+function cleanAuditLogs() { fs.mkdirSync(config.ID_LOG_PATH, { recursive: true }); for (const f of fs.readdirSync(config.ID_LOG_PATH)) { if (f.endsWith('.jsonl')) fs.unlinkSync(join(config.ID_LOG_PATH, f)); } }
+beforeEach(cleanAuditLogs);
+afterEach(cleanAuditLogs);
 
 describe("Proposal Handler Validation Tests", () => {
 
     // ── ValidateNullByte ──────────────────────────────────────────────────────
     describe("ValidateNullByte", () => {
 
-        it("should return NULL_BYTE error for proposals containing null byte characters", () => {
+        it("should return NULL_BYTE error for proposals containing null byte characters", async () => {
             const ProposalNullByte: AgentProposal = {
                 schema_version: "1.0.0",
                 id: "00000000-0000-0000-0000-000000000001",
@@ -38,10 +39,10 @@ describe("Proposal Handler Validation Tests", () => {
                 args: { message: "Cannot contain null byte characters" }
             };
 
-            expect(ValidateProposal(ProposalNullByte)).toEqual(ExpectedError);
+            expect(await ValidateProposal(ProposalNullByte)).toEqual(ExpectedError);
         });
 
-        it("should pass for proposals with no null bytes", () => {
+        it("should pass for proposals with no null bytes", async () => {
             const ValidProposal: AgentProposal = {
                 schema_version: "1.0.0",
                 id: "00000000-0000-0000-0000-000000000002",
@@ -50,14 +51,14 @@ describe("Proposal Handler Validation Tests", () => {
                 args: {}
             };
 
-            expect(ValidateProposal(ValidProposal)).toBeUndefined();
+            expect(await ValidateProposal(ValidProposal)).toBeUndefined();
         });
     });
 
     // ── ValidateASCII ─────────────────────────────────────────────────────────
     describe("ValidateASCII", () => {
 
-        it("should return INVALID_ASCII error for proposals with non-ASCII characters", () => {
+        it("should return INVALID_ASCII error for proposals with non-ASCII characters", async () => {
             const InvalidASCIIProposal: AgentProposal = {
                 schema_version: "1.0.0",
                 id: "00000000-0000-0000-0000-000000000003",
@@ -75,10 +76,10 @@ describe("Proposal Handler Validation Tests", () => {
                 args: { message: "Cannot contain invalid ASCII characters" }
             };
 
-            expect(ValidateProposal(InvalidASCIIProposal)).toEqual(ExpectedError);
+            expect(await ValidateProposal(InvalidASCIIProposal)).toEqual(ExpectedError);
         });
 
-        it("should pass for proposals containing only valid ASCII characters", () => {
+        it("should pass for proposals containing only valid ASCII characters", async () => {
             const ValidASCIIProposal: AgentProposal = {
                 schema_version: "1.0.0",
                 id: "00000000-0000-0000-0000-000000000004",
@@ -87,14 +88,14 @@ describe("Proposal Handler Validation Tests", () => {
                 args: {}
             };
 
-            expect(ValidateProposal(ValidASCIIProposal)).toBeUndefined();
+            expect(await ValidateProposal(ValidASCIIProposal)).toBeUndefined();
         });
     });
 
     // ── validatePayloadSize ───────────────────────────────────────────────────
     describe("validatePayloadSize", () => {
 
-        it("should return PAYLOAD_OVERFLOW error for proposals exceeding the size limit", () => {
+        it("should return PAYLOAD_OVERFLOW error for proposals exceeding the size limit", async () => {
             const OversizedProposal: AgentProposal = {
                 schema_version: "1.0.0",
                 id: "00000000-0000-0000-0000-000000000005",
@@ -116,10 +117,10 @@ describe("Proposal Handler Validation Tests", () => {
                 }
             };
 
-            expect(ValidateProposal(OversizedProposal)).toEqual(ExpectedError);
+            expect(await ValidateProposal(OversizedProposal)).toEqual(ExpectedError);
         });
 
-        it("should pass for proposals within the size limit", () => {
+        it("should pass for proposals within the size limit", async () => {
             const SmallProposal: AgentProposal = {
                 schema_version: "1.0.0",
                 id: "00000000-0000-0000-0000-000000000006",
@@ -128,15 +129,16 @@ describe("Proposal Handler Validation Tests", () => {
                 args: {}
             };
 
-            expect(ValidateProposal(SmallProposal)).toBeUndefined();
+            expect(await ValidateProposal(SmallProposal)).toBeUndefined();
         });
     });
 
     // ── ValidateIDCollision ───────────────────────────────────────────────────
     describe("ValidateIDCollision", () => {
 
-        it("should return ID_COLLISION error for proposals with a previously seen ID", () => {
-            fs.writeFileSync(config.ID_LOG_PATH, TEST_UUID + "\n");
+        it("should return ID_COLLISION error for proposals with a previously seen ID", async () => {
+            fs.writeFileSync(join(config.ID_LOG_PATH, "test_collision.jsonl"),
+                JSON.stringify({ record_type: "audit_event", proposal_id: TEST_UUID }) + "\n");
 
             const ProposalWithIDCollision: AgentProposal = {
                 schema_version: "1.0.0",
@@ -157,10 +159,10 @@ describe("Proposal Handler Validation Tests", () => {
                 }
             };
 
-            expect(ValidateProposal(ProposalWithIDCollision)).toEqual(ExpectedError);
+            expect(await ValidateProposal(ProposalWithIDCollision)).toEqual(ExpectedError);
         });
 
-        it("should pass for proposals with a unique ID not in the log", () => {
+        it("should pass for proposals with a unique ID not in the log", async () => {
             const UniqueIDProposal: AgentProposal = {
                 schema_version: "1.0.0",
                 id: "00000000-0000-0000-0000-000000000008",
@@ -169,7 +171,7 @@ describe("Proposal Handler Validation Tests", () => {
                 args: {}
             };
 
-            expect(ValidateProposal(UniqueIDProposal)).toBeUndefined();
+            expect(await ValidateProposal(UniqueIDProposal)).toBeUndefined();
         });
     });
 

@@ -1,51 +1,31 @@
-import { keyof } from "zod";
+import { listeners } from "cluster";
 import * as config from "./schemas/ProposalErrorConfig.js";
 import { ProposalErrorCode } from "./schemas/ProposalErrorRegistry.js";
 import { GateError } from "./schemas/ProposalErrorSchema.js";
 import { AgentProposal } from "./schemas/ProposalSchema.js";
-import * as fs from "fs";
 import * as fsPromises from 'fs/promises';
-import { dirname } from 'path';
 //Proposal Error handling logic for incoming proposals. As of now it simply defines the proposal type and logs it.
 //This should be done in Typescript PascalCase for better readability and maintainability.
 
 export type proposal_type = AgentProposal;
 
-//Eventually we want to return the error to the LLM, and Log it. FOr now it just returns it. 
-export function ValidateProposal(proposal: proposal_type ): string | GateError | undefined {
+//Eventually we want to return the error to the LLM, and Log it. FOr now it just returns it.
+export async function ValidateProposal(proposal: proposal_type ): Promise<GateError | undefined> {
     // Check for null byte characters
     const nullByteError = ValidateNullByte(proposal);
-    if (nullByteError) {
-        LogError(nullByteError); 
-        return nullByteError;
-    }
+    if (nullByteError) return nullByteError;
 
     // Check for valid ASCII characters
     const asciiError = ValidateASCII(proposal);
-    if (asciiError) {
-        LogError(asciiError);
-        return asciiError;
-    }
+    if (asciiError) return asciiError;
 
     // Check for payload size
     const payloadError = validatePayloadSize(proposal);
-    if (payloadError) {
-        LogError(payloadError);
-        return payloadError;
-    }
+    if (payloadError) return payloadError;
 
-    // Check for ID Collision
-    const idCollisionError = ValidateIDCollision(proposal);
-    if (idCollisionError) {
-        LogError(idCollisionError);
-        return idCollisionError;
-    }
-   // const CoreStructure = ValidateCoreStructure(proposal);
-    // if (CoreStructure) {
-    //     LogError(CoreStructure);
-    //     return CoreStructure;
-    // }
-    LogID(proposal.id);
+    // Check for ID Collision (async — non-blocking read)
+    const idCollisionError = await ValidateIDCollision(proposal);
+    if (idCollisionError) return idCollisionError;
 }
     
     
@@ -155,25 +135,33 @@ but eventually this should be checking against a
 database/logfile of logged proposal IDs.*/
 
 
-//WIP```````````````````````````````````````````````````````````````
-  function ValidateIDCollision (proposal: proposal_type) {
-    // Load previously seen IDs from the ID log
-    let lines: string[] = [];
-    
+async function ValidateIDCollision(proposal: proposal_type): Promise<GateError | undefined> {
+    const seenIDs = new Set<string>();
+
     try {
-        const data =   fs.readFileSync(config.ID_LOG_PATH, 'utf-8');
-        lines = data.split("\n");
-
-
+        const files = await fsPromises.readdir(config.ID_LOG_PATH);
+        for (const file of files.filter(f => f.endsWith('.jsonl'))) {
+            const content = await fsPromises.readFile(`${config.ID_LOG_PATH}/${file}`, 'utf-8');
+            for (const line of content.split('\n')) {
+                const trimmed = line.trim();
+                if (!trimmed) continue;
+                try {
+                    const record = JSON.parse(trimmed);
+                    if (record.record_type === 'audit_event' && record.proposal_id) {
+                        seenIDs.add(record.proposal_id);
+                    }
+                } catch {
+                    // skip malformed lines
+                }
+            }
+        }
     } catch (err) {
-
         console.log("ID Log Error: ", err);
-        // Log file missing or unreadable — treat as empty backlog
+        // Log directory missing or unreadable — treat as empty backlog
     }
 
-    const proposal_id = proposal.id;
-    if (lines.includes(proposal_id)) {
-        let error : GateError = {
+    if (seenIDs.has(proposal.id)) {
+        return {
             schema_version: config.schema_version,
             id: crypto.randomUUID(),
             input: proposal,
@@ -183,7 +171,6 @@ database/logfile of logged proposal IDs.*/
                 message: "ID matches with previously logged proposal ID"
             }
         };
-        return error;
     }
 }
 
@@ -227,45 +214,3 @@ database/logfile of logged proposal IDs.*/
 // }
 
 
-//Logs the Error, no need for schema now.
-async function LogError(error:GateError) {
-    //Creates Timstamp for Log Entry and finds ErrorID
-
-
-    const TimeStamp = new Date().toISOString();
-    //Constructs Log Entry Object
-    const LogEntry = {
-        log_schema_version: config.log_schema_version,
-        severity:config.LogSeverity.LOW,
-        timestamp: TimeStamp,
-        args: {
-             message: `Error ID: ${error.id} | Log found in: ${config.ERROR_LOG_PATH}`,
-             error: error
-        }
-     };
-
-
-    //Append Log Entry to Log File
-    try {
-        if (config.ERROR_LOG_PATH === "") {
-        await fsPromises.mkdir(dirname(config.ERROR_LOG_PATH), { recursive: true });
-         }
-        await fsPromises.appendFile(config.ERROR_LOG_PATH, JSON.stringify(LogEntry) + "\n");
-    } catch (err) {
-        console.error("Failed to log error:", err);
-    }
-}
-
-
-async function LogID(proposal_id:string) {
-
-    // No collision — record this ID so future proposals can be checked against it
-    try {
-        if (config.ERROR_LOG_PATH === "") {
-            await fsPromises.mkdir(dirname(config.ERROR_LOG_PATH), { recursive: true });
-         }
-            await fsPromises.appendFile(config.ERROR_LOG_PATH, JSON.stringify({ id: proposal_id }) + "\n");
-    } catch (err) {
-        console.error("Failed to write to ID log:", err);
-    }
-}
