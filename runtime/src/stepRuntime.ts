@@ -8,7 +8,10 @@ import { dispatchAction } from "./actions/dispatcher.js";
 import { recordAuditEvent } from "./logging/auditService.js";
 
 import { ExecutionErrorId, GetExecutionOutcome } from "./schemas/ExecutionRegistry.js";
-import { ValidateProposal, proposal_type } from "./Proposal_Handler.js";
+import { ValidateProposal } from "./Proposal_Handler.js";
+import { GateError } from "./schemas/ProposalErrorSchema.js";
+import { ProposalErrorCode } from "./schemas/ProposalErrorRegistry.js";
+import { schema_version } from "./schemas/ProposalErrorConfig.js";
 /**
  * Assumptions:
  * 1. already updated ExecutionContracts.ts so that:
@@ -117,33 +120,50 @@ export function createStepContext(rawPayload: string, traceId: string): StepCont
   };
 }
 
-export function validateReceive(rawPayload: string): void {
+export function validateReceive(rawPayload: string): GateError | undefined {
   if (rawPayload.trim().length === 0) {
-    throw new ValidationError(
-      "RECEIVE",
-      "MISSING_CONTENT",
-      "Required field is missing or empty"
-    );
+    return {
+      schema_version,
+      id: crypto.randomUUID(),
+      input: rawPayload,
+      ErrorId: ProposalErrorCode.MISSING_CONTENT,
+      args: { field: "payload", message: "Required field is missing or incorrectly formatted" },
+    };
   }
 
-  if (rawPayload.length > MAX_PAYLOAD_CHARS) {
-    throw new ValidationError(
-      "RECEIVE",
-      "PAYLOAD_OVERFLOW",
-      `Payload exceeds maximum size of ${MAX_PAYLOAD_CHARS} characters`
-    );
+  // Byte-length check (matches Proposal_Handler.validatePayloadSize)
+  const byteLength = new TextEncoder().encode(rawPayload).byteLength;
+  if (byteLength > MAX_PAYLOAD_CHARS) {
+    return {
+      schema_version,
+      id: crypto.randomUUID(),
+      input: rawPayload,
+      ErrorId: ProposalErrorCode.PAYLOAD_OVERFLOW,
+      args: { size: byteLength, limit: MAX_PAYLOAD_CHARS, message: "Payload exceeds maximum size of 1024 characters" },
+    };
   }
 
   if (rawPayload.includes("\0")) {
-    throw new ValidationError(
-      "RECEIVE",
-      "NULL_BYTE",
-      "Cannot contain null byte characters"
-    );
+    return {
+      schema_version,
+      id: crypto.randomUUID(),
+      input: rawPayload,
+      ErrorId: ProposalErrorCode.NULL_BYTE,
+      args: { message: "Cannot contain null byte characters" },
+    };
   }
 
-
-
+  // ASCII validation (matches Proposal_Handler.ValidateASCII)
+  // Allows printable ASCII (0x20–0x7E) plus valid JSON whitespace (tab, LF, CR)
+  if (!/^[\x09\x0A\x0D\x20-\x7E]*$/.test(rawPayload)) {
+    return {
+      schema_version,
+      id: crypto.randomUUID(),
+      input: rawPayload,
+      ErrorId: ProposalErrorCode.INVALID_ASCII,
+      args: { message: "Cannot contain invalid ASCII characters" },
+    };
+  }
 }
 
 
@@ -381,7 +401,14 @@ export async function processStep(
 
   try {
     // RECEIVE
-    validateReceive(rawPayload);
+    const receiveError = validateReceive(rawPayload);
+    if (receiveError) {
+      throw new ValidationError(
+        "RECEIVE",
+        receiveError.ErrorId,
+        (receiveError.args as { message: string }).message
+      );
+    }
 
     // PARSE
     const parsed = parseProposal(rawPayload);
@@ -406,6 +433,16 @@ export async function processStep(
     });
 
     hydrateContextFromProposal(ctx, validatedProposal);
+
+    // VALIDATE_PROPOSAL (ID collision via Proposal_Handler)
+    const proposalError = await ValidateProposal(validatedProposal);
+    if (proposalError) {
+      throw new ValidationError(
+        "VALIDATE_ARGS",
+        proposalError.ErrorId,
+        (proposalError.args as { message: string }).message
+      );
+    }
 
     // AUTHORIZE
     authorizeProposal(validatedProposal);
