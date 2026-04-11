@@ -26,24 +26,16 @@ describe("stepRuntime Core Logic", () => {
 
     it("should reject payload exceeding 1024 characters", () => {
       const largePayload = "a".repeat(1025);
-      try {
-        validateReceive(largePayload);
-        expect.fail("Should have thrown ValidationError");
-      } catch (e: any) {
-        expect(e).toBeInstanceOf(ValidationError);
-        expect(e.code).toBe("PAYLOAD_OVERFLOW");
-      }
+      const result = validateReceive(largePayload);
+      expect(result).toBeDefined();
+      expect(result?.ErrorId).toBe("PAYLOAD_OVERFLOW");
     });
 
     it("should reject payload with null bytes", () => {
       const payloadWithNull = '{"action": "THINK\0"}';
-      try {
-        validateReceive(payloadWithNull);
-        expect.fail("Should have thrown ValidationError");
-      } catch (e: any) {
-        expect(e).toBeInstanceOf(ValidationError);
-        expect(e.code).toBe("NULL_BYTE");
-      }
+      const result = validateReceive(payloadWithNull);
+      expect(result).toBeDefined();
+      expect(result?.ErrorId).toBe("NULL_BYTE");
     });
 
   });
