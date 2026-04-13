@@ -1,8 +1,8 @@
 import * as fs from 'fs/promises';
-import * as path from 'path';
 import { Dirent } from 'fs';
 import { ActionType } from '../schemas/ActionTypeRegistry.js';
 import { ExecutionPrimitive, ListFilesArgs, RuntimeResponse } from '../schemas/ExecutionContracts.js';
+import { resolveSandboxPath, mapFsErrorCode } from './sandboxPath.js';
 
 export const listFiles: ExecutionPrimitive<ListFilesArgs> = async (
     proposal_id: string,
@@ -19,7 +19,7 @@ export const listFiles: ExecutionPrimitive<ListFilesArgs> = async (
             };
         }
 
-        const physicalPath = path.join(process.cwd(), 'sandbox', args.path.slice('/sandbox/'.length));
+        const physicalPath = resolveSandboxPath(args.path);
         const dirents = await fs.readdir(physicalPath, { withFileTypes: true });
 
         // Map Dirent arrays to serializable objects representing the directory tree structure or names
@@ -43,7 +43,7 @@ export const listFiles: ExecutionPrimitive<ListFilesArgs> = async (
             outcome: "EXECUTION_ERROR",
             result: null,
             error: {
-                error_code: "EXECUTION_ERROR",
+                error_code: mapFsErrorCode(err),
                 message: err.message || String(err)
             }
         };

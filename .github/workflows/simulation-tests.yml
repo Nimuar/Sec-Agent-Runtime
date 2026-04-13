@@ -58,8 +58,10 @@ jobs:
       - name: Publish Evaluation Report
         if: always()
         run: |
-          if [ -f tests/results/metrics_report.md ]; then
-            cat tests/results/metrics_report.md >> $GITHUB_STEP_SUMMARY
+          latest_report=$(ls -t tests/results/metrics_report_*.md | head -n 1 2>/dev/null || true)
+          if [ -n "$latest_report" ] && [ -f "$latest_report" ]; then
+            cat "$latest_report" >> $GITHUB_STEP_SUMMARY
+            cp "$latest_report" tests/results/metrics_report.md
           fi
           
       - name: Comment on PR
@@ -68,3 +70,10 @@ jobs:
         with:
           file-path: tests/results/metrics_report.md
           comment-tag: evaluation_report
+
+      - name: Upload Report Artifact
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: Evaluation-Report
+          path: tests/results/metrics_report_*.md

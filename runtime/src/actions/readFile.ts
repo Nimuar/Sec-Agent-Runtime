@@ -1,7 +1,7 @@
 import * as fs from 'fs/promises';
-import * as path from 'path';
 import { ActionType } from '../schemas/ActionTypeRegistry.js';
 import { ExecutionPrimitive, ReadFileArgs, RuntimeResponse } from '../schemas/ExecutionContracts.js';
+import { resolveSandboxPath, mapFsErrorCode } from './sandboxPath.js';
 
 export const readFile: ExecutionPrimitive<ReadFileArgs> = async (
     proposal_id: string,
@@ -21,7 +21,7 @@ export const readFile: ExecutionPrimitive<ReadFileArgs> = async (
             };
         }
 
-        const physicalPath = path.join(process.cwd(), 'sandbox', args.path.slice('/sandbox/'.length));
+        const physicalPath = resolveSandboxPath(args.path);
         const content = await fs.readFile(physicalPath, 'utf-8');
 
         return {
@@ -32,11 +32,8 @@ export const readFile: ExecutionPrimitive<ReadFileArgs> = async (
             error: null
         };
     } catch (err: any) {
-        const error_code =
-            err.code === "ENOENT"    ? "FILE_NOT_FOUND" :
-            err.code === "EISDIR"    ? "IS_DIRECTORY"   :
-            err.code === "EACCES"    ? "PERMISSION_DENIED" :
-            "UNKNOWN_ERROR";
+        // readFile semantically returns FILE_NOT_FOUND for ENOENT (not PATH_NOT_FOUND)
+        const error_code = err.code === "ENOENT" ? "FILE_NOT_FOUND" : mapFsErrorCode(err);
 
         return {
             proposal_id,

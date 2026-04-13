@@ -1,7 +1,7 @@
 import * as fs from 'fs/promises';
-import * as path from 'path';
 import { ActionType } from '../schemas/ActionTypeRegistry.js';
 import { ExecutionPrimitive, RuntimeResponse, WriteFileArgs } from '../schemas/ExecutionContracts.js';
+import { resolveSandboxPath, mapFsErrorCode } from './sandboxPath.js';
 
 export const writeFile: ExecutionPrimitive<WriteFileArgs> = async (
     proposal_id: string,
@@ -28,7 +28,7 @@ export const writeFile: ExecutionPrimitive<WriteFileArgs> = async (
             };
         }
 
-        const physicalPath = path.join(process.cwd(), 'sandbox', args.path.slice('/sandbox/'.length));
+        const physicalPath = resolveSandboxPath(args.path);
         await fs.writeFile(physicalPath, args.content);
 
         return {
@@ -45,7 +45,7 @@ export const writeFile: ExecutionPrimitive<WriteFileArgs> = async (
             outcome: "EXECUTION_ERROR",
             result: null,
             error: {
-                error_code: "EXECUTION_ERROR",
+                error_code: mapFsErrorCode(err),
                 message: err.message || String(err)
             }
         };

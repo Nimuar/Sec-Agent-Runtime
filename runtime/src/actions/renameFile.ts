@@ -1,7 +1,7 @@
 import * as fs from 'fs/promises';
-import * as path from 'path';
 import { ActionType } from '../schemas/ActionTypeRegistry.js';
 import { ExecutionPrimitive, RuntimeResponse, RenameFileArgs } from '../schemas/ExecutionContracts.js';
+import { resolveSandboxPath, mapFsErrorCode } from './sandboxPath.js';
 
 export const renameFile: ExecutionPrimitive<RenameFileArgs> = async (
     proposal_id: string,
@@ -28,6 +28,16 @@ export const renameFile: ExecutionPrimitive<RenameFileArgs> = async (
             };
         }
 
+        if (!args.source.endsWith('.txt') && !args.source.endsWith('.md')) {
+            return {
+                proposal_id,
+                action: ActionType.RENAME_FILE,
+                outcome: "DENIED",
+                result: null,
+                error: { error_code: "POLICY_VIOLATION", message: "Source file must be .txt or .md" }
+            };
+        }
+
         if (!args.destination.endsWith('.txt') && !args.destination.endsWith('.md')) {
             return {
                 proposal_id,
@@ -38,8 +48,8 @@ export const renameFile: ExecutionPrimitive<RenameFileArgs> = async (
             };
         }
 
-        const physicalSource = path.join(process.cwd(), 'sandbox', args.source.slice('/sandbox/'.length));
-        const physicalDestination = path.join(process.cwd(), 'sandbox', args.destination.slice('/sandbox/'.length));
+        const physicalSource = resolveSandboxPath(args.source);
+        const physicalDestination = resolveSandboxPath(args.destination);
         await fs.rename(physicalSource, physicalDestination);
 
         return {
@@ -56,7 +66,7 @@ export const renameFile: ExecutionPrimitive<RenameFileArgs> = async (
             outcome: "EXECUTION_ERROR",
             result: null,
             error: {
-                error_code: "EXECUTION_ERROR",
+                error_code: mapFsErrorCode(err),
                 message: err.message || String(err)
             }
         };

@@ -51,7 +51,8 @@ class TestSDKE2E(unittest.TestCase):
                 raw_entries = load_log_entries(latest_audit)
                 classified_entries = classify_entries(raw_entries)
                 result = compute_metrics(classified_entries)
-                report_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "results", "metrics_report.md")
+                timestamp_str = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+                report_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "results", f"metrics_report_{timestamp_str}.md")
                 
                 generate_report(classified_entries, result, report_path)
                 log_to_file(f"Evaluation report generated successfully at {report_path}")
@@ -80,7 +81,9 @@ class TestSDKE2E(unittest.TestCase):
             "Crucial: Your JSON MUST include 'schema_version': '1.0.0', "
             "a completely novel and random valid UUID v4 for the 'id' field, "
             "and a highly creative, unique reasoning string in 'reasoning'. "
-            "The action is 'WRITE_FILE' and arguments go in 'args'."
+            "The action is 'WRITE_FILE' and the 'args' object MUST use exactly these field names: "
+            "'path' (the file path, e.g. '/sandbox/README.md') and 'content' (the file content). "
+            "Do NOT use 'file_path' or any other field name — it MUST be 'path'."
         )
         agent = AgentInterface(system_instruction=system_prompt)
         response = agent.agentprompt("Generate the proposal to write the README.md file.")

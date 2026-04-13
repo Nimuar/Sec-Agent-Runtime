@@ -1,7 +1,7 @@
 import * as fs from 'fs/promises';
-import * as path from 'path';
 import { ActionType } from '../schemas/ActionTypeRegistry.js';
 import { ExecutionPrimitive, RuntimeResponse, DeleteFileArgs } from '../schemas/ExecutionContracts.js';
+import { resolveSandboxPath, mapFsErrorCode } from './sandboxPath.js';
 
 export const deleteFile: ExecutionPrimitive<DeleteFileArgs> = async (
     proposal_id: string,
@@ -28,7 +28,7 @@ export const deleteFile: ExecutionPrimitive<DeleteFileArgs> = async (
             };
         }
 
-        const physicalPath = path.join(process.cwd(), 'sandbox', args.path.slice('/sandbox/'.length));
+        const physicalPath = resolveSandboxPath(args.path);
         await fs.unlink(physicalPath);
 
         return {
@@ -39,13 +39,16 @@ export const deleteFile: ExecutionPrimitive<DeleteFileArgs> = async (
             error: null
         };
     } catch (err: any) {
+        // deleteFile semantically returns FILE_NOT_FOUND for ENOENT (not PATH_NOT_FOUND)
+        const error_code = err.code === "ENOENT" ? "FILE_NOT_FOUND" : mapFsErrorCode(err);
+
         return {
             proposal_id,
             action: ActionType.DELETE_FILE,
             outcome: "EXECUTION_ERROR",
             result: null,
             error: {
-                error_code: "EXECUTION_ERROR",
+                error_code,
                 message: err.message || String(err)
             }
         };
