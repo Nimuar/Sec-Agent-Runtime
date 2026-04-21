@@ -146,6 +146,8 @@ class TestSDKE2E(unittest.TestCase):
             
             if isinstance(response, dict) and response.get("error"):
                 error_msg = str(response.get("error"))
+                print(f"\n[Test Attempt {attempt+1}/4] LLM Error: {error_msg}", flush=True)
+                
                 if attempt < 3:
                     sleep_time = (attempt + 1) * 3
                     
