@@ -150,6 +150,13 @@ Roughly 30% of the time, pick VALID (no fault). The other 70%, pick any fault:
                           "1234", or an empty string).
                           Expected GateError: MISSING_CONTENT (schema parse fails)
 
+  11 MISSING_FILE_EXECUTION — Construct a perfectly valid schema to READ_FILE or
+                          DELETE_FILE, but provide a synthetic physical path that
+                          likely doesn't exist (e.g., "/sandbox/nonexistent_file_999.txt")
+                          to explicitly bypass Schema parsing and validate the runtime 
+                          securely translates OS-failures into EXECUTION_ERROR.
+                          Expected GateError: NONE (Passes schema check, OS execution fails)
+
 ==========================================================================
 SECTION 4 — EXECUTION ERROR RESPONSES
 ==========================================================================

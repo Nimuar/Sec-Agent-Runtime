@@ -166,9 +166,68 @@ class TestSDKE2E(unittest.TestCase):
         """Prompt LLM for a BAD_EXTENSION fault. Verify the runtime rejects it."""
         self._run_llm_fault_test("BAD_EXTENSION", "VALIDATION_ERROR")
 
-    # Removed hardcoded deterministic tests to enforce 100% LLM-in-the-loop
+    # 2. Hardcoded Deterministic Tests
+    def test_payload_overflow(self):
+        """Send a payload > 1024 bytes. Assert VALIDATION_ERROR."""
+        payload = {
+            "schema_version": "1.0.0",
+            "id": str(uuid.uuid4()),
+            "reasoning": "A" * 1500,
+            "action": "THINK",
+            "args": {}
+        }
+        log_to_file("Executing test_payload_overflow")
+        response = requests.post(SERVER_URL, json=payload)
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.json().get("outcome"), "VALIDATION_ERROR")
 
-# Dynamically generate 100 deep LLM fault injection tests
+    def test_path_escape(self):
+        """Send a WRITE_FILE action with path ../escape.txt. Assert VALIDATION_ERROR."""
+        payload = {
+            "schema_version": "1.0.0",
+            "id": str(uuid.uuid4()),
+            "reasoning": "Path traversal attempt",
+            "action": "WRITE_FILE",
+            "args": {
+                "path": "../escape.txt",
+                "content": "Malicious payload attempt"
+            }
+        }
+        log_to_file("Executing test_path_escape")
+        response = requests.post(SERVER_URL, json=payload)
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.json().get("outcome"), "VALIDATION_ERROR")
+
+    def test_schema_malformation(self):
+        """Send a payload missing the schema_version field. Assert VALIDATION_ERROR."""
+        payload = {
+            "id": str(uuid.uuid4()),
+            "reasoning": "Schema violation",
+            "action": "THINK",
+            "args": {}
+        }
+        log_to_file("Executing test_schema_malformation")
+        response = requests.post(SERVER_URL, json=payload)
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.json().get("outcome"), "VALIDATION_ERROR")
+
+    def test_execution_enoent(self):
+        """Send a READ_FILE action for /sandbox/does_not_exist.txt. Assert EXECUTION_ERROR."""
+        payload = {
+            "schema_version": "1.0.0",
+            "id": str(uuid.uuid4()),
+            "reasoning": "Read non-existent file",
+            "action": "READ_FILE",
+            "args": {
+                "path": "/sandbox/does_not_exist.txt"
+            }
+        }
+        log_to_file("Executing test_execution_enoent")
+        response = requests.post(SERVER_URL, json=payload)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json().get("outcome"), "EXECUTION_ERROR")
+
+# Dynamically generate 110 deep LLM fault injection tests
 def _generate_fault_tests(cls):
     categories = [
         ("NULL_BYTE", "VALIDATION_ERROR"),
@@ -180,10 +239,11 @@ def _generate_fault_tests(cls):
         ("PATH_ESCAPE", "VALIDATION_ERROR"), 
         ("BAD_ACTION", "DENIED"),
         ("WRONG_ARGS", "VALIDATION_ERROR"),
-        ("INVALID_UUID", "VALIDATION_ERROR")
+        ("INVALID_UUID", "VALIDATION_ERROR"),
+        ("MISSING_FILE_EXECUTION", "EXECUTION_ERROR")
     ]
     
-    for i in range(1, 11): # 10 iterations of 10 faults = 100 native LLM tests
+    for i in range(1, 11): # 10 iterations of 11 faults = 110 native LLM tests
         for fault, expected in categories:
             test_name = f"test_generated_llm_fault_{fault.lower()}_{i}"
             def test_func(self, f=fault, e=expected):
