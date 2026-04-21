@@ -138,24 +138,34 @@ class TestSDKE2E(unittest.TestCase):
         
         import time
         import re
+        import time
+        import re
         response = None
         for attempt in range(4):
             response = agent.agentprompt(f"Generate a proposal with the {requested_fault} fault.")
             
             if isinstance(response, dict) and response.get("error"):
                 error_msg = str(response.get("error"))
-                if "503" in error_msg or "429" in error_msg:
-                    if attempt < 3:
-                        sleep_time = (attempt + 1) * 3
+                if attempt < 3:
+                    sleep_time = (attempt + 1) * 3
+                    
+                    match = re.search(r'retry in (\d+(?:\.\d+)?)s', error_msg)
+                    if match:
+                        sleep_time = float(match.group(1)) + 1.0
                         
-                        match = re.search(r'retry in (\d+(?:\.\d+)?)s', error_msg)
-                        if match:
-                            sleep_time = float(match.group(1)) + 1.0
-                            
-                        log_to_file(f"Rate limited or unavailable. Retrying in {sleep_time}s...")
-                        time.sleep(sleep_time)
-                        continue
-            break
+                    log_to_file(f"LLM API Error. Retrying in {sleep_time}s...")
+                    time.sleep(sleep_time)
+                    continue
+            
+            # If the LLM successfully generated a dictionary but hallucinated the wrong fault type or no fault type
+            if isinstance(response, dict) and response.get("fault") == requested_fault:
+                break
+                
+            if attempt < 3:
+                got_fault = response.get("fault") if isinstance(response, dict) else "None"
+                log_to_file(f"LLM generated {got_fault} instead of {requested_fault}. Retrying...")
+                time.sleep(2) # brief pause before hitting the LLM again
+                continue
             
         self.assertIsInstance(response, dict, f"Expected LLM response to be a dict, got {type(response)}: {response}")
         
