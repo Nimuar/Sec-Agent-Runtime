@@ -137,6 +137,7 @@ class TestSDKE2E(unittest.TestCase):
         agent = AgentInterface(system_instruction=system_prompt)
         
         import time
+        import re
         response = None
         for attempt in range(4):
             response = agent.agentprompt(f"Generate a proposal with the {requested_fault} fault.")
@@ -146,6 +147,11 @@ class TestSDKE2E(unittest.TestCase):
                 if "503" in error_msg or "429" in error_msg:
                     if attempt < 3:
                         sleep_time = (attempt + 1) * 3
+                        
+                        match = re.search(r'retry in (\d+(?:\.\d+)?)s', error_msg)
+                        if match:
+                            sleep_time = float(match.group(1)) + 1.0
+                            
                         log_to_file(f"Rate limited or unavailable. Retrying in {sleep_time}s...")
                         time.sleep(sleep_time)
                         continue
