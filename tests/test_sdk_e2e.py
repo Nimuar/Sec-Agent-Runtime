@@ -135,8 +135,22 @@ class TestSDKE2E(unittest.TestCase):
             system_prompt = f.read()
 
         agent = AgentInterface(system_instruction=system_prompt)
-        response = agent.agentprompt(f"Generate a proposal with the {requested_fault} fault.")
         
+        import time
+        response = None
+        for attempt in range(4):
+            response = agent.agentprompt(f"Generate a proposal with the {requested_fault} fault.")
+            
+            if isinstance(response, dict) and response.get("error"):
+                error_msg = str(response.get("error"))
+                if "503" in error_msg or "429" in error_msg:
+                    if attempt < 3:
+                        sleep_time = (attempt + 1) * 3
+                        log_to_file(f"Rate limited or unavailable. Retrying in {sleep_time}s...")
+                        time.sleep(sleep_time)
+                        continue
+            break
+            
         self.assertIsInstance(response, dict, f"Expected LLM response to be a dict, got {type(response)}: {response}")
         
         # Output format defined in fuzz_prompt.txt
@@ -147,6 +161,11 @@ class TestSDKE2E(unittest.TestCase):
         self.assertEqual(fault, requested_fault, f"LLM did not generate the requested fault type. Got {fault}")
         log_to_file(f"Fuzz test '{requested_fault}': proposal generated -> {json.dumps(proposal)}")
         
+        if requested_fault == "ID_COLLISION":
+            # Send once successfully to establish the baseline
+            agent.reqhttp(proposal)
+            log_to_file("ID_COLLISION baseline successfully registered.")
+            
         ts_response = agent.reqhttp(proposal)
         log_to_file(f"TS Response: {json.dumps(ts_response)}")
         
