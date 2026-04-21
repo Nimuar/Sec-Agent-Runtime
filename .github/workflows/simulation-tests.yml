@@ -50,7 +50,7 @@ jobs:
           if [ -d "tests" ] && [ "$(ls -A tests 2>/dev/null)" ]; then
             export PYTHONPATH=$PYTHONPATH:.
             pip install python-dotenv google-genai requests pytest pydantic
-            pytest tests/test_sdk_e2e.py tests/test_boundary.py -v
+            pytest -s tests/test_sdk_e2e.py tests/test_boundary.py -v
           else
             echo "No tests directory found or directory is empty, skipping simulation tests"
           fi
