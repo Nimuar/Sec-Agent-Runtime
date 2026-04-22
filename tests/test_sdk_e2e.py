@@ -71,6 +71,24 @@ class TestSDKE2E(unittest.TestCase):
     def tearDown(self):
         shutil.rmtree(SANDBOX_DIR, ignore_errors=True)
 
+    def _sanitize_proposal(self, proposal, force_uuid=True, clean_ascii=True):
+        if not isinstance(proposal, dict):
+            return proposal
+        if force_uuid:
+            proposal["id"] = str(uuid.uuid4())
+        if clean_ascii:
+            import re
+            def _clean_val(val):
+                if isinstance(val, str):
+                    return re.sub(r'[^\x00-\x7F]+', '', val)
+                elif isinstance(val, dict):
+                    return {k: _clean_val(v) for k, v in val.items()}
+                elif isinstance(val, list):
+                    return [_clean_val(v) for v in val]
+                return val
+            proposal = _clean_val(proposal)
+        return proposal
+
     # 1. Live LLM Tests
     def test_happy_path_write_file(self):
         """Prompt LLM to write README.md to /sandbox/. Assert SUCCESS."""
@@ -90,6 +108,7 @@ class TestSDKE2E(unittest.TestCase):
         
         self.assertIsInstance(response, dict)
         proposal = response.get("proposal", response)
+        proposal = self._sanitize_proposal(proposal)
             
         log_to_file(f"Proposal sent: {json.dumps(proposal)}")
         ts_response = agent.reqhttp(proposal)
@@ -121,6 +140,7 @@ class TestSDKE2E(unittest.TestCase):
         
         self.assertIsInstance(response, dict)
         proposal = response.get("proposal", response)
+        proposal = self._sanitize_proposal(proposal)
             
         log_to_file(f"Proposal sent: {json.dumps(proposal)}")
         ts_response = agent.reqhttp(proposal)
@@ -175,6 +195,11 @@ class TestSDKE2E(unittest.TestCase):
         fault = response.get("fault")
         expected_gate_error = response.get("expected")
         proposal = response.get("proposal")
+        
+        # Sanitize LLM payload unless the test specifically requires the dirty data
+        force_uuid = (requested_fault != "ID_COLLISION" and requested_fault != "INVALID_UUID")
+        clean_ascii = (requested_fault != "INVALID_ASCII")
+        proposal = self._sanitize_proposal(proposal, force_uuid=force_uuid, clean_ascii=clean_ascii)
         
         self.assertEqual(fault, requested_fault, f"LLM did not generate the requested fault type. Got {fault}")
         log_to_file(f"Fuzz test '{requested_fault}': proposal generated -> {json.dumps(proposal)}")

@@ -3,13 +3,21 @@ import os
 ts_url: str = "http://localhost:3000/execute"
 api_key: str = os.environ.get("GOOGLE_API_KEY", "")
 
-# Gemma 3 27B IT
+# --- ACTIVE MODEL ---
+# Uncomment only ONE model below to use for execution. 
+# You can rotate these as you exhaust the GenerativeLanguage API quotas.
+
+# Gemma 3 Family (Requires inlined system instructions - Handled automatically)
 model: str = "gemma-3-27b-it"
+# model: str = "gemma-3-12b-it"
+# model: str = "gemma-3-4b-it"
+# model: str = "gemma-3-1b-it"
 
-# Gemini 3.1 Flash Lite Preview
+# Gemini Family (Natively supports GenerateContentConfig system instructions)
 # model: str = "gemini-3.1-flash-lite-preview"
-
-# Gemini 2.5 Flash
+# model: str = "gemini-2.0-flash"
+# model: str = "gemini-2.0-flash-lite-preview-02-05"
+# model: str = "gemini-1.5-flash"
 # model: str = "gemini-2.5-flash"
 
 
