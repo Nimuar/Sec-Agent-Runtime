@@ -2,7 +2,15 @@ import os
 
 ts_url: str = "http://localhost:3000/execute"
 api_key: str = os.environ.get("GOOGLE_API_KEY", "")
-model: str = "gemini-3.1-flash-lite-preview"
+
+# Gemma 3 27B IT
+model: str = "gemma-3-27b-it"
+
+# Gemini 3.1 Flash Lite Preview
+# model: str = "gemini-3.1-flash-lite-preview"
+
+# Gemini 2.5 Flash
+# model: str = "gemini-2.5-flash"
 
 
 sample_proposals = [
