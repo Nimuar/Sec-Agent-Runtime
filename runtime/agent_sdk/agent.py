@@ -41,13 +41,19 @@ class AgentInterface:
         else:
             try:
                 kwargs = {}
+                final_contents = message + "\n"
+                
                 if self.system_instruction:
-                    kwargs["config"] = types.GenerateContentConfig(
-                        system_instruction=self.system_instruction
-                    )
+                    if "gemini" in self.model.lower():
+                        kwargs["config"] = types.GenerateContentConfig(
+                            system_instruction=self.system_instruction
+                        )
+                    else:
+                        # For Gemma or other targets, inline the system instruction manually into the prompt payload
+                        final_contents = f"System Instruction:\n{self.system_instruction}\n\nUser Request:\n{message}\n"
 
                 response = self.client.models.generate_content(
-                    model=self.model, contents=(message + "\n"), **kwargs
+                    model=self.model, contents=final_contents, **kwargs
                 )
                 print("response: ", response)
                 text = self._clean_json(response.text)
