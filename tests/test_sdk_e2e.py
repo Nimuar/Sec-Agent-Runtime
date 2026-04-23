@@ -201,6 +201,12 @@ class TestSDKE2E(unittest.TestCase):
         clean_ascii = (requested_fault != "INVALID_ASCII")
         proposal = self._sanitize_proposal(proposal, force_uuid=force_uuid, clean_ascii=clean_ascii)
         
+        # If testing for PAYLOAD_OVERFLOW, guarantee the payload strictly breaks the 1024-byte Zod threshold
+        # even if an under-parameterized LLM output a string that was too short.
+        if requested_fault == "PAYLOAD_OVERFLOW" and isinstance(proposal, dict):
+            if "reasoning" in proposal and len(str(proposal["reasoning"])) < 2000:
+                proposal["reasoning"] = str(proposal["reasoning"]) + (" Overflow! " * 200)
+
         self.assertEqual(fault, requested_fault, f"LLM did not generate the requested fault type. Got {fault}")
         log_to_file(f"Fuzz test '{requested_fault}': proposal generated -> {json.dumps(proposal)}")
         
