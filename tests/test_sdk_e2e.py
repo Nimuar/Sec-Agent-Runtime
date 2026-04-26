@@ -71,6 +71,24 @@ class TestSDKE2E(unittest.TestCase):
     def tearDown(self):
         shutil.rmtree(SANDBOX_DIR, ignore_errors=True)
 
+    def _sanitize_proposal(self, proposal, force_uuid=True, clean_ascii=True):
+        if not isinstance(proposal, dict):
+            return proposal
+        if force_uuid:
+            proposal["id"] = str(uuid.uuid4())
+        if clean_ascii:
+            import re
+            def _clean_val(val):
+                if isinstance(val, str):
+                    return re.sub(r'[^\x00-\x7F]+', '', val)
+                elif isinstance(val, dict):
+                    return {k: _clean_val(v) for k, v in val.items()}
+                elif isinstance(val, list):
+                    return [_clean_val(v) for v in val]
+                return val
+            proposal = _clean_val(proposal)
+        return proposal
+
     # 1. Live LLM Tests
     def test_happy_path_write_file(self):
         """Prompt LLM to write README.md to /sandbox/. Assert SUCCESS."""
@@ -90,6 +108,7 @@ class TestSDKE2E(unittest.TestCase):
         
         self.assertIsInstance(response, dict)
         proposal = response.get("proposal", response)
+        proposal = self._sanitize_proposal(proposal)
             
         log_to_file(f"Proposal sent: {json.dumps(proposal)}")
         ts_response = agent.reqhttp(proposal)
@@ -121,6 +140,7 @@ class TestSDKE2E(unittest.TestCase):
         
         self.assertIsInstance(response, dict)
         proposal = response.get("proposal", response)
+        proposal = self._sanitize_proposal(proposal)
             
         log_to_file(f"Proposal sent: {json.dumps(proposal)}")
         ts_response = agent.reqhttp(proposal)
@@ -135,8 +155,40 @@ class TestSDKE2E(unittest.TestCase):
             system_prompt = f.read()
 
         agent = AgentInterface(system_instruction=system_prompt)
-        response = agent.agentprompt(f"Generate a proposal with the {requested_fault} fault.")
         
+        import time
+        import re
+        import time
+        import re
+        response = None
+        for attempt in range(4):
+            response = agent.agentprompt(f"Generate a proposal with the {requested_fault} fault.")
+            
+            if isinstance(response, dict) and response.get("error"):
+                error_msg = str(response.get("error"))
+                print(f"\n[Test Attempt {attempt+1}/4] LLM Error: {error_msg}", flush=True)
+                
+                if attempt < 3:
+                    sleep_time = (attempt + 1) * 3
+                    
+                    match = re.search(r'retry in (\d+(?:\.\d+)?)s', error_msg)
+                    if match:
+                        sleep_time = float(match.group(1)) + 1.0
+                        
+                    log_to_file(f"LLM API Error. Retrying in {sleep_time}s...")
+                    time.sleep(sleep_time)
+                    continue
+            
+            # If the LLM successfully generated a dictionary but hallucinated the wrong fault type or no fault type
+            if isinstance(response, dict) and response.get("fault") == requested_fault:
+                break
+                
+            if attempt < 3:
+                got_fault = response.get("fault") if isinstance(response, dict) else "None"
+                log_to_file(f"LLM generated {got_fault} instead of {requested_fault}. Retrying...")
+                time.sleep(2) # brief pause before hitting the LLM again
+                continue
+            
         self.assertIsInstance(response, dict, f"Expected LLM response to be a dict, got {type(response)}: {response}")
         
         # Output format defined in fuzz_prompt.txt
@@ -144,9 +196,25 @@ class TestSDKE2E(unittest.TestCase):
         expected_gate_error = response.get("expected")
         proposal = response.get("proposal")
         
+        # Sanitize LLM payload unless the test specifically requires the dirty data
+        force_uuid = (requested_fault != "ID_COLLISION" and requested_fault != "INVALID_UUID")
+        clean_ascii = (requested_fault != "INVALID_ASCII")
+        proposal = self._sanitize_proposal(proposal, force_uuid=force_uuid, clean_ascii=clean_ascii)
+        
+        # If testing for PAYLOAD_OVERFLOW, guarantee the payload strictly breaks the 1024-byte Zod threshold
+        # even if an under-parameterized LLM output a string that was too short.
+        if requested_fault == "PAYLOAD_OVERFLOW" and isinstance(proposal, dict):
+            if "reasoning" in proposal and len(str(proposal["reasoning"])) < 2000:
+                proposal["reasoning"] = str(proposal["reasoning"]) + (" Overflow! " * 200)
+
         self.assertEqual(fault, requested_fault, f"LLM did not generate the requested fault type. Got {fault}")
         log_to_file(f"Fuzz test '{requested_fault}': proposal generated -> {json.dumps(proposal)}")
         
+        if requested_fault == "ID_COLLISION":
+            # Send once successfully to establish the baseline
+            agent.reqhttp(proposal)
+            log_to_file("ID_COLLISION baseline successfully registered.")
+            
         ts_response = agent.reqhttp(proposal)
         log_to_file(f"TS Response: {json.dumps(ts_response)}")
         
@@ -226,3 +294,33 @@ class TestSDKE2E(unittest.TestCase):
         response = requests.post(SERVER_URL, json=payload)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json().get("outcome"), "EXECUTION_ERROR")
+
+# Dynamically generate 110 deep LLM fault injection tests
+def _generate_fault_tests(cls):
+    categories = [
+        ("NULL_BYTE", "VALIDATION_ERROR"),
+        ("INVALID_ASCII", "VALIDATION_ERROR"),
+        ("PAYLOAD_OVERFLOW", "VALIDATION_ERROR"),
+        ("ID_COLLISION", "VALIDATION_ERROR"),
+        ("MISSING_CONTENT", "VALIDATION_ERROR"),
+        ("BAD_EXTENSION", "VALIDATION_ERROR"),
+        ("PATH_ESCAPE", "VALIDATION_ERROR"), 
+        ("BAD_ACTION", "DENIED"),
+        ("WRONG_ARGS", "VALIDATION_ERROR"),
+        ("INVALID_UUID", "VALIDATION_ERROR"),
+        ("MISSING_FILE_EXECUTION", "EXECUTION_ERROR")
+    ]
+    
+    for i in range(1, 11): # 10 iterations of 11 faults = 110 native LLM tests
+        for fault, expected in categories:
+            test_name = f"test_generated_llm_fault_{fault.lower()}_{i}"
+            def test_func(self, f=fault, e=expected):
+                self._run_llm_fault_test(f, e)
+            test_func.__name__ = test_name
+            test_func.__doc__ = f"Autogenerated LLM fault test {i} for {fault}"
+            setattr(cls, test_name, test_func)
+
+_generate_fault_tests(TestSDKE2E)
+
+if __name__ == "__main__":
+    unittest.main()
