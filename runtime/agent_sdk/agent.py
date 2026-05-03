@@ -46,7 +46,13 @@ class AgentInterface:
                 if self.system_instruction:
                     if "gemini" in self.model.lower():
                         kwargs["config"] = types.GenerateContentConfig(
-                            system_instruction=self.system_instruction
+                            system_instruction=self.system_instruction,
+                            safety_settings=[
+                                {"category": "HARM_CATEGORY_DANGEROUS_CONTENT", "threshold": "BLOCK_NONE"},
+                                {"category": "HARM_CATEGORY_HARASSMENT", "threshold": "BLOCK_NONE"},
+                                {"category": "HARM_CATEGORY_HATE_SPEECH", "threshold": "BLOCK_NONE"},
+                                {"category": "HARM_CATEGORY_SEXUALLY_EXPLICIT", "threshold": "BLOCK_NONE"}
+                            ]
                         )
                     else:
                         # For Gemma or other targets, inline the system instruction manually into the prompt payload
@@ -56,6 +62,11 @@ class AgentInterface:
                     model=self.model, contents=final_contents, **kwargs
                 )
                 print("response: ", response)
+                
+                if not response.text:
+                    print("LLM returned empty response. Likely Safety Block.")
+                    return {"error": "Empty response from LLM (Likely Safety Block)", "outcome": "LLM_FAULT"}
+                
                 text = self._clean_json(response.text)
                 parsed = json.loads(text)
                 self.proposal_history.append((message, parsed))
