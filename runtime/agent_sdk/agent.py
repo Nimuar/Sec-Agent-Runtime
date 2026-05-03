@@ -65,8 +65,10 @@ class AgentInterface:
                         threshold=types.HarmBlockThreshold.BLOCK_NONE,
                     ),
                 ],
-                "response_mime_type": "application/json",  # Force structured output
             }
+
+            if "gemini" in self.model.lower():
+                config_args["response_mime_type"] = "application/json"
 
             # 2. Handle System Instructions based on Model Support
             if self.system_instruction:

@@ -8,14 +8,14 @@ api_key: str = os.environ.get("GOOGLE_API_KEY", "")
 # You can rotate these as you exhaust the GenerativeLanguage API quotas.
 
 # Gemma 3 Family (Requires inlined system instructions - Handled automatically)
-model: str = "gemma-3-27b-it"
+# model: str = "gemma-3-27b-it"
 # model: str = "gemma-3-12b-it"
 # model: str = "gemma-3-4b-it"
 # model: str = "gemma-3-1b-it"
 
 # Gemini Family (Natively supports GenerateContentConfig system instructions)
 # model: str = "gemini-3.1-flash-lite-preview"
-# model: str = "gemini-2.0-flash"
+model: str = "gemini-2.0-flash"
 # model: str = "gemini-2.0-flash-lite-preview-02-05"
 # model: str = "gemini-1.5-flash"
 # model: str = "gemini-2.5-flash"
