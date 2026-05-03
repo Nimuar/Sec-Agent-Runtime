@@ -4,7 +4,7 @@ ts_url: str = "http://localhost:3000/execute"
 api_key: str = os.environ.get("GOOGLE_API_KEY", "")
 
 # --- ACTIVE MODEL ---
-# Uncomment only ONE model below to use for execution. 
+# Uncomment only ONE model below to use for execution.
 # You can rotate these as you exhaust the GenerativeLanguage API quotas.
 
 # Gemma 3 Family (Requires inlined system instructions - Handled automatically)
@@ -14,8 +14,8 @@ api_key: str = os.environ.get("GOOGLE_API_KEY", "")
 # model: str = "gemma-3-1b-it"
 
 # Gemini Family (Natively supports GenerateContentConfig system instructions)
-# model: str = "gemini-3.1-flash-lite-preview"
-model: str = "gemini-2.0-flash"
+model: str = "gemini-3.1-flash-lite-preview"
+# model: str = "gemini-2.0-flash"
 # model: str = "gemini-2.0-flash-lite-preview-02-05"
 # model: str = "gemini-1.5-flash"
 # model: str = "gemini-2.5-flash"
