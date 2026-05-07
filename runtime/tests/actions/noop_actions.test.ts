@@ -17,7 +17,7 @@ describe('No-Op Actions', () => {
             const response = await finish('1', { response: 'all done' });
             expect(response.outcome).toBe('SUCCESS');
             expect(response.action).toBe(ActionType.FINISH);
-            expect(response.result.final_response).toBe('all done');
+            expect(response.result?.final_response).toBe('all done');
         });
     });
 });

@@ -26,7 +26,7 @@ describe('Audit Service', () => {
 
     it('should record audit events', () => {
         const event = { trace_id: 'test', outcome: 'SUCCESS' as any };
-        recordAuditEvent(event);
+        recordAuditEvent(event as any);
         expect(mockWriteEvent).toHaveBeenCalled();
     });
 
@@ -35,7 +35,7 @@ describe('Audit Service', () => {
         expect(mockClose).toHaveBeenCalled();
 
         vi.clearAllMocks();
-        recordAuditEvent({ trace_id: 'test2', outcome: 'SUCCESS' as any });
+        recordAuditEvent({ trace_id: 'test2', outcome: 'SUCCESS' as any } as any);
         expect(mockWriteEvent).not.toHaveBeenCalled();
     });
 

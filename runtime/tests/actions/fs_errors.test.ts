@@ -58,7 +58,7 @@ describe('File System Error Handling', () => {
 
     it('renameFile should handle cross-device link error', async () => {
         vi.mocked(fs.rename).mockRejectedValue({ code: 'EXDEV', message: 'Cross-device link' });
-        const res = await renameFile('1', { oldPath: '/sandbox/a', newPath: '/sandbox/b' });
+        const res = await renameFile('1', { source: '/sandbox/a.txt', destination: '/sandbox/b.txt' });
         expect(res.outcome).toBe('EXECUTION_ERROR');
         expect(res.error?.error_code).toBe('UNKNOWN_ERROR'); // Default case
     });
