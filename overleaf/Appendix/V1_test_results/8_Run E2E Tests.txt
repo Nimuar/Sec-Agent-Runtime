@@ -1,0 +1,146 @@
+﻿2026-03-16T02:12:18.8035986Z ##[group]Run (cd runtime && npx tsx src/server.ts &)
+2026-03-16T02:12:18.8036375Z [36;1m(cd runtime && npx tsx src/server.ts &)[0m
+2026-03-16T02:12:18.8036967Z [36;1msleep 5[0m
+2026-03-16T02:12:18.8037186Z [36;1mexport PYTHONPATH=$PYTHONPATH:.[0m
+2026-03-16T02:12:18.8037462Z [36;1mpytest tests/test_sdk_e2e.py -v[0m
+2026-03-16T02:12:18.8087466Z shell: /usr/bin/bash -e {0}
+2026-03-16T02:12:18.8087690Z env:
+2026-03-16T02:12:18.8087935Z   pythonLocation: /opt/hostedtoolcache/Python/3.11.14/x64
+2026-03-16T02:12:18.8088357Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.11.14/x64/lib/pkgconfig
+2026-03-16T02:12:18.8088777Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.14/x64
+2026-03-16T02:12:18.8089152Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.14/x64
+2026-03-16T02:12:18.8089503Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.14/x64
+2026-03-16T02:12:18.8089870Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.11.14/x64/lib
+2026-03-16T02:12:18.8090341Z   GOOGLE_API_KEY: ***
+2026-03-16T02:12:18.8090558Z ##[endgroup]
+2026-03-16T02:12:19.4520912Z npm warn exec The following package was not found and will be installed: tsx@4.21.0
+2026-03-16T02:12:24.4098010Z ============================= test session starts ==============================
+2026-03-16T02:12:24.4099551Z platform linux -- Python 3.11.14, pytest-9.0.2, pluggy-1.6.0 -- /opt/hostedtoolcache/Python/3.11.14/x64/bin/python
+2026-03-16T02:12:24.4100534Z cachedir: .pytest_cache
+2026-03-16T02:12:24.4101259Z rootdir: /home/runner/work/Sec-Agent-Runtime/Sec-Agent-Runtime
+2026-03-16T02:12:24.4101925Z plugins: anyio-4.12.1
+2026-03-16T02:12:25.6477568Z collecting ... collected 8 items
+2026-03-16T02:12:25.6478174Z 
+2026-03-16T02:12:25.6561332Z tests/test_sdk_e2e.py::TestSDKE2E::test_execution_enoent [RECEIVE] Incoming request: f3a52ca2-3d03-40f6-82d2-7aff12ffee4a
+2026-03-16T02:12:25.6596912Z [TRACE] {
+2026-03-16T02:12:25.6597471Z   "trace_id": "f3a52ca2-3d03-40f6-82d2-7aff12ffee4a",
+2026-03-16T02:12:25.6598179Z   "proposal_id": "29b62467-d4a6-4516-988c-bce12f648cc9",
+2026-03-16T02:12:25.6598558Z   "schema_version": "1.0.0",
+2026-03-16T02:12:25.6598814Z   "action": "READ_FILE",
+2026-03-16T02:12:25.6599053Z   "args_summary": {
+2026-03-16T02:12:25.6599320Z     "path": "/sandbox/does_not_exist.txt"
+2026-03-16T02:12:25.6599605Z   },
+2026-03-16T02:12:25.6599823Z   "outcome": "EXECUTION_ERROR",
+2026-03-16T02:12:25.6600113Z   "error_code": "EXECUTION_ERROR",
+2026-03-16T02:12:25.6600406Z   "phase_failed_at": "EXECUTE",
+2026-03-16T02:12:25.6600711Z   "received_at": "2026-03-16T02:12:25.656Z",
+2026-03-16T02:12:25.6601056Z   "completed_at": "2026-03-16T02:12:25.659Z",
+2026-03-16T02:12:25.6601381Z   "reasoning": "Read non-existent file"
+2026-03-16T02:12:25.6601664Z }
+2026-03-16T02:12:25.6638154Z PASSED          [ 12%]
+2026-03-16T02:12:26.7948223Z tests/test_sdk_e2e.py::TestSDKE2E::test_happy_path_list_files [RECEIVE] Incoming request: 7208d227-0112-4a4d-8be8-af63cf0aaa2b
+2026-03-16T02:12:26.7960260Z [TRACE] {
+2026-03-16T02:12:26.7960721Z   "trace_id": "7208d227-0112-4a4d-8be8-af63cf0aaa2b",
+2026-03-16T02:12:26.7961419Z   "proposal_id": "7a3b4c12-9e8d-4f2a-b6c5-1d9e8f7a6b5c",
+2026-03-16T02:12:26.7962022Z   "schema_version": "1.0.0",
+2026-03-16T02:12:26.7962478Z   "action": "LIST_FILES",
+2026-03-16T02:12:26.7962865Z   "args_summary": {
+2026-03-16T02:12:26.7963226Z     "path": "/sandbox/"
+2026-03-16T02:12:26.7963627Z   },
+2026-03-16T02:12:26.7963940Z   "outcome": "SUCCESS",
+2026-03-16T02:12:26.7964346Z   "error_code": null,
+2026-03-16T02:12:26.7964756Z   "phase_failed_at": null,
+2026-03-16T02:12:26.7965335Z   "received_at": "2026-03-16T02:12:26.794Z",
+2026-03-16T02:12:26.7965949Z   "completed_at": "2026-03-16T02:12:26.795Z",
+2026-03-16T02:12:26.7967528Z   "reasoning": "I am initiating a request to list the contents of the /sandbox/ directory to verify the current file structure within the secure runtime environment."
+2026-03-16T02:12:26.7968395Z }
+2026-03-16T02:12:26.7990780Z PASSED     [ 25%]
+2026-03-16T02:12:27.8311626Z tests/test_sdk_e2e.py::TestSDKE2E::test_happy_path_write_file [RECEIVE] Incoming request: 0aaebf23-fd79-4bed-a5b1-393fd2ffe827
+2026-03-16T02:12:27.8327046Z [TRACE] {
+2026-03-16T02:12:27.8327568Z   "trace_id": "0aaebf23-fd79-4bed-a5b1-393fd2ffe827",
+2026-03-16T02:12:27.8328274Z   "proposal_id": "7b8f9e0a-4c2d-4e5f-a6b7-8d9c0e1f2a3b",
+2026-03-16T02:12:27.8328850Z   "schema_version": "1.0.0",
+2026-03-16T02:12:27.8329268Z   "action": "WRITE_FILE",
+2026-03-16T02:12:27.8329681Z   "args_summary": {
+2026-03-16T02:12:27.8330116Z     "path": "/sandbox/README.md",
+2026-03-16T02:12:27.8330615Z     "content": "Hello Sandbox"
+2026-03-16T02:12:27.8331018Z   },
+2026-03-16T02:12:27.8331441Z   "outcome": "SUCCESS",
+2026-03-16T02:12:27.8357280Z   "error_code": null,
+2026-03-16T02:12:27.8357680Z   "phase_failed_at": null,
+2026-03-16T02:12:27.8358173Z   "received_at": "2026-03-16T02:12:27.830Z",
+2026-03-16T02:12:27.8358757Z   "completed_at": "2026-03-16T02:12:27.832Z",
+2026-03-16T02:12:27.8359997Z   "reasoning": "To test the secure runtime environment by creating a mandatory README.md file in the /sandbox/ directory as requested."
+2026-03-16T02:12:27.8361026Z }
+2026-03-16T02:12:27.8363336Z PASSED     [ 37%]
+2026-03-16T02:12:28.9156451Z tests/test_sdk_e2e.py::TestSDKE2E::test_llm_fault_bad_action [RECEIVE] Incoming request: c90db56c-6e5c-4992-b695-9c41afaaf8b2
+2026-03-16T02:12:28.9159195Z [TRACE] {
+2026-03-16T02:12:28.9159660Z   "trace_id": "c90db56c-6e5c-4992-b695-9c41afaaf8b2",
+2026-03-16T02:12:28.9160334Z   "proposal_id": "e49c8f12-9c42-4b2a-8d19-58b4562c1e2d",
+2026-03-16T02:12:28.9160873Z   "schema_version": "1.0.0",
+2026-03-16T02:12:28.9161255Z   "action": null,
+2026-03-16T02:12:28.9161571Z   "args_summary": {
+2026-03-16T02:12:28.9161912Z     "command": "ls -la"
+2026-03-16T02:12:28.9162619Z   },
+2026-03-16T02:12:28.9162897Z   "outcome": "DENIED",
+2026-03-16T02:12:28.9163310Z   "error_code": "ACTION_NOT_ALLOWED",
+2026-03-16T02:12:28.9163818Z   "phase_failed_at": "AUTHORIZE",
+2026-03-16T02:12:28.9164300Z   "received_at": "2026-03-16T02:12:28.915Z",
+2026-03-16T02:12:28.9164856Z   "completed_at": "2026-03-16T02:12:28.915Z",
+2026-03-16T02:12:28.9165717Z   "reasoning": "Attempting to execute a system command using a prohibited action type."
+2026-03-16T02:12:28.9166463Z }
+2026-03-16T02:12:28.9189712Z PASSED      [ 50%]
+2026-03-16T02:12:30.2065858Z tests/test_sdk_e2e.py::TestSDKE2E::test_llm_fault_bad_extension [RECEIVE] Incoming request: c1ed5469-067c-4297-84ee-e17d3639a8a5
+2026-03-16T02:12:30.2076473Z [TRACE] {
+2026-03-16T02:12:30.2077090Z   "trace_id": "c1ed5469-067c-4297-84ee-e17d3639a8a5",
+2026-03-16T02:12:30.2077768Z   "proposal_id": "e4f8d2b1-9a7c-4e3d-8f2a-5b9c1d3f6e8a",
+2026-03-16T02:12:30.2078303Z   "schema_version": "1.0.0",
+2026-03-16T02:12:30.2078719Z   "action": "WRITE_FILE",
+2026-03-16T02:12:30.2079080Z   "args_summary": {
+2026-03-16T02:12:30.2079463Z     "path": "/sandbox/script.sh",
+2026-03-16T02:12:30.2079931Z     "content": "echo 'Hello World'"
+2026-03-16T02:12:30.2080326Z   },
+2026-03-16T02:12:30.2080651Z   "outcome": "VALIDATION_ERROR",
+2026-03-16T02:12:30.2081103Z   "error_code": "INVALID_CONTENT",
+2026-03-16T02:12:30.2081602Z   "phase_failed_at": "VALIDATE_ARGS",
+2026-03-16T02:12:30.2082112Z   "received_at": "2026-03-16T02:12:30.206Z",
+2026-03-16T02:12:30.2082631Z   "completed_at": "2026-03-16T02:12:30.207Z",
+2026-03-16T02:12:30.2083384Z   "reasoning": "Attempting to create an executable file which is not allowed."
+2026-03-16T02:12:30.2084069Z }
+2026-03-16T02:12:30.2108375Z PASSED   [ 62%]
+2026-03-16T02:12:30.2132743Z tests/test_sdk_e2e.py::TestSDKE2E::test_path_escape [RECEIVE] Incoming request: 5d4719ba-6a36-49ef-aa7f-ceadb34144b5
+2026-03-16T02:12:30.2137793Z [TRACE] {
+2026-03-16T02:12:30.2139314Z   "trace_id": "5d4719ba-6a36-49ef-aa7f-ceadb34144b5",
+2026-03-16T02:12:30.2140086Z   "proposal_id": "68a11309-f145-4b4c-8ad7-506fbb81dc77",
+2026-03-16T02:12:30.2140620Z   "schema_version": "1.0.0",
+2026-03-16T02:12:30.2141008Z   "action": "WRITE_FILE",
+2026-03-16T02:12:30.2141384Z   "args_summary": {
+2026-03-16T02:12:30.2141741Z     "path": "../escape.txt",
+2026-03-16T02:12:30.2142603Z     "content": "Malicious payload attempt"
+2026-03-16T02:12:30.2143070Z   },
+2026-03-16T02:12:30.2143438Z   "outcome": "VALIDATION_ERROR",
+2026-03-16T02:12:30.2143934Z   "error_code": "INVALID_CONTENT",
+2026-03-16T02:12:30.2144461Z   "phase_failed_at": "VALIDATE_ARGS",
+2026-03-16T02:12:30.2145023Z   "received_at": "2026-03-16T02:12:30.213Z",
+2026-03-16T02:12:30.2145599Z   "completed_at": "2026-03-16T02:12:30.213Z",
+2026-03-16T02:12:30.2146182Z   "reasoning": "Path traversal attempt"
+2026-03-16T02:12:30.2146844Z }
+2026-03-16T02:12:30.2153015Z PASSED               [ 75%]
+2026-03-16T02:12:30.2191594Z tests/test_sdk_e2e.py::TestSDKE2E::test_payload_overflow PASSED          [ 87%]
+2026-03-16T02:12:30.2212539Z tests/test_sdk_e2e.py::TestSDKE2E::test_schema_malformation [RECEIVE] Incoming request: 713a841c-1ddf-4de0-9074-29ba3e48cdc1
+2026-03-16T02:12:30.2214582Z [TRACE] {
+2026-03-16T02:12:30.2215033Z   "trace_id": "713a841c-1ddf-4de0-9074-29ba3e48cdc1",
+2026-03-16T02:12:30.2215552Z   "proposal_id": null,
+2026-03-16T02:12:30.2215856Z   "schema_version": null,
+2026-03-16T02:12:30.2216076Z   "action": null,
+2026-03-16T02:12:30.2216263Z   "args_summary": null,
+2026-03-16T02:12:30.2216499Z   "outcome": "VALIDATION_ERROR",
+2026-03-16T02:12:30.2217001Z   "error_code": "INVALID_CONTENT",
+2026-03-16T02:12:30.2217309Z   "phase_failed_at": "VALIDATE_SCHEMA",
+2026-03-16T02:12:30.2217866Z   "received_at": "2026-03-16T02:12:30.221Z",
+2026-03-16T02:12:30.2218449Z   "completed_at": "2026-03-16T02:12:30.221Z",
+2026-03-16T02:12:30.2218924Z   "reasoning": null
+2026-03-16T02:12:30.2219263Z }
+2026-03-16T02:12:30.3398040Z PASSED       [100%]
+2026-03-16T02:12:30.3398296Z 
+2026-03-16T02:12:30.3398978Z ============================== 8 passed in 5.82s ===============================

@@ -1,0 +1,530 @@
+﻿2026-03-16T02:11:59.5049485Z Current runner version: '2.332.0'
+2026-03-16T02:11:59.5079859Z ##[group]Runner Image Provisioner
+2026-03-16T02:11:59.5081310Z Hosted Compute Agent
+2026-03-16T02:11:59.5082123Z Version: 20260213.493
+2026-03-16T02:11:59.5083068Z Commit: 5c115507f6dd24b8de37d8bbe0bb4509d0cc0fa3
+2026-03-16T02:11:59.5084055Z Build Date: 2026-02-13T00:28:41Z
+2026-03-16T02:11:59.5085155Z Worker ID: {e2dae094-b3b4-4f09-8436-6927daff7d2a}
+2026-03-16T02:11:59.5086166Z Azure Region: westcentralus
+2026-03-16T02:11:59.5087170Z ##[endgroup]
+2026-03-16T02:11:59.5089051Z ##[group]Operating System
+2026-03-16T02:11:59.5089930Z Ubuntu
+2026-03-16T02:11:59.5090652Z 24.04.3
+2026-03-16T02:11:59.5091468Z LTS
+2026-03-16T02:11:59.5092243Z ##[endgroup]
+2026-03-16T02:11:59.5092963Z ##[group]Runner Image
+2026-03-16T02:11:59.5093852Z Image: ubuntu-24.04
+2026-03-16T02:11:59.5094570Z Version: 20260302.42.1
+2026-03-16T02:11:59.5096713Z Included Software: https://github.com/actions/runner-images/blob/ubuntu24/20260302.42/images/ubuntu/Ubuntu2404-Readme.md
+2026-03-16T02:11:59.5099092Z Image Release: https://github.com/actions/runner-images/releases/tag/ubuntu24%2F20260302.42
+2026-03-16T02:11:59.5100505Z ##[endgroup]
+2026-03-16T02:11:59.5104804Z ##[group]GITHUB_TOKEN Permissions
+2026-03-16T02:11:59.5107686Z Actions: write
+2026-03-16T02:11:59.5108544Z ArtifactMetadata: write
+2026-03-16T02:11:59.5109416Z Attestations: write
+2026-03-16T02:11:59.5110151Z Checks: write
+2026-03-16T02:11:59.5110995Z Contents: write
+2026-03-16T02:11:59.5111735Z Deployments: write
+2026-03-16T02:11:59.5112560Z Discussions: write
+2026-03-16T02:11:59.5113366Z Issues: write
+2026-03-16T02:11:59.5114075Z Metadata: read
+2026-03-16T02:11:59.5114847Z Models: read
+2026-03-16T02:11:59.5115510Z Packages: write
+2026-03-16T02:11:59.5116356Z Pages: write
+2026-03-16T02:11:59.5117383Z PullRequests: write
+2026-03-16T02:11:59.5118189Z RepositoryProjects: write
+2026-03-16T02:11:59.5119167Z SecurityEvents: write
+2026-03-16T02:11:59.5119930Z Statuses: write
+2026-03-16T02:11:59.5120677Z ##[endgroup]
+2026-03-16T02:11:59.5123205Z Secret source: Actions
+2026-03-16T02:11:59.5124234Z Prepare workflow directory
+2026-03-16T02:11:59.5794414Z Prepare all required actions
+2026-03-16T02:11:59.5833244Z Getting action download info
+2026-03-16T02:11:59.9558436Z Download action repository 'actions/checkout@v4' (SHA:34e114876b0b11c390a56381ad16ebd13914f8d5)
+2026-03-16T02:12:00.6823500Z Download action repository 'actions/setup-node@v4' (SHA:49933ea5288caeca8642d1e84afbd3f7d6820020)
+2026-03-16T02:12:01.4250110Z Complete job name: test
+2026-03-16T02:12:01.4968741Z ##[group]Run actions/checkout@v4
+2026-03-16T02:12:01.4969367Z with:
+2026-03-16T02:12:01.4969636Z   repository: Nimuar/Sec-Agent-Runtime
+2026-03-16T02:12:01.4970128Z   token: ***
+2026-03-16T02:12:01.4970363Z   ssh-strict: true
+2026-03-16T02:12:01.4970608Z   ssh-user: git
+2026-03-16T02:12:01.4970851Z   persist-credentials: true
+2026-03-16T02:12:01.4971130Z   clean: true
+2026-03-16T02:12:01.4971374Z   sparse-checkout-cone-mode: true
+2026-03-16T02:12:01.4971675Z   fetch-depth: 1
+2026-03-16T02:12:01.4971931Z   fetch-tags: false
+2026-03-16T02:12:01.4972177Z   show-progress: true
+2026-03-16T02:12:01.4972430Z   lfs: false
+2026-03-16T02:12:01.4972661Z   submodules: false
+2026-03-16T02:12:01.4972907Z   set-safe-directory: true
+2026-03-16T02:12:01.4973379Z ##[endgroup]
+2026-03-16T02:12:01.6104346Z Syncing repository: Nimuar/Sec-Agent-Runtime
+2026-03-16T02:12:01.6105778Z ##[group]Getting Git version info
+2026-03-16T02:12:01.6106375Z Working directory is '/home/runner/work/Sec-Agent-Runtime/Sec-Agent-Runtime'
+2026-03-16T02:12:01.6107467Z [command]/usr/bin/git version
+2026-03-16T02:12:01.6190016Z git version 2.53.0
+2026-03-16T02:12:01.6216349Z ##[endgroup]
+2026-03-16T02:12:01.6231716Z Temporarily overriding HOME='/home/runner/work/_temp/b42ea5b6-f463-4f1f-8a88-d8f148c4b8c2' before making global git config changes
+2026-03-16T02:12:01.6233342Z Adding repository directory to the temporary git global config as a safe directory
+2026-03-16T02:12:01.6238463Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/Sec-Agent-Runtime/Sec-Agent-Runtime
+2026-03-16T02:12:01.6279360Z Deleting the contents of '/home/runner/work/Sec-Agent-Runtime/Sec-Agent-Runtime'
+2026-03-16T02:12:01.6283150Z ##[group]Initializing the repository
+2026-03-16T02:12:01.6288272Z [command]/usr/bin/git init /home/runner/work/Sec-Agent-Runtime/Sec-Agent-Runtime
+2026-03-16T02:12:01.6408400Z hint: Using 'master' as the name for the initial branch. This default branch name
+2026-03-16T02:12:01.6409520Z hint: will change to "main" in Git 3.0. To configure the initial branch name
+2026-03-16T02:12:01.6410182Z hint: to use in all of your new repositories, which will suppress this warning,
+2026-03-16T02:12:01.6410638Z hint: call:
+2026-03-16T02:12:01.6410851Z hint:
+2026-03-16T02:12:01.6411163Z hint: 	git config --global init.defaultBranch <name>
+2026-03-16T02:12:01.6411805Z hint:
+2026-03-16T02:12:01.6412468Z hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+2026-03-16T02:12:01.6413188Z hint: 'development'. The just-created branch can be renamed via this command:
+2026-03-16T02:12:01.6413809Z hint:
+2026-03-16T02:12:01.6414250Z hint: 	git branch -m <name>
+2026-03-16T02:12:01.6414757Z hint:
+2026-03-16T02:12:01.6415467Z hint: Disable this message with "git config set advice.defaultBranchName false"
+2026-03-16T02:12:01.6417016Z Initialized empty Git repository in /home/runner/work/Sec-Agent-Runtime/Sec-Agent-Runtime/.git/
+2026-03-16T02:12:01.6425814Z [command]/usr/bin/git remote add origin https://github.com/Nimuar/Sec-Agent-Runtime
+2026-03-16T02:12:01.6462254Z ##[endgroup]
+2026-03-16T02:12:01.6463104Z ##[group]Disabling automatic garbage collection
+2026-03-16T02:12:01.6468315Z [command]/usr/bin/git config --local gc.auto 0
+2026-03-16T02:12:01.6498799Z ##[endgroup]
+2026-03-16T02:12:01.6499607Z ##[group]Setting up auth
+2026-03-16T02:12:01.6505999Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-03-16T02:12:01.6537223Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-03-16T02:12:01.6896386Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-03-16T02:12:01.6927015Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-03-16T02:12:01.7162139Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+2026-03-16T02:12:01.7193793Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+2026-03-16T02:12:01.7439513Z [command]/usr/bin/git config --local http.https://github.com/.extraheader AUTHORIZATION: basic ***
+2026-03-16T02:12:01.7474854Z ##[endgroup]
+2026-03-16T02:12:01.7475730Z ##[group]Fetching the repository
+2026-03-16T02:12:01.7484062Z [command]/usr/bin/git -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules --depth=1 origin +bba18bfcb441366e7ccf7666997af2232df531c8:refs/remotes/pull/13/merge
+2026-03-16T02:12:02.9163260Z From https://github.com/Nimuar/Sec-Agent-Runtime
+2026-03-16T02:12:02.9164167Z  * [new ref]         bba18bfcb441366e7ccf7666997af2232df531c8 -> pull/13/merge
+2026-03-16T02:12:02.9198721Z ##[endgroup]
+2026-03-16T02:12:02.9199307Z ##[group]Determining the checkout info
+2026-03-16T02:12:02.9200614Z ##[endgroup]
+2026-03-16T02:12:02.9206004Z [command]/usr/bin/git sparse-checkout disable
+2026-03-16T02:12:02.9249944Z [command]/usr/bin/git config --local --unset-all extensions.worktreeConfig
+2026-03-16T02:12:02.9275754Z ##[group]Checking out the ref
+2026-03-16T02:12:02.9280026Z [command]/usr/bin/git checkout --progress --force refs/remotes/pull/13/merge
+2026-03-16T02:12:03.0208248Z Note: switching to 'refs/remotes/pull/13/merge'.
+2026-03-16T02:12:03.0208779Z 
+2026-03-16T02:12:03.0209115Z You are in 'detached HEAD' state. You can look around, make experimental
+2026-03-16T02:12:03.0210211Z changes and commit them, and you can discard any commits you make in this
+2026-03-16T02:12:03.0210972Z state without impacting any branches by switching back to a branch.
+2026-03-16T02:12:03.0211449Z 
+2026-03-16T02:12:03.0211813Z If you want to create a new branch to retain commits you create, you may
+2026-03-16T02:12:03.0212539Z do so (now or later) by using -c with the switch command. Example:
+2026-03-16T02:12:03.0212887Z 
+2026-03-16T02:12:03.0212997Z   git switch -c <new-branch-name>
+2026-03-16T02:12:03.0213200Z 
+2026-03-16T02:12:03.0213326Z Or undo this operation with:
+2026-03-16T02:12:03.0214588Z 
+2026-03-16T02:12:03.0214707Z   git switch -
+2026-03-16T02:12:03.0214870Z 
+2026-03-16T02:12:03.0215099Z Turn off this advice by setting config variable advice.detachedHead to false
+2026-03-16T02:12:03.0215404Z 
+2026-03-16T02:12:03.0215774Z HEAD is now at bba18bf Merge 003d112ae784c815521f9a1fe08a4ad40de65022 into dd68950f874ba6e4980dd744091b7792f400f7e6
+2026-03-16T02:12:03.0218901Z ##[endgroup]
+2026-03-16T02:12:03.0265345Z [command]/usr/bin/git log -1 --format=%H
+2026-03-16T02:12:03.0291984Z bba18bfcb441366e7ccf7666997af2232df531c8
+2026-03-16T02:12:03.0539608Z ##[group]Run actions/setup-node@v4
+2026-03-16T02:12:03.0539887Z with:
+2026-03-16T02:12:03.0540075Z   node-version: 20.x
+2026-03-16T02:12:03.0540272Z   cache: npm
+2026-03-16T02:12:03.0540445Z   always-auth: false
+2026-03-16T02:12:03.0540633Z   check-latest: false
+2026-03-16T02:12:03.0540957Z   token: ***
+2026-03-16T02:12:03.0541162Z ##[endgroup]
+2026-03-16T02:12:03.2313721Z Found in cache @ /opt/hostedtoolcache/node/20.20.0/x64
+2026-03-16T02:12:03.2320840Z ##[group]Environment details
+2026-03-16T02:12:05.5641301Z node: v20.20.0
+2026-03-16T02:12:05.5641687Z npm: 10.8.2
+2026-03-16T02:12:05.5642000Z yarn: 1.22.22
+2026-03-16T02:12:05.5644139Z ##[endgroup]
+2026-03-16T02:12:05.5670408Z [command]/opt/hostedtoolcache/node/20.20.0/x64/bin/npm config get cache
+2026-03-16T02:12:05.8548614Z /home/runner/.npm
+2026-03-16T02:12:06.0636937Z Cache hit for: node-cache-Linux-x64-npm-7550fa9de7c4b7437bacca0313d4900828baa4119d8395ce68b9d1ea3be4b51d
+2026-03-16T02:12:07.1029879Z Received 34602742 of 34602742 (100.0%), 39.9 MBs/sec
+2026-03-16T02:12:07.1031079Z Cache Size: ~33 MB (34602742 B)
+2026-03-16T02:12:07.1061023Z [command]/usr/bin/tar -xf /home/runner/work/_temp/1eaea575-33ff-46d4-89d8-b2727912442f/cache.tzst -P -C /home/runner/work/Sec-Agent-Runtime/Sec-Agent-Runtime --use-compress-program unzstd
+2026-03-16T02:12:07.1840141Z Cache restored successfully
+2026-03-16T02:12:07.1917758Z Cache restored from key: node-cache-Linux-x64-npm-7550fa9de7c4b7437bacca0313d4900828baa4119d8395ce68b9d1ea3be4b51d
+2026-03-16T02:12:07.2130462Z ##[group]Run npm ci
+2026-03-16T02:12:07.2130738Z [36;1mnpm ci[0m
+2026-03-16T02:12:07.2191090Z shell: /usr/bin/bash -e {0}
+2026-03-16T02:12:07.2191345Z ##[endgroup]
+2026-03-16T02:12:10.0181489Z 
+2026-03-16T02:12:10.0189723Z added 156 packages, and audited 157 packages in 3s
+2026-03-16T02:12:10.0190078Z 
+2026-03-16T02:12:10.0190265Z 46 packages are looking for funding
+2026-03-16T02:12:10.0190587Z   run `npm fund` for details
+2026-03-16T02:12:10.0192045Z 
+2026-03-16T02:12:10.0192261Z found 0 vulnerabilities
+2026-03-16T02:12:10.0401443Z ##[group]Run npm run test
+2026-03-16T02:12:10.0401717Z [36;1mnpm run test[0m
+2026-03-16T02:12:10.0450702Z shell: /usr/bin/bash -e {0}
+2026-03-16T02:12:10.0450941Z ##[endgroup]
+2026-03-16T02:12:10.1794319Z 
+2026-03-16T02:12:10.1794906Z > agent-runtime@1.0.0 test
+2026-03-16T02:12:10.1795374Z > vitest run
+2026-03-16T02:12:10.1795510Z 
+2026-03-16T02:12:10.5816380Z 
+2026-03-16T02:12:10.5821870Z [1m[46m RUN [49m[22m [36mv4.1.0 [39m[90m/home/runner/work/Sec-Agent-Runtime/Sec-Agent-Runtime[39m
+2026-03-16T02:12:10.5822636Z 
+2026-03-16T02:12:10.9510586Z  [32m✓[39m runtime/src/Proposal_Handler_Test.test.ts [2m([22m[2m8 tests[22m[2m)[22m[32m 16[2mms[22m[39m
+2026-03-16T02:12:10.9942243Z  [32m✓[39m runtime/src/actions/__tests__/fileActions.test.ts [2m([22m[2m22 tests[22m[2m)[22m[32m 19[2mms[22m[39m
+2026-03-16T02:12:11.0151043Z  [32m✓[39m runtime/tests/schemas/ProposalSchema.test.ts [2m([22m[2m21 tests[22m[2m)[22m[32m 21[2mms[22m[39m
+2026-03-16T02:12:11.2569277Z  [32m✓[39m runtime/tests/schemas/ProposalError.test.ts [2m([22m[2m16 tests[22m[2m)[22m[32m 14[2mms[22m[39m
+2026-03-16T02:12:11.3378806Z  [32m✓[39m runtime/tests/stepRuntime.test.ts [2m([22m[2m14 tests[22m[2m)[22m[32m 9[2mms[22m[39m
+2026-03-16T02:12:11.4889611Z [90mstdout[2m | runtime/tests/api/server.test.ts[2m > [22m[2mAgent Execution API[2m > [22m[2mshould return 200 SUCCESS for a valid proposal
+2026-03-16T02:12:11.4891766Z [22m[39m[RECEIVE] Incoming request: 5648a5db-77b0-47c3-af37-d08b3f92814b
+2026-03-16T02:12:11.4892645Z 
+2026-03-16T02:12:11.4894418Z [90mstdout[2m | runtime/tests/api/server.test.ts[2m > [22m[2mAgent Execution API[2m > [22m[2mshould return 200 SUCCESS for a valid proposal
+2026-03-16T02:12:11.4895653Z [22m[39m[TRACE] {
+2026-03-16T02:12:11.4896261Z   "trace_id": "5648a5db-77b0-47c3-af37-d08b3f92814b",
+2026-03-16T02:12:11.4897242Z   "proposal_id": "550e8400-e29b-41d4-a716-446655440000",
+2026-03-16T02:12:11.4897848Z   "schema_version": "1.0.0",
+2026-03-16T02:12:11.4898287Z   "action": "THINK",
+2026-03-16T02:12:11.4898688Z   "args_summary": {},
+2026-03-16T02:12:11.4899091Z   "outcome": "SUCCESS",
+2026-03-16T02:12:11.4899477Z   "error_code": null,
+2026-03-16T02:12:11.4899841Z   "phase_failed_at": null,
+2026-03-16T02:12:11.4900345Z   "received_at": "2026-03-16T02:12:11.482Z",
+2026-03-16T02:12:11.4900908Z   "completed_at": "2026-03-16T02:12:11.486Z",
+2026-03-16T02:12:11.4901532Z   "reasoning": "Thinking about something"
+2026-03-16T02:12:11.4902017Z }
+2026-03-16T02:12:11.4902182Z 
+2026-03-16T02:12:11.4983241Z [90mstdout[2m | runtime/tests/api/server.test.ts[2m > [22m[2mAgent Execution API[2m > [22m[2mshould return 400 VALIDATION_ERROR for malformed JSON
+2026-03-16T02:12:11.4984949Z [22m[39m[RECEIVE] Incoming request: 67cb8503-01fe-4ba7-802a-3d11882094df
+2026-03-16T02:12:11.4985675Z [TRACE] {
+2026-03-16T02:12:11.4986179Z   "trace_id": "67cb8503-01fe-4ba7-802a-3d11882094df",
+2026-03-16T02:12:11.4988740Z   "proposal_id": null,
+2026-03-16T02:12:11.4989195Z   "schema_version": null,
+2026-03-16T02:12:11.4989628Z   "action": null,
+2026-03-16T02:12:11.4990110Z   "args_summary": null,
+2026-03-16T02:12:11.4990605Z   "outcome": "VALIDATION_ERROR",
+2026-03-16T02:12:11.4991113Z   "error_code": "INVALID_CONTENT",
+2026-03-16T02:12:11.4991660Z   "phase_failed_at": "VALIDATE_SCHEMA",
+2026-03-16T02:12:11.4992242Z   "received_at": "2026-03-16T02:12:11.496Z",
+2026-03-16T02:12:11.4992823Z   "completed_at": "2026-03-16T02:12:11.497Z",
+2026-03-16T02:12:11.4993317Z   "reasoning": null
+2026-03-16T02:12:11.4993682Z }
+2026-03-16T02:12:11.4997253Z 
+2026-03-16T02:12:11.5024409Z [90mstdout[2m | runtime/tests/api/server.test.ts[2m > [22m[2mAgent Execution API[2m > [22m[2mshould return 200 and bubble up EXECUTION_ERROR from dispatcher
+2026-03-16T02:12:11.5026201Z [22m[39m[RECEIVE] Incoming request: 729033a6-dfa4-434d-a3e5-c9253e958f14
+2026-03-16T02:12:11.5030391Z 
+2026-03-16T02:12:11.5040104Z [90mstdout[2m | runtime/tests/api/server.test.ts[2m > [22m[2mAgent Execution API[2m > [22m[2mshould return 200 and bubble up EXECUTION_ERROR from dispatcher
+2026-03-16T02:12:11.5041878Z [22m[39m[TRACE] {
+2026-03-16T02:12:11.5042834Z   "trace_id": "729033a6-dfa4-434d-a3e5-c9253e958f14",
+2026-03-16T02:12:11.5043849Z   "proposal_id": "550e8400-e29b-41d4-a716-446655440010",
+2026-03-16T02:12:11.5044460Z   "schema_version": "1.0.0",
+2026-03-16T02:12:11.5044891Z   "action": "THINK",
+2026-03-16T02:12:11.5045269Z   "args_summary": {},
+2026-03-16T02:12:11.5045693Z   "outcome": "EXECUTION_ERROR",
+2026-03-16T02:12:11.5046182Z   "error_code": "EXECUTION_ERROR",
+2026-03-16T02:12:11.5046892Z   "phase_failed_at": "EXECUTE",
+2026-03-16T02:12:11.5047401Z   "received_at": "2026-03-16T02:12:11.501Z",
+2026-03-16T02:12:11.5047964Z   "completed_at": "2026-03-16T02:12:11.501Z",
+2026-03-16T02:12:11.5048840Z   "reasoning": "Thinking about something"
+2026-03-16T02:12:11.5049291Z }
+2026-03-16T02:12:11.5049471Z 
+2026-03-16T02:12:11.5061540Z [90mstdout[2m | runtime/tests/api/server.test.ts[2m > [22m[2mAgent Execution API[2m > [22m[2mshould return 200 EXECUTION_ERROR for unhandled server exceptions
+2026-03-16T02:12:11.5067700Z [22m[39m[RECEIVE] Incoming request: 2ce13c2f-4883-47e8-b355-6e0f8037ef80
+2026-03-16T02:12:11.5073781Z 
+2026-03-16T02:12:11.5076275Z [90mstdout[2m | runtime/tests/api/server.test.ts[2m > [22m[2mAgent Execution API[2m > [22m[2mshould return 200 EXECUTION_ERROR for unhandled server exceptions
+2026-03-16T02:12:11.5078705Z [22m[39m[TRACE] {
+2026-03-16T02:12:11.5079654Z   "trace_id": "2ce13c2f-4883-47e8-b355-6e0f8037ef80",
+2026-03-16T02:12:11.5080604Z   "proposal_id": "550e8400-e29b-41d4-a716-446655440020",
+2026-03-16T02:12:11.5081232Z   "schema_version": "1.0.0",
+2026-03-16T02:12:11.5081668Z   "action": "THINK",
+2026-03-16T02:12:11.5082065Z   "args_summary": {},
+2026-03-16T02:12:11.5082500Z   "outcome": "EXECUTION_ERROR",
+2026-03-16T02:12:11.5083014Z   "error_code": "EXECUTION_ERROR",
+2026-03-16T02:12:11.5083531Z   "phase_failed_at": "EXECUTE",
+2026-03-16T02:12:11.5084078Z   "received_at": "2026-03-16T02:12:11.505Z",
+2026-03-16T02:12:11.5084671Z   "completed_at": "2026-03-16T02:12:11.505Z",
+2026-03-16T02:12:11.5085228Z   "reasoning": "Thinking about something"
+2026-03-16T02:12:11.5085724Z }
+2026-03-16T02:12:11.5085892Z 
+2026-03-16T02:12:11.5101437Z [90mstdout[2m | runtime/tests/api/server.test.ts[2m > [22m[2mAgent Execution API[2m > [22m[2mshould return 400 VALIDATION_ERROR for proposal with extra fields (Strict Schema)
+2026-03-16T02:12:11.5104512Z [22m[39m[RECEIVE] Incoming request: f5f4e2fe-bb5d-4dc0-b4e0-be580ab72b81
+2026-03-16T02:12:11.5105687Z [TRACE] {
+2026-03-16T02:12:11.5112816Z   "trace_id": "f5f4e2fe-bb5d-4dc0-b4e0-be580ab72b81",
+2026-03-16T02:12:11.5114013Z   "proposal_id": null,
+2026-03-16T02:12:11.5114878Z   "schema_version": null,
+2026-03-16T02:12:11.5116754Z   "action": null,
+2026-03-16T02:12:11.5117518Z   "args_summary": null,
+2026-03-16T02:12:11.5118240Z   "outcome": "VALIDATION_ERROR",
+2026-03-16T02:12:11.5119156Z   "error_code": "INVALID_CONTENT",
+2026-03-16T02:12:11.5120185Z   "phase_failed_at": "VALIDATE_SCHEMA",
+2026-03-16T02:12:11.5121095Z   "received_at": "2026-03-16T02:12:11.509Z",
+2026-03-16T02:12:11.5122170Z   "completed_at": "2026-03-16T02:12:11.509Z",
+2026-03-16T02:12:11.5123037Z   "reasoning": null
+2026-03-16T02:12:11.5128627Z }
+2026-03-16T02:12:11.5128821Z 
+2026-03-16T02:12:11.5183925Z [90mstdout[2m | runtime/tests/api/server.test.ts[2m > [22m[2mAgent Execution API[2m > [22m[2mshould return 400 DENIED for directory traversal in paths
+2026-03-16T02:12:11.5185943Z [22m[39m[RECEIVE] Incoming request: 05a0a89d-0fe6-4a95-a120-01f702fff70b
+2026-03-16T02:12:11.5187348Z [TRACE] {
+2026-03-16T02:12:11.5188144Z   "trace_id": "05a0a89d-0fe6-4a95-a120-01f702fff70b",
+2026-03-16T02:12:11.5190193Z   "proposal_id": "550e8400-e29b-41d4-a716-446655440000",
+2026-03-16T02:12:11.5190797Z   "schema_version": "1.0.0",
+2026-03-16T02:12:11.5191245Z   "action": "WRITE_FILE",
+2026-03-16T02:12:11.5191668Z   "args_summary": {
+2026-03-16T02:12:11.5192534Z     "path": "/sandbox/../../etc/passwd.txt",
+2026-03-16T02:12:11.5193119Z     "content": "malicious"
+2026-03-16T02:12:11.5193505Z   },
+2026-03-16T02:12:11.5193814Z   "outcome": "DENIED",
+2026-03-16T02:12:11.5194273Z   "error_code": "POLICY_VIOLATION",
+2026-03-16T02:12:11.5194802Z   "phase_failed_at": "AUTHORIZE",
+2026-03-16T02:12:11.5195363Z   "received_at": "2026-03-16T02:12:11.516Z",
+2026-03-16T02:12:11.5195954Z   "completed_at": "2026-03-16T02:12:11.517Z",
+2026-03-16T02:12:11.5196762Z   "reasoning": "Thinking about something"
+2026-03-16T02:12:11.5197313Z }
+2026-03-16T02:12:11.5197491Z 
+2026-03-16T02:12:11.5211509Z  [32m✓[39m runtime/tests/api/server.test.ts [2m([22m[2m7 tests[22m[2m)[22m[32m 51[2mms[22m[39m
+2026-03-16T02:12:11.6344564Z  [32m✓[39m runtime/tests/schemas/robustness.test.ts [2m([22m[2m3 tests[22m[2m)[22m[32m 9[2mms[22m[39m
+2026-03-16T02:12:11.7112180Z  [32m✓[39m runtime/src/actions/__tests__/dispatcher.test.ts [2m([22m[2m2 tests[22m[2m)[22m[32m 5[2mms[22m[39m
+2026-03-16T02:12:11.7237671Z [90mstdout[2m | runtime/tests/api/robustness.test.ts[2m > [22m[2mAPI Boundary Robustness[2m > [22m[2mMethod & Header Spoofing[2m > [22m[2mshould reject POST /execute with incorrect Content-Type
+2026-03-16T02:12:11.7238805Z [22m[39m[RECEIVE] Incoming request: 082f282b-cee5-4afd-8971-21b7471081f0
+2026-03-16T02:12:11.7239167Z [TRACE] {
+2026-03-16T02:12:11.7239428Z   "trace_id": "082f282b-cee5-4afd-8971-21b7471081f0",
+2026-03-16T02:12:11.7239726Z   "proposal_id": null,
+2026-03-16T02:12:11.7239940Z   "schema_version": null,
+2026-03-16T02:12:11.7240148Z   "action": null,
+2026-03-16T02:12:11.7240343Z   "args_summary": null,
+2026-03-16T02:12:11.7240577Z   "outcome": "VALIDATION_ERROR",
+2026-03-16T02:12:11.7240844Z   "error_code": "MISSING_CONTENT",
+2026-03-16T02:12:11.7241133Z   "phase_failed_at": "RECEIVE",
+2026-03-16T02:12:11.7241402Z   "received_at": "2026-03-16T02:12:11.722Z",
+2026-03-16T02:12:11.7241702Z   "completed_at": "2026-03-16T02:12:11.722Z",
+2026-03-16T02:12:11.7241978Z   "reasoning": null
+2026-03-16T02:12:11.7242169Z }
+2026-03-16T02:12:11.7242258Z 
+2026-03-16T02:12:11.7374201Z [90mstdout[2m | runtime/tests/api/robustness.test.ts[2m > [22m[2mAPI Boundary Robustness[2m > [22m[2mConcurrency & Race Conditions[2m > [22m[2mshould handle simultaneous requests and increment step indexes
+2026-03-16T02:12:11.7375569Z [22m[39m[RECEIVE] Incoming request: 5ea3069e-e3ae-4ccb-ade6-4058f69313a2
+2026-03-16T02:12:11.7375901Z 
+2026-03-16T02:12:11.7377264Z [90mstdout[2m | runtime/tests/api/robustness.test.ts[2m > [22m[2mAPI Boundary Robustness[2m > [22m[2mConcurrency & Race Conditions[2m > [22m[2mshould handle simultaneous requests and increment step indexes
+2026-03-16T02:12:11.7378195Z [22m[39m[TRACE] {
+2026-03-16T02:12:11.7378506Z   "trace_id": "5ea3069e-e3ae-4ccb-ade6-4058f69313a2",
+2026-03-16T02:12:11.7378894Z   "proposal_id": "550e8400-e29b-41d4-a716-446655440000",
+2026-03-16T02:12:11.7379199Z   "schema_version": "1.0.0",
+2026-03-16T02:12:11.7379433Z   "action": "THINK",
+2026-03-16T02:12:11.7379636Z   "args_summary": {},
+2026-03-16T02:12:11.7379845Z   "outcome": "SUCCESS",
+2026-03-16T02:12:11.7380047Z   "error_code": null,
+2026-03-16T02:12:11.7380255Z   "phase_failed_at": null,
+2026-03-16T02:12:11.7380526Z   "received_at": "2026-03-16T02:12:11.734Z",
+2026-03-16T02:12:11.7381012Z   "completed_at": "2026-03-16T02:12:11.737Z",
+2026-03-16T02:12:11.7381316Z   "reasoning": "Robustness check"
+2026-03-16T02:12:11.7381549Z }
+2026-03-16T02:12:11.7381644Z 
+2026-03-16T02:12:11.7386418Z [90mstdout[2m | runtime/tests/api/robustness.test.ts[2m > [22m[2mAPI Boundary Robustness[2m > [22m[2mConcurrency & Race Conditions[2m > [22m[2mshould handle simultaneous requests and increment step indexes
+2026-03-16T02:12:11.7388596Z [22m[39m[RECEIVE] Incoming request: a3cb2682-508b-4db7-937f-49f83cfe7a09
+2026-03-16T02:12:11.7388933Z 
+2026-03-16T02:12:11.7390223Z [90mstdout[2m | runtime/tests/api/robustness.test.ts[2m > [22m[2mAPI Boundary Robustness[2m > [22m[2mConcurrency & Race Conditions[2m > [22m[2mshould handle simultaneous requests and increment step indexes
+2026-03-16T02:12:11.7391113Z [22m[39m[TRACE] {
+2026-03-16T02:12:11.7391395Z   "trace_id": "a3cb2682-508b-4db7-937f-49f83cfe7a09",
+2026-03-16T02:12:11.7391758Z   "proposal_id": "550e8400-e29b-41d4-a716-446655440000",
+2026-03-16T02:12:11.7392062Z   "schema_version": "1.0.0",
+2026-03-16T02:12:11.7392294Z   "action": "THINK",
+2026-03-16T02:12:11.7392493Z   "args_summary": {},
+2026-03-16T02:12:11.7392683Z   "outcome": "SUCCESS",
+2026-03-16T02:12:11.7392886Z   "error_code": null,
+2026-03-16T02:12:11.7393085Z   "phase_failed_at": null,
+2026-03-16T02:12:11.7393347Z   "received_at": "2026-03-16T02:12:11.738Z",
+2026-03-16T02:12:11.7393646Z   "completed_at": "2026-03-16T02:12:11.738Z",
+2026-03-16T02:12:11.7394079Z   "reasoning": "Robustness check"
+2026-03-16T02:12:11.7394304Z }
+2026-03-16T02:12:11.7394391Z 
+2026-03-16T02:12:11.7399683Z [90mstdout[2m | runtime/tests/api/robustness.test.ts[2m > [22m[2mAPI Boundary Robustness[2m > [22m[2mConcurrency & Race Conditions[2m > [22m[2mshould handle simultaneous requests and increment step indexes
+2026-03-16T02:12:11.7400826Z [22m[39m[RECEIVE] Incoming request: 60ff09ea-83b3-4501-a4d2-9c94368007ac
+2026-03-16T02:12:11.7401108Z 
+2026-03-16T02:12:11.7404629Z [90mstdout[2m | runtime/tests/api/robustness.test.ts[2m > [22m[2mAPI Boundary Robustness[2m > [22m[2mConcurrency & Race Conditions[2m > [22m[2mshould handle simultaneous requests and increment step indexes
+2026-03-16T02:12:11.7405513Z [22m[39m[TRACE] {
+2026-03-16T02:12:11.7405794Z   "trace_id": "60ff09ea-83b3-4501-a4d2-9c94368007ac",
+2026-03-16T02:12:11.7406164Z   "proposal_id": "550e8400-e29b-41d4-a716-446655440000",
+2026-03-16T02:12:11.7406464Z   "schema_version": "1.0.0",
+2026-03-16T02:12:11.7406960Z   "action": "THINK",
+2026-03-16T02:12:11.7407159Z   "args_summary": {},
+2026-03-16T02:12:11.7407363Z   "outcome": "SUCCESS",
+2026-03-16T02:12:11.7407565Z   "error_code": null,
+2026-03-16T02:12:11.7407777Z   "phase_failed_at": null,
+2026-03-16T02:12:11.7408037Z   "received_at": "2026-03-16T02:12:11.739Z",
+2026-03-16T02:12:11.7408343Z   "completed_at": "2026-03-16T02:12:11.739Z",
+2026-03-16T02:12:11.7408635Z   "reasoning": "Robustness check"
+2026-03-16T02:12:11.7408933Z }
+2026-03-16T02:12:11.7409098Z 
+2026-03-16T02:12:11.7413456Z [90mstdout[2m | runtime/tests/api/robustness.test.ts[2m > [22m[2mAPI Boundary Robustness[2m > [22m[2mConcurrency & Race Conditions[2m > [22m[2mshould handle simultaneous requests and increment step indexes
+2026-03-16T02:12:11.7414609Z [22m[39m[RECEIVE] Incoming request: ed400849-d52d-43dd-9511-461753a8f287
+2026-03-16T02:12:11.7414890Z 
+2026-03-16T02:12:11.7415866Z [90mstdout[2m | runtime/tests/api/robustness.test.ts[2m > [22m[2mAPI Boundary Robustness[2m > [22m[2mConcurrency & Race Conditions[2m > [22m[2mshould handle simultaneous requests and increment step indexes
+2026-03-16T02:12:11.7417059Z [22m[39m[TRACE] {
+2026-03-16T02:12:11.7417350Z   "trace_id": "ed400849-d52d-43dd-9511-461753a8f287",
+2026-03-16T02:12:11.7417732Z   "proposal_id": "550e8400-e29b-41d4-a716-446655440000",
+2026-03-16T02:12:11.7418045Z   "schema_version": "1.0.0",
+2026-03-16T02:12:11.7418263Z   "action": "THINK",
+2026-03-16T02:12:11.7418464Z   "args_summary": {},
+2026-03-16T02:12:11.7418667Z   "outcome": "SUCCESS",
+2026-03-16T02:12:11.7418876Z   "error_code": null,
+2026-03-16T02:12:11.7419079Z   "phase_failed_at": null,
+2026-03-16T02:12:11.7419341Z   "received_at": "2026-03-16T02:12:11.740Z",
+2026-03-16T02:12:11.7419640Z   "completed_at": "2026-03-16T02:12:11.740Z",
+2026-03-16T02:12:11.7419933Z   "reasoning": "Robustness check"
+2026-03-16T02:12:11.7420210Z }
+2026-03-16T02:12:11.7420380Z 
+2026-03-16T02:12:11.7423732Z [90mstdout[2m | runtime/tests/api/robustness.test.ts[2m > [22m[2mAPI Boundary Robustness[2m > [22m[2mConcurrency & Race Conditions[2m > [22m[2mshould handle simultaneous requests and increment step indexes
+2026-03-16T02:12:11.7425509Z [22m[39m[RECEIVE] Incoming request: 71088ada-5aba-4efd-b833-d073d42f9460
+2026-03-16T02:12:11.7425845Z 
+2026-03-16T02:12:11.7427077Z [90mstdout[2m | runtime/tests/api/robustness.test.ts[2m > [22m[2mAPI Boundary Robustness[2m > [22m[2mConcurrency & Race Conditions[2m > [22m[2mshould handle simultaneous requests and increment step indexes
+2026-03-16T02:12:11.7427930Z [22m[39m[TRACE] {
+2026-03-16T02:12:11.7428217Z   "trace_id": "71088ada-5aba-4efd-b833-d073d42f9460",
+2026-03-16T02:12:11.7428599Z   "proposal_id": "550e8400-e29b-41d4-a716-446655440000",
+2026-03-16T02:12:11.7428895Z   "schema_version": "1.0.0",
+2026-03-16T02:12:11.7429118Z   "action": "THINK",
+2026-03-16T02:12:11.7429315Z   "args_summary": {},
+2026-03-16T02:12:11.7429515Z   "outcome": "SUCCESS",
+2026-03-16T02:12:11.7429714Z   "error_code": null,
+2026-03-16T02:12:11.7430063Z   "phase_failed_at": null,
+2026-03-16T02:12:11.7430324Z   "received_at": "2026-03-16T02:12:11.741Z",
+2026-03-16T02:12:11.7430624Z   "completed_at": "2026-03-16T02:12:11.742Z",
+2026-03-16T02:12:11.7430913Z   "reasoning": "Robustness check"
+2026-03-16T02:12:11.7431138Z }
+2026-03-16T02:12:11.7431226Z 
+2026-03-16T02:12:11.7435463Z [90mstdout[2m | runtime/tests/api/robustness.test.ts[2m > [22m[2mAPI Boundary Robustness[2m > [22m[2mConcurrency & Race Conditions[2m > [22m[2mshould handle simultaneous requests and increment step indexes
+2026-03-16T02:12:11.7437432Z [22m[39m[RECEIVE] Incoming request: 958c6069-f3de-4784-b6c2-a98c65527c23
+2026-03-16T02:12:11.7437731Z 
+2026-03-16T02:12:11.7438726Z [90mstdout[2m | runtime/tests/api/robustness.test.ts[2m > [22m[2mAPI Boundary Robustness[2m > [22m[2mConcurrency & Race Conditions[2m > [22m[2mshould handle simultaneous requests and increment step indexes
+2026-03-16T02:12:11.7439570Z [22m[39m[TRACE] {
+2026-03-16T02:12:11.7439852Z   "trace_id": "958c6069-f3de-4784-b6c2-a98c65527c23",
+2026-03-16T02:12:11.7440276Z   "proposal_id": "550e8400-e29b-41d4-a716-446655440000",
+2026-03-16T02:12:11.7440587Z   "schema_version": "1.0.0",
+2026-03-16T02:12:11.7440838Z   "action": "THINK",
+2026-03-16T02:12:11.7441044Z   "args_summary": {},
+2026-03-16T02:12:11.7441247Z   "outcome": "SUCCESS",
+2026-03-16T02:12:11.7441447Z   "error_code": null,
+2026-03-16T02:12:11.7441650Z   "phase_failed_at": null,
+2026-03-16T02:12:11.7441913Z   "received_at": "2026-03-16T02:12:11.743Z",
+2026-03-16T02:12:11.7442215Z   "completed_at": "2026-03-16T02:12:11.743Z",
+2026-03-16T02:12:11.7442498Z   "reasoning": "Robustness check"
+2026-03-16T02:12:11.7442725Z }
+2026-03-16T02:12:11.7442815Z 
+2026-03-16T02:12:11.7446965Z [90mstdout[2m | runtime/tests/api/robustness.test.ts[2m > [22m[2mAPI Boundary Robustness[2m > [22m[2mConcurrency & Race Conditions[2m > [22m[2mshould handle simultaneous requests and increment step indexes
+2026-03-16T02:12:11.7448479Z [22m[39m[RECEIVE] Incoming request: 4e9841db-513e-44fd-a822-e08780992ef6
+2026-03-16T02:12:11.7448762Z 
+2026-03-16T02:12:11.7449754Z [90mstdout[2m | runtime/tests/api/robustness.test.ts[2m > [22m[2mAPI Boundary Robustness[2m > [22m[2mConcurrency & Race Conditions[2m > [22m[2mshould handle simultaneous requests and increment step indexes
+2026-03-16T02:12:11.7450579Z [22m[39m[TRACE] {
+2026-03-16T02:12:11.7450847Z   "trace_id": "4e9841db-513e-44fd-a822-e08780992ef6",
+2026-03-16T02:12:11.7451216Z   "proposal_id": "550e8400-e29b-41d4-a716-446655440000",
+2026-03-16T02:12:11.7451515Z   "schema_version": "1.0.0",
+2026-03-16T02:12:11.7451736Z   "action": "THINK",
+2026-03-16T02:12:11.7451935Z   "args_summary": {},
+2026-03-16T02:12:11.7452129Z   "outcome": "SUCCESS",
+2026-03-16T02:12:11.7452333Z   "error_code": null,
+2026-03-16T02:12:11.7452534Z   "phase_failed_at": null,
+2026-03-16T02:12:11.7452801Z   "received_at": "2026-03-16T02:12:11.744Z",
+2026-03-16T02:12:11.7453099Z   "completed_at": "2026-03-16T02:12:11.744Z",
+2026-03-16T02:12:11.7453397Z   "reasoning": "Robustness check"
+2026-03-16T02:12:11.7453627Z }
+2026-03-16T02:12:11.7453749Z 
+2026-03-16T02:12:11.7458297Z [90mstdout[2m | runtime/tests/api/robustness.test.ts[2m > [22m[2mAPI Boundary Robustness[2m > [22m[2mConcurrency & Race Conditions[2m > [22m[2mshould handle simultaneous requests and increment step indexes
+2026-03-16T02:12:11.7459693Z [22m[39m[RECEIVE] Incoming request: f974c10f-b79c-4455-a62f-9b4df325b745
+2026-03-16T02:12:11.7459980Z 
+2026-03-16T02:12:11.7460951Z [90mstdout[2m | runtime/tests/api/robustness.test.ts[2m > [22m[2mAPI Boundary Robustness[2m > [22m[2mConcurrency & Race Conditions[2m > [22m[2mshould handle simultaneous requests and increment step indexes
+2026-03-16T02:12:11.7461777Z [22m[39m[TRACE] {
+2026-03-16T02:12:11.7462044Z   "trace_id": "f974c10f-b79c-4455-a62f-9b4df325b745",
+2026-03-16T02:12:11.7462404Z   "proposal_id": "550e8400-e29b-41d4-a716-446655440000",
+2026-03-16T02:12:11.7462703Z   "schema_version": "1.0.0",
+2026-03-16T02:12:11.7463055Z   "action": "THINK",
+2026-03-16T02:12:11.7463256Z   "args_summary": {},
+2026-03-16T02:12:11.7463456Z   "outcome": "SUCCESS",
+2026-03-16T02:12:11.7463654Z   "error_code": null,
+2026-03-16T02:12:11.7463868Z   "phase_failed_at": null,
+2026-03-16T02:12:11.7464132Z   "received_at": "2026-03-16T02:12:11.745Z",
+2026-03-16T02:12:11.7464425Z   "completed_at": "2026-03-16T02:12:11.745Z",
+2026-03-16T02:12:11.7464708Z   "reasoning": "Robustness check"
+2026-03-16T02:12:11.7464936Z }
+2026-03-16T02:12:11.7465021Z 
+2026-03-16T02:12:11.7469737Z [90mstdout[2m | runtime/tests/api/robustness.test.ts[2m > [22m[2mAPI Boundary Robustness[2m > [22m[2mConcurrency & Race Conditions[2m > [22m[2mshould handle simultaneous requests and increment step indexes
+2026-03-16T02:12:11.7471206Z [22m[39m[RECEIVE] Incoming request: d220faf5-69ed-4867-b29f-510c8e13c4ce
+2026-03-16T02:12:11.7471687Z 
+2026-03-16T02:12:11.7472852Z [90mstdout[2m | runtime/tests/api/robustness.test.ts[2m > [22m[2mAPI Boundary Robustness[2m > [22m[2mConcurrency & Race Conditions[2m > [22m[2mshould handle simultaneous requests and increment step indexes
+2026-03-16T02:12:11.7473709Z [22m[39m[TRACE] {
+2026-03-16T02:12:11.7473977Z   "trace_id": "d220faf5-69ed-4867-b29f-510c8e13c4ce",
+2026-03-16T02:12:11.7474336Z   "proposal_id": "550e8400-e29b-41d4-a716-446655440000",
+2026-03-16T02:12:11.7474634Z   "schema_version": "1.0.0",
+2026-03-16T02:12:11.7474852Z   "action": "THINK",
+2026-03-16T02:12:11.7475043Z   "args_summary": {},
+2026-03-16T02:12:11.7475241Z   "outcome": "SUCCESS",
+2026-03-16T02:12:11.7475444Z   "error_code": null,
+2026-03-16T02:12:11.7475647Z   "phase_failed_at": null,
+2026-03-16T02:12:11.7475901Z   "received_at": "2026-03-16T02:12:11.746Z",
+2026-03-16T02:12:11.7476199Z   "completed_at": "2026-03-16T02:12:11.746Z",
+2026-03-16T02:12:11.7476696Z   "reasoning": "Robustness check"
+2026-03-16T02:12:11.7476987Z }
+2026-03-16T02:12:11.7477075Z 
+2026-03-16T02:12:11.7481842Z [90mstdout[2m | runtime/tests/api/robustness.test.ts[2m > [22m[2mAPI Boundary Robustness[2m > [22m[2mConcurrency & Race Conditions[2m > [22m[2mshould handle simultaneous requests and increment step indexes
+2026-03-16T02:12:11.7483449Z [22m[39m[RECEIVE] Incoming request: e215de92-8401-4048-a827-b91ff6b8f30d
+2026-03-16T02:12:11.7483909Z 
+2026-03-16T02:12:11.7484885Z [90mstdout[2m | runtime/tests/api/robustness.test.ts[2m > [22m[2mAPI Boundary Robustness[2m > [22m[2mConcurrency & Race Conditions[2m > [22m[2mshould handle simultaneous requests and increment step indexes
+2026-03-16T02:12:11.7485703Z [22m[39m[TRACE] {
+2026-03-16T02:12:11.7485966Z   "trace_id": "e215de92-8401-4048-a827-b91ff6b8f30d",
+2026-03-16T02:12:11.7486321Z   "proposal_id": "550e8400-e29b-41d4-a716-446655440000",
+2026-03-16T02:12:11.7486854Z   "schema_version": "1.0.0",
+2026-03-16T02:12:11.7487073Z   "action": "THINK",
+2026-03-16T02:12:11.7487269Z   "args_summary": {},
+2026-03-16T02:12:11.7487468Z   "outcome": "SUCCESS",
+2026-03-16T02:12:11.7487679Z   "error_code": null,
+2026-03-16T02:12:11.7487873Z   "phase_failed_at": null,
+2026-03-16T02:12:11.7488138Z   "received_at": "2026-03-16T02:12:11.747Z",
+2026-03-16T02:12:11.7488438Z   "completed_at": "2026-03-16T02:12:11.747Z",
+2026-03-16T02:12:11.7488901Z   "reasoning": "Robustness check"
+2026-03-16T02:12:11.7489138Z }
+2026-03-16T02:12:11.7489231Z 
+2026-03-16T02:12:11.7555233Z [90mstdout[2m | runtime/tests/api/robustness.test.ts[2m > [22m[2mAPI Boundary Robustness[2m > [22m[2mStalled Execution[2m > [22m[2mshould not crash when an action is slow
+2026-03-16T02:12:11.7556244Z [22m[39m[RECEIVE] Incoming request: 7aca8090-31e4-4709-a461-176d34d4e1e1
+2026-03-16T02:12:11.7556763Z 
+2026-03-16T02:12:12.2568042Z [90mstdout[2m | runtime/tests/api/robustness.test.ts[2m > [22m[2mAPI Boundary Robustness[2m > [22m[2mStalled Execution[2m > [22m[2mshould not crash when an action is slow
+2026-03-16T02:12:12.2569086Z [22m[39m[TRACE] {
+2026-03-16T02:12:12.2569458Z   "trace_id": "7aca8090-31e4-4709-a461-176d34d4e1e1",
+2026-03-16T02:12:12.2570329Z   "proposal_id": "550e8400-e29b-41d4-a716-446655440000",
+2026-03-16T02:12:12.2570733Z   "schema_version": "1.0.0",
+2026-03-16T02:12:12.2571029Z   "action": "THINK",
+2026-03-16T02:12:12.2571281Z   "args_summary": {},
+2026-03-16T02:12:12.2571484Z   "outcome": "SUCCESS",
+2026-03-16T02:12:12.2571696Z   "error_code": null,
+2026-03-16T02:12:12.2571906Z   "phase_failed_at": null,
+2026-03-16T02:12:12.2572178Z   "received_at": "2026-03-16T02:12:11.754Z",
+2026-03-16T02:12:12.2572484Z   "completed_at": "2026-03-16T02:12:12.255Z",
+2026-03-16T02:12:12.2572797Z   "reasoning": "Robustness check"
+2026-03-16T02:12:12.2573041Z }
+2026-03-16T02:12:12.2573134Z 
+2026-03-16T02:12:12.2591799Z  [32m✓[39m runtime/tests/api/robustness.test.ts [2m([22m[2m4 tests[22m[2m)[22m[33m 556[2mms[22m[39m
+2026-03-16T02:12:12.2592792Z        [33m[2m✓[22m[39m should not crash when an action is slow [33m 504[2mms[22m[39m
+2026-03-16T02:12:12.2628299Z 
+2026-03-16T02:12:12.2632917Z [2m Test Files [22m [1m[32m9 passed[39m[22m[90m (9)[39m
+2026-03-16T02:12:12.2633902Z [2m      Tests [22m [1m[32m97 passed[39m[22m[90m (97)[39m
+2026-03-16T02:12:12.2634587Z [2m   Start at [22m 02:12:10
+2026-03-16T02:12:12.2636711Z [2m   Duration [22m 1.67s[2m (transform 491ms, setup 0ms, import 1.51s, tests 701ms, environment 2ms)[22m
+2026-03-16T02:12:12.2639359Z 
+2026-03-16T02:12:12.2957310Z Post job cleanup.
+2026-03-16T02:12:12.4477465Z Cache hit occurred on the primary key node-cache-Linux-x64-npm-7550fa9de7c4b7437bacca0313d4900828baa4119d8395ce68b9d1ea3be4b51d, not saving cache.
+2026-03-16T02:12:12.4602069Z Post job cleanup.
+2026-03-16T02:12:12.5554632Z [command]/usr/bin/git version
+2026-03-16T02:12:12.5599573Z git version 2.53.0
+2026-03-16T02:12:12.5645263Z Temporarily overriding HOME='/home/runner/work/_temp/99c76830-fb85-4c81-b3f4-bc13f8afa699' before making global git config changes
+2026-03-16T02:12:12.5647020Z Adding repository directory to the temporary git global config as a safe directory
+2026-03-16T02:12:12.5659778Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/Sec-Agent-Runtime/Sec-Agent-Runtime
+2026-03-16T02:12:12.5695435Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-03-16T02:12:12.5729997Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-03-16T02:12:12.5967677Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-03-16T02:12:12.5989694Z http.https://github.com/.extraheader
+2026-03-16T02:12:12.6002159Z [command]/usr/bin/git config --local --unset-all http.https://github.com/.extraheader
+2026-03-16T02:12:12.6033620Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-03-16T02:12:12.6262703Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+2026-03-16T02:12:12.6293216Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+2026-03-16T02:12:12.6634125Z Cleaning up orphan processes
+2026-03-16T02:12:12.6925534Z ##[warning]Node.js 20 actions are deprecated. The following actions are running on Node.js 20 and may not work as expected: actions/checkout@v4, actions/setup-node@v4. Actions will be forced to run with Node.js 24 by default starting June 2nd, 2026. Please check if updated versions of these actions are available that support Node.js 24. To opt into Node.js 24 now, set the FORCE_JAVASCRIPT_ACTIONS_TO_NODE24=true environment variable on the runner or in your workflow file. Once Node.js 24 becomes the default, you can temporarily opt out by setting ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION=true. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
