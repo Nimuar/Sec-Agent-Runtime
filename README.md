@@ -128,3 +128,27 @@ In addition to industry-standard software engineering practices, these projects 
 | Kevin Rivera                    | Nimuar              | https://www.linkedin.com/in/krivera53/                      |
 | Evan Berendt                    | epbehren3           | https://www.linkedin.com/in/evan-behrendt-7a0046152/        |
 | Ting-Chia Liu                   | Lucy0918            | https://www.linkedin.com/in/tingchia-liu/                   |
+
+<br/>
+
+---
+
+### Technical Debt & Architectural Post-Mortem
+
+This repository represents a functional V1 prototype developed under academic constraints. While the system successfully implements a **Positive Security Model** for autonomous agents, the following technical debt was intentionally deferred to meet the project deadline and is documented here for architectural transparency.
+
+#### 1. Performance & Scalability: $O(N)$ ID Validation
+* **The Debt:** The `ValidateIDCollision` function in `Proposal_Handler.ts` currently performs a sequential read and parse of all historical `.jsonl` audit logs on every incoming request to check for ID collisions.
+* **The Impact:** System latency scales linearly with the history of the system. This is a risk that will eventually cause execution timeouts in a high-frequency production environment.
+
+#### 2. Security: Shallow Payload Validation
+* **The Debt:** The `ValidateASCII` logic in `Proposal_Handler.ts` utilizes a nested loop that only validates the first two levels of the JSON proposal. 
+* **The Impact:** A malicious or hallucinating agent can bypass security gates by nesting payloads deeper than two levels (e.g., `args.metadata.nested_payload`). 
+
+#### 3. Reliability: Ephemeral State Management
+* **The Debt:** Agent quotas and session tracking are managed via an in-memory `Map` in `server.ts`.
+* **The Impact:** The system lacks resilience. A server restart resets all agent burn rates, allowing for scenarios where an agent can bypass its credit limit by triggering a service recycle.
+
+#### 4. Architecture: Policy vs. Enforcement Boundary
+* **The Debt:** The system relies on logical decoupling between the SDK and the Runtime. 
+* **The Impact:** Without OS-level enforcement (e.g., cgroups, namespaces, or Docker-in-Docker isolation), the security boundary is purely cooperative. An untrusted SDK process with host-level permissions could theoretically bypass the Runtime mediation layer entirely.
