@@ -175,3 +175,4 @@ full_test_results.txt
 full_regression_results.txt
 test_results.txt
 runtime/agent_sdk/history.txt
+coverage_output.txt

@@ -4,6 +4,7 @@ import requests
 import json
 import re
 import os
+
 try:
     from . import AgentConfig
 except ImportError:
@@ -20,7 +21,7 @@ class AgentInterface:
         self,
         api_key: str = None,
         model: str = AgentConfig.model,
-        system_instruction: str = None
+        system_instruction: str = None,
     ):
         self.api_key = api_key or os.getenv("GOOGLE_API_KEY")
 
@@ -38,39 +39,80 @@ class AgentInterface:
         # Confirm agent active (Should be if possible.)
         if not self.active:
             return {"error": "Interface not active", "outcome": "EXECUTION_ERROR"}
-        else:
-            try:
-                kwargs = {}
-                final_contents = message + "\n"
-                
-                if self.system_instruction:
-                    if "gemini" in self.model.lower():
-                        kwargs["config"] = types.GenerateContentConfig(
-                            system_instruction=self.system_instruction
-                        )
-                    else:
-                        # For Gemma or other targets, inline the system instruction manually into the prompt payload
-                        final_contents = f"System Instruction:\n{self.system_instruction}\n\nUser Request:\n{message}\n"
 
-                response = self.client.models.generate_content(
-                    model=self.model, contents=final_contents, **kwargs
-                )
-                print("response: ", response)
-                text = self._clean_json(response.text)
-                parsed = json.loads(text)
-                self.proposal_history.append((message, parsed))
-                return parsed
-            except json.JSONDecodeError as e:
-                print(f"Failed to parse LLM response: {e}")
-                return {"error": str(e), "outcome": "EXECUTION_ERROR"}
-            except Exception as e:
-                print(f"Error communicating with LLM: {e}")
-                return {"error": str(e), "outcome": "EXECUTION_ERROR"}
+        try:
+            kwargs = {}
+            final_contents = message + "\n"
+
+            # 1. ALWAYS disable safety settings, regardless of model (Gemini or Gemma)
+            # Using the strict types required by the google.genai SDK
+            config_args = {
+                "safety_settings": [
+                    types.SafetySetting(
+                        category=types.HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT,
+                        threshold=types.HarmBlockThreshold.BLOCK_NONE,
+                    ),
+                    types.SafetySetting(
+                        category=types.HarmCategory.HARM_CATEGORY_HARASSMENT,
+                        threshold=types.HarmBlockThreshold.BLOCK_NONE,
+                    ),
+                    types.SafetySetting(
+                        category=types.HarmCategory.HARM_CATEGORY_HATE_SPEECH,
+                        threshold=types.HarmBlockThreshold.BLOCK_NONE,
+                    ),
+                    types.SafetySetting(
+                        category=types.HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT,
+                        threshold=types.HarmBlockThreshold.BLOCK_NONE,
+                    ),
+                ],
+            }
+
+            if "gemini" in self.model.lower():
+                config_args["response_mime_type"] = "application/json"
+
+            # 2. Handle System Instructions based on Model Support
+            if self.system_instruction:
+                if "gemini" in self.model.lower():
+                    config_args["system_instruction"] = self.system_instruction
+                else:
+                    # Gemma API fallback
+                    final_contents = f"System Instruction:\n{self.system_instruction}\n\nUser Request:\n{message}\n"
+
+            # Apply the typed config
+            kwargs["config"] = types.GenerateContentConfig(**config_args)
+
+            response = self.client.models.generate_content(
+                model=self.model, contents=final_contents, **kwargs
+            )
+
+            # --- CRITICAL DEBUGGING ADDITION ---
+            # This will tell you exactly WHY Google blocked it if it still fails
+            if response.candidates and response.candidates[0].finish_reason:
+                finish_reason = response.candidates[0].finish_reason
+                if finish_reason != "STOP":
+                    print(f"Model stopped early! Finish Reason: {finish_reason}")
+            # -----------------------------------
+
+            if not response.text:
+                print("LLM returned empty response. Likely Safety Block or Recitation.")
+                return {"error": "Empty response from LLM", "outcome": "LLM_FAULT"}
+
+            text = self._clean_json(response.text)
+            parsed = json.loads(text)
+            self.proposal_history.append((message, parsed))
+            return parsed
+
+        except json.JSONDecodeError as e:
+            print(f"Failed to parse LLM response: {e}")
+            return {"error": str(e), "outcome": "EXECUTION_ERROR"}
+        except Exception as e:
+            print(f"Error communicating with LLM: {e}")
+            return {"error": str(e), "outcome": "EXECUTION_ERROR"}
 
     def _clean_json(self, text: str) -> str:
         """Strips markdown code blocks from the string."""
-        text = re.sub(r'```json\s*(.*?)\s*```', r'\1', text, flags=re.DOTALL)
-        text = re.sub(r'```\s*(.*?)\s*```', r'\1', text, flags=re.DOTALL)
+        text = re.sub(r"```json\s*(.*?)\s*```", r"\1", text, flags=re.DOTALL)
+        text = re.sub(r"```\s*(.*?)\s*```", r"\1", text, flags=re.DOTALL)
         return text.strip()
 
     # Checking for agent activity turns agent on or off.

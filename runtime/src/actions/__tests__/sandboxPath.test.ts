@@ -5,9 +5,9 @@ import { SANDBOX_DIR, resolveSandboxPath, mapFsErrorCode } from '../sandboxPath'
 describe('sandboxPath', () => {
 
     describe('SANDBOX_DIR', () => {
-        it('should resolve to runtime/sandbox/', () => {
-            expect(SANDBOX_DIR).toContain('runtime');
-            expect(SANDBOX_DIR).toMatch(/runtime[/\\]sandbox$/);
+        it('should resolve to a directory named sandbox', () => {
+            expect(path.isAbsolute(SANDBOX_DIR)).toBe(true);
+            expect(path.basename(SANDBOX_DIR)).toBe('sandbox');
         });
     });
 

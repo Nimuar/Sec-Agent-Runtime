@@ -191,10 +191,16 @@ class TestSDKE2E(unittest.TestCase):
             
         self.assertIsInstance(response, dict, f"Expected LLM response to be a dict, got {type(response)}: {response}")
         
+        if response.get("outcome") == "LLM_FAULT":
+            self.fail(f"LLM generated an empty response (LLM_FAULT) instead of expected output.")
+            
         # Output format defined in fuzz_prompt.txt
         fault = response.get("fault")
         expected_gate_error = response.get("expected")
         proposal = response.get("proposal")
+        
+        if not proposal:
+            self.fail(f"LLM Fault: Generated response missing 'proposal'. Response was: {json.dumps(response)}")
         
         # Sanitize LLM payload unless the test specifically requires the dirty data
         force_uuid = (requested_fault != "ID_COLLISION" and requested_fault != "INVALID_UUID")

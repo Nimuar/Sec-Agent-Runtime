@@ -1,0 +1,188 @@
+﻿2026-03-16T02:12:11.8828344Z ##[group]Run # Start the Express API server in the background
+2026-03-16T02:12:11.8828790Z [36;1m# Start the Express API server in the background[0m
+2026-03-16T02:12:11.8829123Z [36;1m(cd runtime && npx tsx src/server.ts &)[0m
+2026-03-16T02:12:11.8829380Z [36;1m[0m
+2026-03-16T02:12:11.8829605Z [36;1m# Wait for the server to be ready (Port 3000)[0m
+2026-03-16T02:12:11.8829964Z [36;1mecho "Waiting for server to start on localhost:3000..."[0m
+2026-03-16T02:12:11.8830269Z [36;1msleep 5[0m
+2026-03-16T02:12:11.8830447Z [36;1m[0m
+2026-03-16T02:12:11.8830694Z [36;1mif [ -d "tests" ] && [ "$(ls -A tests 2>/dev/null)" ]; then[0m
+2026-03-16T02:12:11.8831029Z [36;1m  export PYTHONPATH=$PYTHONPATH:.[0m
+2026-03-16T02:12:11.8831421Z [36;1m  pip install python-dotenv google-genai requests pytest python-dotenv[0m
+2026-03-16T02:12:11.8831934Z [36;1m  pytest tests/test_sdk_e2e.py -v[0m
+2026-03-16T02:12:11.8832178Z [36;1melse[0m
+2026-03-16T02:12:11.8832803Z [36;1m  echo "No tests directory found or directory is empty, skipping simulation tests"[0m
+2026-03-16T02:12:11.8833331Z [36;1mfi[0m
+2026-03-16T02:12:11.8859839Z shell: /usr/bin/bash -e {0}
+2026-03-16T02:12:11.8860096Z env:
+2026-03-16T02:12:11.8860364Z   pythonLocation: /opt/hostedtoolcache/Python/3.11.14/x64
+2026-03-16T02:12:11.8860775Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.11.14/x64/lib/pkgconfig
+2026-03-16T02:12:11.8861177Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.14/x64
+2026-03-16T02:12:11.8861551Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.14/x64
+2026-03-16T02:12:11.8861916Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.14/x64
+2026-03-16T02:12:11.8862271Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.11.14/x64/lib
+2026-03-16T02:12:11.8862984Z   GOOGLE_API_KEY: ***
+2026-03-16T02:12:11.8863203Z ##[endgroup]
+2026-03-16T02:12:11.8914812Z Waiting for server to start on localhost:3000...
+2026-03-16T02:12:12.4784606Z npm warn exec The following package was not found and will be installed: tsx@4.21.0
+2026-03-16T02:12:17.1689837Z Requirement already satisfied: python-dotenv in /opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages (1.2.2)
+2026-03-16T02:12:17.1694500Z Requirement already satisfied: google-genai in /opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages (1.67.0)
+2026-03-16T02:12:17.1698534Z Requirement already satisfied: requests in /opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages (2.32.5)
+2026-03-16T02:12:17.1702540Z Requirement already satisfied: pytest in /opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages (9.0.2)
+2026-03-16T02:12:17.1728875Z Requirement already satisfied: anyio<5.0.0,>=4.8.0 in /opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages (from google-genai) (4.12.1)
+2026-03-16T02:12:17.1737052Z Requirement already satisfied: google-auth<3.0.0,>=2.47.0 in /opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages (from google-auth[requests]<3.0.0,>=2.47.0->google-genai) (2.49.1)
+2026-03-16T02:12:17.1742104Z Requirement already satisfied: httpx<1.0.0,>=0.28.1 in /opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages (from google-genai) (0.28.1)
+2026-03-16T02:12:17.1747109Z Requirement already satisfied: pydantic<3.0.0,>=2.9.0 in /opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages (from google-genai) (2.12.5)
+2026-03-16T02:12:17.1753851Z Requirement already satisfied: tenacity<9.2.0,>=8.2.3 in /opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages (from google-genai) (9.1.4)
+2026-03-16T02:12:17.1758465Z Requirement already satisfied: websockets<17.0,>=13.0.0 in /opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages (from google-genai) (16.0)
+2026-03-16T02:12:17.1763876Z Requirement already satisfied: typing-extensions<5.0.0,>=4.11.0 in /opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages (from google-genai) (4.15.0)
+2026-03-16T02:12:17.1768001Z Requirement already satisfied: distro<2,>=1.7.0 in /opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages (from google-genai) (1.9.0)
+2026-03-16T02:12:17.1770616Z Requirement already satisfied: sniffio in /opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages (from google-genai) (1.3.1)
+2026-03-16T02:12:17.1782720Z Requirement already satisfied: charset_normalizer<4,>=2 in /opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages (from requests) (3.4.6)
+2026-03-16T02:12:17.1785936Z Requirement already satisfied: idna<4,>=2.5 in /opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages (from requests) (3.11)
+2026-03-16T02:12:17.1789898Z Requirement already satisfied: urllib3<3,>=1.21.1 in /opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages (from requests) (2.6.3)
+2026-03-16T02:12:17.1793768Z Requirement already satisfied: certifi>=2017.4.17 in /opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages (from requests) (2026.2.25)
+2026-03-16T02:12:17.1830795Z Requirement already satisfied: pyasn1-modules>=0.2.1 in /opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages (from google-auth<3.0.0,>=2.47.0->google-auth[requests]<3.0.0,>=2.47.0->google-genai) (0.4.2)
+2026-03-16T02:12:17.1835634Z Requirement already satisfied: cryptography>=38.0.3 in /opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages (from google-auth<3.0.0,>=2.47.0->google-auth[requests]<3.0.0,>=2.47.0->google-genai) (46.0.5)
+2026-03-16T02:12:17.1877392Z Requirement already satisfied: httpcore==1.* in /opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages (from httpx<1.0.0,>=0.28.1->google-genai) (1.0.9)
+2026-03-16T02:12:17.1894522Z Requirement already satisfied: h11>=0.16 in /opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages (from httpcore==1.*->httpx<1.0.0,>=0.28.1->google-genai) (0.16.0)
+2026-03-16T02:12:17.1920751Z Requirement already satisfied: annotated-types>=0.6.0 in /opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages (from pydantic<3.0.0,>=2.9.0->google-genai) (0.7.0)
+2026-03-16T02:12:17.1925231Z Requirement already satisfied: pydantic-core==2.41.5 in /opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages (from pydantic<3.0.0,>=2.9.0->google-genai) (2.41.5)
+2026-03-16T02:12:17.1930200Z Requirement already satisfied: typing-inspection>=0.4.2 in /opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages (from pydantic<3.0.0,>=2.9.0->google-genai) (0.4.2)
+2026-03-16T02:12:17.1978132Z Requirement already satisfied: iniconfig>=1.0.1 in /opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages (from pytest) (2.3.0)
+2026-03-16T02:12:17.1982502Z Requirement already satisfied: packaging>=22 in /opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages (from pytest) (26.0)
+2026-03-16T02:12:17.1987105Z Requirement already satisfied: pluggy<2,>=1.5 in /opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages (from pytest) (1.6.0)
+2026-03-16T02:12:17.1991195Z Requirement already satisfied: pygments>=2.7.2 in /opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages (from pytest) (2.19.2)
+2026-03-16T02:12:17.2041443Z Requirement already satisfied: cffi>=2.0.0 in /opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages (from cryptography>=38.0.3->google-auth<3.0.0,>=2.47.0->google-auth[requests]<3.0.0,>=2.47.0->google-genai) (2.0.0)
+2026-03-16T02:12:17.2063696Z Requirement already satisfied: pycparser in /opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages (from cffi>=2.0.0->cryptography>=38.0.3->google-auth<3.0.0,>=2.47.0->google-auth[requests]<3.0.0,>=2.47.0->google-genai) (3.0)
+2026-03-16T02:12:17.2091195Z Requirement already satisfied: pyasn1<0.7.0,>=0.6.1 in /opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages (from pyasn1-modules>=0.2.1->google-auth<3.0.0,>=2.47.0->google-auth[requests]<3.0.0,>=2.47.0->google-genai) (0.6.2)
+2026-03-16T02:12:17.8436816Z ============================= test session starts ==============================
+2026-03-16T02:12:17.8438163Z platform linux -- Python 3.11.14, pytest-9.0.2, pluggy-1.6.0 -- /opt/hostedtoolcache/Python/3.11.14/x64/bin/python
+2026-03-16T02:12:17.8439445Z cachedir: .pytest_cache
+2026-03-16T02:12:17.8440167Z rootdir: /home/runner/work/Sec-Agent-Runtime/Sec-Agent-Runtime
+2026-03-16T02:12:17.8440777Z plugins: anyio-4.12.1
+2026-03-16T02:12:18.6870008Z collecting ... collected 8 items
+2026-03-16T02:12:18.6870312Z 
+2026-03-16T02:12:18.6944197Z tests/test_sdk_e2e.py::TestSDKE2E::test_execution_enoent [RECEIVE] Incoming request: 78be371e-eac3-4a10-a26f-094e53a1e291
+2026-03-16T02:12:18.6976191Z [TRACE] {
+2026-03-16T02:12:18.6976554Z   "trace_id": "78be371e-eac3-4a10-a26f-094e53a1e291",
+2026-03-16T02:12:18.6976981Z   "proposal_id": "522826ed-b2bb-459d-a138-9464e7c75881",
+2026-03-16T02:12:18.6977293Z   "schema_version": "1.0.0",
+2026-03-16T02:12:18.6977776Z   "action": "READ_FILE",
+2026-03-16T02:12:18.6978003Z   "args_summary": {
+2026-03-16T02:12:18.6978259Z     "path": "/sandbox/does_not_exist.txt"
+2026-03-16T02:12:18.6978524Z   },
+2026-03-16T02:12:18.6978745Z   "outcome": "EXECUTION_ERROR",
+2026-03-16T02:12:18.6979012Z   "error_code": "EXECUTION_ERROR",
+2026-03-16T02:12:18.6979288Z   "phase_failed_at": "EXECUTE",
+2026-03-16T02:12:18.6979574Z   "received_at": "2026-03-16T02:12:18.694Z",
+2026-03-16T02:12:18.6979887Z   "completed_at": "2026-03-16T02:12:18.697Z",
+2026-03-16T02:12:18.6980197Z   "reasoning": "Read non-existent file"
+2026-03-16T02:12:18.6980458Z }
+2026-03-16T02:12:18.7012918Z PASSED          [ 12%]
+2026-03-16T02:13:07.5351718Z tests/test_sdk_e2e.py::TestSDKE2E::test_happy_path_list_files [RECEIVE] Incoming request: ccfe4207-c672-4232-871f-9193d828e49f
+2026-03-16T02:13:07.5364078Z [TRACE] {
+2026-03-16T02:13:07.5364497Z   "trace_id": "ccfe4207-c672-4232-871f-9193d828e49f",
+2026-03-16T02:13:07.5364975Z   "proposal_id": "7b3e9a22-d18f-4a6c-9428-32b509d71c4a",
+2026-03-16T02:13:07.5365491Z   "schema_version": "1.0.0",
+2026-03-16T02:13:07.5365892Z   "action": "LIST_FILES",
+2026-03-16T02:13:07.5366251Z   "args_summary": {
+2026-03-16T02:13:07.5366596Z     "path": "/sandbox/"
+2026-03-16T02:13:07.5366933Z   },
+2026-03-16T02:13:07.5367230Z   "outcome": "SUCCESS",
+2026-03-16T02:13:07.5367584Z   "error_code": null,
+2026-03-16T02:13:07.5367950Z   "phase_failed_at": null,
+2026-03-16T02:13:07.5368388Z   "received_at": "2026-03-16T02:13:07.535Z",
+2026-03-16T02:13:07.5368830Z   "completed_at": "2026-03-16T02:13:07.536Z",
+2026-03-16T02:13:07.5370146Z   "reasoning": "I am initiating a directory listing of '/sandbox/' to verify the current file structure within the secure runtime environment as part of the testing protocol."
+2026-03-16T02:13:07.5371225Z }
+2026-03-16T02:13:07.5392159Z PASSED     [ 25%]
+2026-03-16T02:13:46.6960569Z tests/test_sdk_e2e.py::TestSDKE2E::test_happy_path_write_file [RECEIVE] Incoming request: c17b22c7-6bda-4886-81e2-452c9e499f21
+2026-03-16T02:13:46.6974278Z [TRACE] {
+2026-03-16T02:13:46.6974841Z   "trace_id": "c17b22c7-6bda-4886-81e2-452c9e499f21",
+2026-03-16T02:13:46.6975312Z   "proposal_id": "550e8400-e29b-41d4-a716-446655440000",
+2026-03-16T02:13:46.6975705Z   "schema_version": "1.0.0",
+2026-03-16T02:13:46.6975991Z   "action": "WRITE_FILE",
+2026-03-16T02:13:46.6976268Z   "args_summary": {
+2026-03-16T02:13:46.6976571Z     "path": "/sandbox/README.md",
+2026-03-16T02:13:46.6976903Z     "content": "Hello Sandbox"
+2026-03-16T02:13:46.6977175Z   },
+2026-03-16T02:13:46.6977393Z   "outcome": "SUCCESS",
+2026-03-16T02:13:46.6977648Z   "error_code": null,
+2026-03-16T02:13:46.6977913Z   "phase_failed_at": null,
+2026-03-16T02:13:46.6978246Z   "received_at": "2026-03-16T02:13:46.695Z",
+2026-03-16T02:13:46.6978615Z   "completed_at": "2026-03-16T02:13:46.697Z",
+2026-03-16T02:13:46.6979558Z   "reasoning": "I am writing the 'README.md' file to the '/sandbox/' directory as part of the environment testing protocol to confirm write permissions and file system accessibility."
+2026-03-16T02:13:46.6980369Z }
+2026-03-16T02:13:46.7000483Z PASSED     [ 37%]
+2026-03-16T02:13:47.7522017Z tests/test_sdk_e2e.py::TestSDKE2E::test_llm_fault_bad_action [RECEIVE] Incoming request: 5eda67a5-6903-4252-9a26-0d56bc9dc431
+2026-03-16T02:13:47.7524913Z [TRACE] {
+2026-03-16T02:13:47.7525429Z   "trace_id": "5eda67a5-6903-4252-9a26-0d56bc9dc431",
+2026-03-16T02:13:47.7526053Z   "proposal_id": "e7b9c1d3-4a2b-4c5d-9e8f-7a6b5c4d3e2f",
+2026-03-16T02:13:47.7526547Z   "schema_version": "1.0.0",
+2026-03-16T02:13:47.7526911Z   "action": null,
+2026-03-16T02:13:47.7527229Z   "args_summary": {
+2026-03-16T02:13:47.7527547Z     "command": "ls -la"
+2026-03-16T02:13:47.7527882Z   },
+2026-03-16T02:13:47.7528160Z   "outcome": "DENIED",
+2026-03-16T02:13:47.7528552Z   "error_code": "ACTION_NOT_ALLOWED",
+2026-03-16T02:13:47.7529001Z   "phase_failed_at": "AUTHORIZE",
+2026-03-16T02:13:47.7529435Z   "received_at": "2026-03-16T02:13:47.751Z",
+2026-03-16T02:13:47.7529945Z   "completed_at": "2026-03-16T02:13:47.752Z",
+2026-03-16T02:13:47.7530781Z   "reasoning": "Attempting to execute a system command using an unallowed action."
+2026-03-16T02:13:47.7531161Z }
+2026-03-16T02:13:47.7551268Z PASSED      [ 50%]
+2026-03-16T02:13:48.8193742Z tests/test_sdk_e2e.py::TestSDKE2E::test_llm_fault_bad_extension [RECEIVE] Incoming request: de659a6b-38ea-4d97-986e-de84cced419f
+2026-03-16T02:13:48.8201198Z [TRACE] {
+2026-03-16T02:13:48.8201932Z   "trace_id": "de659a6b-38ea-4d97-986e-de84cced419f",
+2026-03-16T02:13:48.8202718Z   "proposal_id": "e7b9a4c8-5f21-4d32-9b0a-7e6d4c1f9b8a",
+2026-03-16T02:13:48.8203307Z   "schema_version": "1.0.0",
+2026-03-16T02:13:48.8203709Z   "action": "WRITE_FILE",
+2026-03-16T02:13:48.8204059Z   "args_summary": {
+2026-03-16T02:13:48.8204455Z     "path": "/sandbox/script.sh",
+2026-03-16T02:13:48.8204848Z     "content": "echo hello"
+2026-03-16T02:13:48.8205164Z   },
+2026-03-16T02:13:48.8205485Z   "outcome": "VALIDATION_ERROR",
+2026-03-16T02:13:48.8205909Z   "error_code": "INVALID_CONTENT",
+2026-03-16T02:13:48.8206370Z   "phase_failed_at": "VALIDATE_ARGS",
+2026-03-16T02:13:48.8206715Z   "received_at": "2026-03-16T02:13:48.819Z",
+2026-03-16T02:13:48.8207018Z   "completed_at": "2026-03-16T02:13:48.819Z",
+2026-03-16T02:13:48.8207451Z   "reasoning": "Attempting to create a script file with a prohibited extension."
+2026-03-16T02:13:48.8207824Z }
+2026-03-16T02:13:48.8227422Z PASSED   [ 62%]
+2026-03-16T02:13:48.8248393Z tests/test_sdk_e2e.py::TestSDKE2E::test_path_escape [RECEIVE] Incoming request: c91dbaf2-83a7-4334-90bc-e0f9fa371eb4
+2026-03-16T02:13:48.8252250Z [TRACE] {
+2026-03-16T02:13:48.8252849Z   "trace_id": "c91dbaf2-83a7-4334-90bc-e0f9fa371eb4",
+2026-03-16T02:13:48.8253467Z   "proposal_id": "483b2358-5643-4698-9528-e0f04e4a82db",
+2026-03-16T02:13:48.8253964Z   "schema_version": "1.0.0",
+2026-03-16T02:13:48.8254347Z   "action": "WRITE_FILE",
+2026-03-16T02:13:48.8254719Z   "args_summary": {
+2026-03-16T02:13:48.8255071Z     "path": "../escape.txt",
+2026-03-16T02:13:48.8255487Z     "content": "Malicious payload attempt"
+2026-03-16T02:13:48.8255931Z   },
+2026-03-16T02:13:48.8256271Z   "outcome": "VALIDATION_ERROR",
+2026-03-16T02:13:48.8256701Z   "error_code": "INVALID_CONTENT",
+2026-03-16T02:13:48.8257065Z   "phase_failed_at": "VALIDATE_ARGS",
+2026-03-16T02:13:48.8257371Z   "received_at": "2026-03-16T02:13:48.824Z",
+2026-03-16T02:13:48.8257672Z   "completed_at": "2026-03-16T02:13:48.825Z",
+2026-03-16T02:13:48.8257959Z   "reasoning": "Path traversal attempt"
+2026-03-16T02:13:48.8258210Z }
+2026-03-16T02:13:48.8269020Z PASSED               [ 75%]
+2026-03-16T02:13:48.8314355Z tests/test_sdk_e2e.py::TestSDKE2E::test_payload_overflow PASSED          [ 87%]
+2026-03-16T02:13:48.8337201Z tests/test_sdk_e2e.py::TestSDKE2E::test_schema_malformation [RECEIVE] Incoming request: 54c0e261-e714-4a47-ac78-cb01ecfd4b03
+2026-03-16T02:13:48.8339564Z [TRACE] {
+2026-03-16T02:13:48.8340039Z   "trace_id": "54c0e261-e714-4a47-ac78-cb01ecfd4b03",
+2026-03-16T02:13:48.8340545Z   "proposal_id": null,
+2026-03-16T02:13:48.8340924Z   "schema_version": null,
+2026-03-16T02:13:48.8341295Z   "action": null,
+2026-03-16T02:13:48.8341629Z   "args_summary": null,
+2026-03-16T02:13:48.8342049Z   "outcome": "VALIDATION_ERROR",
+2026-03-16T02:13:48.8342660Z   "error_code": "INVALID_CONTENT",
+2026-03-16T02:13:48.8343396Z   "phase_failed_at": "VALIDATE_SCHEMA",
+2026-03-16T02:13:48.8343795Z   "received_at": "2026-03-16T02:13:48.833Z",
+2026-03-16T02:13:48.8344098Z   "completed_at": "2026-03-16T02:13:48.833Z",
+2026-03-16T02:13:48.8344364Z   "reasoning": null
+2026-03-16T02:13:48.8344562Z }
+2026-03-16T02:13:48.9387055Z PASSED       [100%]
+2026-03-16T02:13:48.9387385Z 
+2026-03-16T02:13:48.9387712Z ========================= 8 passed in 90.99s (0:01:30) =========================
